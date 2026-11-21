@@ -61,6 +61,10 @@
   .chipRoll { font-size:.78em; opacity:.6; margin-left:3px; }
   .chipRoll::before { content:"· "; }
   .chip.på .chipRoll { opacity:.8; color:var(--gul); }
+  /* Halvmarkerat: har timmar idag men är inte valt */
+  .chip.delvis { background:repeating-linear-gradient(135deg, var(--gulLjus) 0 6px, #fff 6px 12px); box-shadow:inset 0 0 0 1.5px var(--gul); font-weight:600; }
+  .chipTim { font-size:.75em; font-weight:700; margin-left:5px; color:var(--gul); }
+  .chip.på .chipTim { color:var(--gul); }
 
   .post { border-radius:10px; padding:8px; margin-bottom:6px; background:var(--falt); }
   .post textarea, .post input[type=text], .post select { background:#fff; }
@@ -189,6 +193,19 @@
   .projReg input { padding:7px 8px; font-size:.88rem; }
   .projReg.ny { margin-top:8px; grid-template-columns:80px 1fr; }
   .projReg .taBort { padding:7px 9px; }
+  .projFtg { grid-column:1 / -1; margin-top:-2px; }
+  .projFtg select { width:100%; font-size:.85rem; padding:7px 8px; }
+  .ftgNy { display:grid; grid-template-columns:1fr auto auto; gap:5px; margin-top:5px; }
+  .ftgNy input { padding:7px 8px; font-size:.88rem; }
+  .ftgNy .knapp { padding:7px 10px; font-size:.82rem; }
+  .ftgReg { display:grid; grid-template-columns:1fr auto; gap:2px 5px; align-items:center; margin-bottom:7px; }
+  .ftgReg input { padding:7px 8px; font-size:.88rem; }
+  .ftgReg .taBort { padding:7px 9px; }
+  .ftgReg small { grid-column:1 / -1; font-size:.7rem; color:var(--svag); padding-left:4px; }
+  .ftgReg.ny { margin-top:8px; }
+  .ftgReg.ny .knapp { padding:7px 10px; }
+  .projReg { padding-bottom:6px; border-bottom:1px solid var(--linje); margin-bottom:7px; }
+  .projReg.ny, .projReg.borttagen { border-bottom:none; }
   .projReg .ater { flex:0 0 auto; padding:6px 10px; border-radius:8px; border:none; background:#dcfce7; color:#14532d; font-weight:600; font-size:.82rem; }
   .projReg.borttagen span { font-size:.85rem; color:var(--svag); grid-column:1 / 3; }
 
@@ -252,7 +269,19 @@
   .remsaEtikett { display:flex; flex-direction:column; gap:4px; }
   .remsaEtikett span:first-child { height:50px; }
   .remsaEtikett b { height:40px; line-height:40px; font-size:.78rem; color:var(--svart); padding-right:1px; }
-  .dagKol .sum { white-space:nowrap; }
+  .remsaEtikett b { display:flex; flex-direction:column; justify-content:center; line-height:1.05; max-width:54px; overflow:hidden; white-space:normal; word-break:break-word; font-size:.7rem; }
+  .remsaEtikett b small { font-size:.62rem; color:var(--svag); font-weight:600; }
+  /* Dagen har timmar – rutan guldmarkeras som andra valda saker */
+  .dagKol.har input.dagTim { background:var(--gul); color:var(--svart); box-shadow:none; }
+  .dagKol.vald.har input.dagTim { box-shadow:inset 0 0 0 2px var(--svart); }
+  .dagKol.redigerar input.dagTim { background:#fff; box-shadow:0 0 0 3px rgba(171,138,69,.45), inset 0 0 0 2px var(--svart); }
+  /* Fördelningen under rutan */
+  .dagKol .ford { display:flex; flex-direction:column; gap:3px; }
+  .dagKol .fd { border:none; background:var(--falt); border-radius:7px; padding:3px 1px 2px; display:flex; flex-direction:column; align-items:center; line-height:1.05; box-shadow:inset 0 0 0 1px var(--linje); color:var(--text); }
+  .dagKol .fd b { font-size:.8rem; }
+  .dagKol .fd small { font-size:.56rem; color:var(--svag); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 2px; }
+  .dagKol .fd.vald { background:var(--gulLjus); box-shadow:inset 0 0 0 1.5px var(--gul); }
+  .dagKol .fd.vald small { color:var(--svart); font-weight:600; }
 
   /* ---------- Dagboksnotering ---------- */
   #notRuta { margin-top:6px; }
@@ -437,16 +466,21 @@
     </div>
 
     <div class="kort adminBara">
-      <h2>Företag</h2>
-      <input type="text" id="iForetag" placeholder="Schaktmiljö AB" aria-label="Företag">
+      <h2>Företag <small>välj sedan företag för varje projekt nedan</small></h2>
+      <div id="ftgLista"></div>
+      <div class="ftgReg ny">
+        <input type="text" id="nyFtg" placeholder="Nytt företag, t.ex. Puttes Invest AB" aria-label="Nytt företag">
+        <button class="knapp ljus" id="nyttFtg" type="button">+ Lägg till</button>
+      </div>
     </div>
 
     <div class="kort adminBara">
-      <h2>Projekt <small>alla kan rapportera tid på projekten i listan</small></h2>
+      <h2>Projekt <small>nummer, namn och företag – alla kan rapportera tid på projekten i listan</small></h2>
       <div id="projLista"></div>
       <div class="projReg ny">
         <input type="text" id="nyProjNr" placeholder="Nr, t.ex. 4012" aria-label="Projektnummer">
         <input type="text" id="nyProjNamn" placeholder="Namn, t.ex. Solgläntan" aria-label="Projektnamn">
+        <div id="nyProjFtgBox" style="grid-column:1 / -1"></div>
       </div>
       <button class="knapp ljus" id="nyttProj" style="width:100%;margin-top:4px">+ Lägg till projekt</button>
       <button class="lankKnapp dold" id="visaBorttagna" type="button"></button>
@@ -602,13 +636,14 @@ function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;"
 // =====================================================
 //  DATA
 // =====================================================
-// foretag/standard          = { foretag, projekten:[{id, nr, namn, poster:[{id,kod,text}], borttagen}] }
+// foretag/standard          = { foretagen:[namn], projekten:[{id, nr, namn, foretag, poster:[{id,kod,text}], borttagen}] }
+//   (äldre versioner hade ett gemensamt "foretag" – det flyttas in i varje projekt)
 // anvandare/{uid}           = { namn, epost, roll: "admin"|"anstalld", aktiv }
 // tid/{uid}/veckor/{vecka}  = { vecka:"2026-V47", status:"oppen"|"inskickad", inskickadTid, dagar:{ "2026-11-18": {datum, rader:[{id,t,avser,p}]} } }
 //   p = projektets id (rader utan p hör till det första projektet, "standard")
 const STANDARD = {
-  foretag: "Schaktmiljö AB",
-  projekten: [{ id: "standard", nr: "3847", namn: "Månstenen",
+  foretag: "Schaktmiljö AB", foretagen: ["Schaktmiljö AB"],
+  projekten: [{ id: "standard", nr: "3847", namn: "Månstenen", foretag: "Schaktmiljö AB",
     poster: [["Skede 5"], ["Skede 6"], ["ÄTA 036", "kabel under byggväg för belysning"], ["ÄTA 048", "fyll mot garageuppfart"], ["ÄTA 049"]]
       .map(([kod, text]) => ({ id: nyId(), kod, text: text || "" })) }]
 };
@@ -632,8 +667,10 @@ function migreraInst(i) {
   if (!Array.isArray(i.projekten) || !i.projekten.length)
     i.projekten = [{ id: "standard", nr: i.nr || "", namn: i.projekt || "", poster: Array.isArray(i.poster) ? i.poster : [] }];
   delete i.nr; delete i.projekt; delete i.poster;
-  i.projekten.forEach(p => { if (!Array.isArray(p.poster)) p.poster = []; });
+  i.projekten.forEach(p => { if (!Array.isArray(p.poster)) p.poster = []; if (p.foretag === undefined) p.foretag = i.foretag || ""; });
   if (i.foretag === undefined) i.foretag = "";
+  if (!Array.isArray(i.foretagen)) i.foretagen = [];
+  i.foretagen = [...new Set(i.foretagen.concat([i.foretag], i.projekten.map(p => p.foretag)).map(x => (x || "").trim()).filter(Boolean))];
   return i;
 }
 const forstaProjekt = () => inst.projekten[0].id;
@@ -642,6 +679,44 @@ const synligaProjekt = () => inst.projekten.filter(p => !p.borttagen);
 const projNamn = p => p ? ([p.nr, p.namn].map(x => (x || "").trim()).filter(Boolean).join(" ") || "Namnlöst projekt") : "Okänt projekt";
 const projKort = p => p ? ((p.nr || "").trim() || (p.namn || "").trim() || "?") : "?";
 const radProj = r => (r && r.p) || forstaProjekt();
+// Företagen som finns bland projekten (för förslagslistan och rapportens rubrik)
+const unika = a => [...new Set(a.map(x => (x || "").trim()).filter(Boolean))];
+const foretagLista = () => unika((inst.foretagen || []).concat(inst.projekten.filter(p => !p.borttagen).map(p => p.foretag)));
+function laggTillForetag(namn) {
+  namn = (namn || "").trim(); if (!namn) return "";
+  if (!inst.foretagen) inst.foretagen = [];
+  const finns = foretagLista().find(f => f.toLowerCase() === namn.toLowerCase());
+  if (finns) { if (!inst.foretagen.includes(finns)) inst.foretagen.push(finns); return finns; }
+  inst.foretagen.push(namn); return namn;
+}
+// Rullista med företagen + "Nytt företag…" som öppnar ett skrivfält direkt under
+function foretagVal(nu, satt, etikett) {
+  const box = document.createElement("div"); box.className = "projFtg";
+  const sel = document.createElement("select"); sel.setAttribute("aria-label", etikett);
+  const fyll = () => {
+    const l = foretagLista(); sel.innerHTML = "";
+    if (!nu) sel.add(new Option("Välj företag…", ""));
+    l.forEach(f => sel.add(new Option(f, f)));
+    sel.add(new Option("+ Nytt företag…", "__ny"));
+    sel.value = nu || "";
+  };
+  fyll();
+  const ny = document.createElement("div"); ny.className = "ftgNy dold";
+  const inp = document.createElement("input"); inp.type = "text"; inp.placeholder = "Nytt företags namn"; inp.setAttribute("aria-label", "Nytt företag");
+  const ok = document.createElement("button"); ok.type = "button"; ok.className = "knapp"; ok.textContent = "Lägg till";
+  const avbryt = document.createElement("button"); avbryt.type = "button"; avbryt.className = "knapp ljus"; avbryt.textContent = "Avbryt";
+  ny.append(inp, ok, avbryt);
+  const klar = () => { const n = laggTillForetag(inp.value); if (!n) { inp.focus(); return; } nu = n; satt(n); sparaInst(); ny.classList.add("dold"); inp.value = ""; fyll(); toast(n + " är tillagt i företagslistan"); };
+  ok.onclick = klar;
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); klar(); } });
+  avbryt.onclick = () => { ny.classList.add("dold"); inp.value = ""; sel.value = nu || ""; };
+  sel.onchange = () => {
+    if (sel.value === "__ny") { ny.classList.remove("dold"); inp.focus(); return; }
+    nu = sel.value; satt(nu); sparaInst();
+  };
+  box.append(sel, ny);
+  return box;
+}
 function aktivt() {
   if (!projekt(aktivtProjekt) || projekt(aktivtProjekt).borttagen) aktivtProjekt = (synligaProjekt()[0] || inst.projekten[0]).id;
   return projekt(aktivtProjekt);
@@ -974,6 +1049,11 @@ function ritaDag() {
   $("dagInfo").innerHTML = esc(dagRubrik(aktuell));
   const val = dagVal(aktuell), akt = projekt(val.p);
   aktivtProjekt = akt.id;
+  // Timmar som redan finns på dagen – används för att halvmarkera (randigt) val som är med men inte valda
+  const dagRader = (dagFor(aktuell) || { rader: [] }).rader.filter(r => tolkaTim(r.t) > 0);
+  const timProj = id => dagRader.filter(r => radProj(r) === id).reduce((a, r) => a + tolkaTim(r.t), 0);
+  const timPost = et => dagRader.filter(r => radProj(r) === akt.id && (r.avser || "") === et).reduce((a, r) => a + tolkaTim(r.t), 0);
+  const timText = (c, t) => { if (t > 0) { const s = document.createElement("span"); s.className = "chipTim"; s.textContent = fmt(t) + " h"; c.append(s); } };
   const valj = (p, a) => {
     const d = dag(); d.p = p; d.a = a; sattAktivt(p);
     if (harRader(d)) sparaVecka(vid);
@@ -983,8 +1063,10 @@ function ritaDag() {
   const pv = $("projektVal"); pv.innerHTML = ""; pv.classList.toggle("redigera", redigeraProjChips);
   $("projektRad").classList.toggle("dold", synligaProjekt().length < 2 && !arAdmin);
   synligaProjekt().forEach(p => {
-    const c = document.createElement("button"); c.className = "chip" + (p.id === akt.id ? " på" : "");
+    const c = document.createElement("button"); const tp = timProj(p.id);
+    c.className = "chip" + (p.id === akt.id ? " på" : tp > 0 ? " delvis" : "");
     c.textContent = projNamn(p); c.disabled = las && !redigeraProjChips;
+    if (!redigeraProjChips) timText(c, tp);
     if (redigeraProjChips) {
       const x = document.createElement("span"); x.className = "x"; x.textContent = "×"; c.append(x);
       c.onclick = () => {
@@ -1001,8 +1083,10 @@ function ritaDag() {
   const lista = akt.poster.filter(p => (p.kod || "").trim());
   lista.forEach(p => {
     const et = postEtikett(p);
-    const c = document.createElement("button"); c.className = "chip" + (et === val.a ? " på" : "");
+    const c = document.createElement("button"); const tt = timPost(et);
+    c.className = "chip" + (et === val.a ? " på" : tt > 0 ? " delvis" : "");
     c.textContent = p.kod.trim(); c.title = et; c.disabled = las && !redigeraPostChips;
+    if (!redigeraPostChips) timText(c, tt);
     if (redigeraPostChips) {
       const x = document.createElement("span"); x.className = "x"; x.textContent = "×"; c.append(x);
       c.onclick = () => {
@@ -1022,7 +1106,7 @@ function ritaDag() {
   if (!lista.length) av.innerHTML = '<p class="tips" style="margin:0">' + (arAdmin ? "Listan är tom – tryck + för att lägga till skeden och ÄTA." : "Listan är tom – be administratören lägga till skeden och ÄTA.") + "</p>";
   ritaVerktyg("postVerktyg", redigeraPostChips, () => { redigeraPostChips = !redigeraPostChips; ritaDag(); }, () => { $("nyPostRuta").classList.toggle("dold"); if (!$("nyPostRuta").classList.contains("dold")) $("dNyKod").focus(); });
   $("valTips").textContent = las ? "Veckan är inskickad och låst." :
-    "Skriv timmarna för " + (val.a ? val.a.split(" – ")[0] : "valet") + " i dagens ruta i veckan ovanför. Byt val för att dela upp dagen.";
+    "Rutorna i veckan visar dagens total. Tryck på dagens ruta och skriv timmarna för " + (val.a ? val.a.split(" – ")[0] : "valet") + ". Byt val för att dela upp dagen.";
   ritaNotering(las);
   ritaFordelning(las);
   ritaVecka();
@@ -1099,7 +1183,7 @@ function ritaVecka() {
   $("datum").value = aktuell;
   const box = $("dagRemsa");
   const fokus = document.activeElement && document.activeElement.classList.contains("dagTim") ? document.activeElement.dataset.iso : null;
-  box.innerHTML = '<div class="remsaEtikett"><span></span><b>Tim:</b><span></span></div>';
+  box.innerHTML = '<div class="remsaEtikett"><span></span><b id="remsaVad">Totalt</b><i></i></div>';
   for (let i = 0; i < 7; i++) {
     const iso = plusDagar(m, i);
     const kol = document.createElement("div"); kol.className = "dagKol" + (iso === aktuell ? " vald" : "");
@@ -1111,20 +1195,48 @@ function ritaVecka() {
     const inp = document.createElement("input");
     inp.type = "text"; inp.inputMode = "decimal"; inp.className = "dagTim"; inp.dataset.iso = iso; inp.disabled = las;
     inp.placeholder = "–"; inp.setAttribute("aria-label", "Timmar " + dagRubrik(iso));
-    const sum = document.createElement("div"); sum.className = "sum";
+    const sum = document.createElement("div"); sum.className = "ford";
     kol.append(b, inp, sum); box.append(kol);
     fyllDagKol(iso, inp, sum);
-    inp.addEventListener("focus", () => { if (aktuell !== iso) { aktuell = iso; ritaDagUtanRemsa(); markeraVald(); fyllDagKol(iso, inp, sum); } });
-    inp.addEventListener("input", () => { skrivTimmar(iso, inp.value); fyllDagKol(iso, null, sum); ritaFordelning(false); ritaSummor(); });
+    // I vila visar rutan dagens total. Trycker man på den skriver man timmarna för valt skede/ÄTA.
+    inp.addEventListener("focus", () => {
+      if (aktuell !== iso) { aktuell = iso; ritaDagUtanRemsa(); markeraVald(); }
+      redigeraKol(iso, inp, sum, true);
+    });
+    inp.addEventListener("blur", () => { setTimeout(() => { if (document.activeElement !== inp) redigeraKol(iso, inp, sum, false); }, 0); });
+    inp.addEventListener("input", () => { skrivTimmar(iso, inp.value); fyllDagKol(iso, null, sum); ritaDagUtanRemsa(); ritaSummor(); });
   }
-  if (fokus) { const f = box.querySelector(`[data-iso="${fokus}"]`); if (f) f.focus(); }
+  if (fokus) { const f = box.querySelector(`[data-iso="${fokus}"]`); if (f) { f.focus(); const k = f.parentNode; redigeraKol(fokus, f, k.querySelector(".ford"), true); } }
   ritaSummor();
 }
-// Rutan visar timmarna för dagens val; under står dagens summa om dagen är uppdelad
-function fyllDagKol(iso, inp, sum) {
-  const d = dagFor(iso), v = dagVal(iso), r = valRad(d, v), s = dagSumma(d), egna = r ? tolkaTim(r.t) : 0;
-  if (inp) inp.value = r ? r.t : "";
-  sum.textContent = s && s !== egna ? "Tot:" + fmt(s) : "";
+// Rutan visar dagens totala timmar (guldmarkerad när det finns timmar).
+// Under rutan spaltas fördelningen ut, en rad per skede/ÄTA. Tryck på en rad för att välja den.
+function fyllDagKol(iso, inp, ford) {
+  const d = dagFor(iso), s = dagSumma(d), kol = ford.parentNode;
+  const redigerar = kol && kol.classList.contains("redigerar");
+  if (inp && !redigerar) inp.value = s ? fmt(s) : "";
+  if (kol) kol.classList.toggle("har", s > 0);
+  const v = dagVal(iso);
+  const rader = d ? d.rader.filter(r => tolkaTim(r.t) > 0) : [];
+  ford.innerHTML = "";
+  rader.forEach(r => ford.append(fordRad(iso, d, r, v)));
+}
+function fordRad(iso, d, r, v) {
+  const e = document.createElement("button"); e.type = "button";
+  const vald = iso === aktuell && radProj(r) === v.p && (r.avser || "") === v.a;
+  e.className = "fd" + (vald ? " vald" : "");
+  e.innerHTML = "<b>" + fmt(tolkaTim(r.t)) + "</b><small>" + esc((r.avser || "–").split(" – ")[0]) + "</small>";
+  e.title = fmt(tolkaTim(r.t)) + " h " + (r.avser || "");
+  e.onclick = () => { aktuell = iso; d.p = radProj(r); d.a = r.avser || ""; sattAktivt(d.p); ritaDag(); };
+  return e;
+}
+// Växla rutan mellan total (vila) och timmar för valt skede/ÄTA (när man skriver)
+function redigeraKol(iso, inp, ford, pa) {
+  const kol = inp.parentNode; kol.classList.toggle("redigerar", pa);
+  const v = dagVal(iso), r = valRad(dagFor(iso), v), kod = (v.a || "").split(" – ")[0];
+  const et = $("remsaVad");
+  if (pa) { inp.value = r ? r.t : ""; inp.placeholder = "0"; if (et) et.innerHTML = "<small>Tim</small>" + esc(kod || "valet"); try { inp.select(); } catch (e) {} }
+  else { inp.placeholder = "–"; if (et) et.textContent = "Totalt"; fyllDagKol(iso, inp, ford); }
 }
 function markeraVald() {
   document.querySelectorAll("#dagRemsa .dagKol").forEach(k => {
@@ -1163,7 +1275,7 @@ function ritaSummor() {
 function dagNyttProj() {
   const nr = $("dNyProjNr").value.trim(), namn = $("dNyProjNamn").value.trim();
   if (!nr && !namn) { $("dNyProjNr").focus(); return; }
-  const p = { id: "p" + nyId(), nr, namn, poster: [] };
+  const p = { id: "p" + nyId(), nr, namn, foretag: (aktivt() || {}).foretag || "", poster: [] };
   inst.projekten.push(p); $("dNyProjNr").value = ""; $("dNyProjNamn").value = ""; $("nyProjRuta").classList.add("dold");
   const d = dag(); d.p = p.id; d.a = ""; sattAktivt(p.id);
   sparaInst(); ritaDag(); toast("Projekt " + projNamn(p) + " är tillagt – lägg till dess skeden och ÄTA med + Ny");
@@ -1258,6 +1370,11 @@ function rapportProjNamn(set) {
   if (set.size === 0 && inst.projekten.length === 1) return projNamn(inst.projekten[0]);
   return "Alla projekt";
 }
+function rapportForetag(set) {
+  if (rProj !== "alla") return (projekt(rProj) || {}).foretag || "";
+  const ids = set.size ? [...set] : synligaProjekt().map(p => p.id);
+  return unika(ids.map(id => (projekt(id) || {}).foretag)).join(", ");
+}
 function personRapport(karta, fran, till, flera) {
   const dagar = allaDagar(karta);
   const veckorL = [];
@@ -1324,7 +1441,7 @@ function rapportEn(uid, karta, fran, till) {
   const set = projIPeriod([karta], fran, till), flera = set.size > 1;
   const P = personRapport(karta, fran, till, flera), namn = personNamn(uid), proj = rapportProjNamn(set);
   const nr = P.veckor.map(w => w.vecka);
-  const R = rubrikDelar(veckoText(nr), [inst.foretag, namn, P.veckor.length ? datumIntervall(P.veckor[0].fran, P.veckor[P.veckor.length - 1].till) : ""], P.veckor.length ? P.veckor[P.veckor.length - 1].fran.slice(0, 4) : "", proj);
+  const R = rubrikDelar(veckoText(nr), [rapportForetag(set), namn, P.veckor.length ? datumIntervall(P.veckor[0].fran, P.veckor[P.veckor.length - 1].till) : ""], P.veckor.length ? P.veckor[P.veckor.length - 1].fran.slice(0, 4) : "", proj);
   R.filnamn = filnamn(namn, nr, proj);
   const medNot = harNoteringar(P.veckor);
   R.delar = [];
@@ -1376,7 +1493,7 @@ function rapportAlla(fran, till) {
   const personer = sorteradeAnv().map(a => ({ a, P: personRapport((alla || {})[a.id] || {}, fran, till, flera), karta: (alla || {})[a.id] || {} }))
     .filter(x => x.a.aktiv !== false || x.P.total);
   const total = personer.reduce((s, x) => s + x.P.total, 0);
-  const R = rubrikDelar(veckoText(nr), [inst.foretag, "Alla", datumIntervall(fran, till)], till.slice(0, 4), proj);
+  const R = rubrikDelar(veckoText(nr), [rapportForetag(set), "Alla", datumIntervall(fran, till)], till.slice(0, 4), proj);
   R.titel = R.titel.replace("Tidrapport", "Samlad tidrapport"); R.sidfot = R.sidfot.replace("Tidrapport", "Samlad tidrapport");
   R.filnamn = filnamn("Alla", nr, proj);
   R.personer = personer; R.vids = vids;
@@ -1690,11 +1807,48 @@ $("nerPdf").onclick = () => {
 // =====================================================
 //  INSTÄLLNINGAR
 // =====================================================
-$("iForetag").oninput = e => { inst.foretag = e.target.value; sparaInst(); };
+let nyProjFtg = null;
+// Företagslistan i inställningarna: byta namn (följer med i projekten), ta bort, lägga till
+function ritaForetagen() {
+  const box = $("ftgLista"); if (!box) return; box.innerHTML = "";
+  const l = foretagLista();
+  if (!l.length) box.innerHTML = '<p class="tips" style="margin:0 0 6px">Inga företag än – lägg till nedan.</p>';
+  l.forEach(f => {
+    const anv = inst.projekten.filter(p => !p.borttagen && (p.foretag || "").trim() === f).length;
+    const rad = document.createElement("div"); rad.className = "ftgReg";
+    const inp = document.createElement("input"); inp.type = "text"; inp.value = f; inp.setAttribute("aria-label", "Företagets namn");
+    const info = document.createElement("small"); info.textContent = anv ? anv + " projekt" : "inga projekt";
+    let gammal = f;
+    inp.onchange = () => {
+      const ny = inp.value.trim(); if (!ny || ny === gammal) { inp.value = gammal; return; }
+      inst.foretagen = (inst.foretagen || []).map(x => x === gammal ? ny : x);
+      if (!inst.foretagen.includes(ny)) inst.foretagen.push(ny);
+      inst.projekten.forEach(p => { if ((p.foretag || "").trim() === gammal) p.foretag = ny; });
+      gammal = ny; sparaInst(); ritaInst();
+    };
+    const bort = document.createElement("button"); bort.className = "taBort"; bort.textContent = "Ta bort";
+    bort.onclick = () => {
+      if (anv) { toast("Byt först företag på de " + anv + " projekt som använder " + f); return; }
+      inst.foretagen = (inst.foretagen || []).filter(x => x !== f);
+      if (nyProjFtg === f) nyProjFtg = null;
+      sparaInst(); ritaInst(); toast(f + " är borttaget ur företagslistan");
+    };
+    rad.append(inp, bort, info); box.append(rad);
+  });
+}
+function nyttForetag() {
+  const n = laggTillForetag($("nyFtg").value); if (!n) { $("nyFtg").focus(); return; }
+  $("nyFtg").value = ""; sparaInst(); ritaInst(); toast(n + " är tillagt");
+}
+$("nyttFtg").onclick = nyttForetag;
+$("nyFtg").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); nyttForetag(); } });
 let redigeraProj = null;   // vilket projekts avser-lista som visas i inställningarna
 let visaBorttagna = false;
 function ritaInst() {
-  if (document.activeElement !== $("iForetag")) $("iForetag").value = inst.foretag || "";
+  // Nytt projekt: företagsval (förvalt första företaget)
+  if (nyProjFtg === null) nyProjFtg = foretagLista()[0] || "";
+  $("nyProjFtgBox").innerHTML = ""; $("nyProjFtgBox").append(foretagVal(nyProjFtg, v => { nyProjFtg = v; setTimeout(ritaInst, 0); }, "Företag för nytt projekt"));
+  ritaForetagen();
   // ---- Projektlistan ----
   const pl = $("projLista"); pl.innerHTML = "";
   synligaProjekt().forEach(p => {
@@ -1710,7 +1864,8 @@ function ritaInst() {
       p.borttagen = true; if (redigeraProj === p.id) redigeraProj = null;
       sparaInst(); ritaInst(); ritaRubrik(); toast(projNamn(p) + " är borttaget – timmarna finns kvar");
     };
-    rad.append(nr, namn, bort); pl.append(rad);
+    const ftg = foretagVal(p.foretag || "", v => { p.foretag = v; sparaInst(); setTimeout(ritaInst, 0); }, "Företag för " + projNamn(p));
+    rad.append(nr, namn, bort, ftg); pl.append(rad);
   });
   const bt = inst.projekten.filter(p => p.borttagen);
   $("visaBorttagna").classList.toggle("dold", !bt.length);
@@ -1772,7 +1927,7 @@ function laggTillPost() {
 function laggTillProjekt() {
   const nr = $("nyProjNr").value.trim(), namn = $("nyProjNamn").value.trim();
   if (!nr && !namn) { $("nyProjNr").focus(); return; }
-  const p = { id: "p" + nyId(), nr, namn, poster: [] };
+  const p = { id: "p" + nyId(), nr, namn, foretag: nyProjFtg || "", poster: [] };
   inst.projekten.push(p); redigeraProj = p.id;
   $("nyProjNr").value = ""; $("nyProjNamn").value = "";
   sparaInst(); ritaInst(); toast("Projekt " + projNamn(p) + " är tillagt – lägg till dess avser-lista nedan");
