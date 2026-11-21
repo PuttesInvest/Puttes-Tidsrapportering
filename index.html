@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tidrapportering</title>
+<meta name="theme-color" content="#1b2526">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Tidrapport">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  /* ---------- Design: Puttes Invest AB – grafit och guld ---------- */
+  :root { --bg:#f4f2ed; --kort:#fff; --text:#1b2526; --svag:#69706f; --linje:#e5e1d8; --falt:#f6f4ef;
+          --gul:#ab8a45; --gulLjus:#f2eadb; --svart:#1b2526; --rod:#dc2626; --gron:#16a34a; --bas:16px; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { font-size:var(--bas); }
+  body { margin:0; background:var(--bg); color:var(--text); line-height:1.35;
+         font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+
+  header { position:sticky; top:0; z-index:5; background:var(--svart); color:#fff; padding:8px 12px; }
+  .toppRad { display:flex; justify-content:space-between; align-items:center; gap:8px; max-width:680px; margin:0 auto; }
+  h1 { font-size:1rem; margin:0; font-weight:700; letter-spacing:-.01em; display:flex; align-items:center; gap:8px; }
+  h1::before { content:""; width:20px; height:23px; background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjQwMCAyNjAgMzYwIDQxMCI+CjxwYXRoIGZpbGw9IiNGNEVGRTQiIGQ9Ik00NDggMjc4IEg2MjAgQTExNiAxMTYgMCAwIDEgNjI4IDUwOS43IEw1OTYgNDgxIFY0NTAgSDYyMCBBNTYgNTYgMCAwIDAgNjIwIDMzOCBINTE0IFY0MjIgTDQ0OCA0ODEgWiIvPgo8cGF0aCBmaWxsPSIjRjRFRkU0IiBkPSJNNDI2IDUyOCBMNDkyIDQ2OSBWNjUwIEg0MjYgWiIvPgo8cGF0aCBmaWxsPSIjQUI4QTQ1IiBkPSJNNTEwIDQ1MSBMNTc3IDM5MyBWNjUwIEg1MTAgWiIvPgo8cGF0aCBmaWxsPSIjRjRFRkU0IiBkPSJNNTk1IDUwOCBMNjQxIDU0OSBWNjUwIEg1OTUgWiIvPgo8L3N2Zz4K") center/contain no-repeat; display:inline-block; }
+  #sparStatus { font-size:.72rem; color:#a9b2b1; }
+  nav { display:flex; gap:2px; margin:8px auto 0; max-width:680px; background:#263233; border-radius:10px; padding:3px; }
+  nav button { flex:1; background:transparent; color:#a9b2b1; border:none; border-radius:8px; padding:7px 4px; font-size:.85rem; font-weight:600; cursor:pointer; }
+  nav button.vald { background:var(--gul); color:var(--svart); }
+
+  main { max-width:680px; margin:0 auto; padding:10px 10px 90px; }
+  .kort { background:var(--kort); border-radius:12px; padding:12px; margin-bottom:8px; box-shadow:0 1px 2px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.03); }
+  .kort h2 { font-size:.78rem; margin:0 0 8px; text-transform:uppercase; letter-spacing:.06em; color:var(--svart); font-weight:700; }
+  .kort h2 small { display:block; text-transform:none; letter-spacing:0; font-weight:400; color:var(--svag); font-size:.78rem; margin-top:1px; }
+  label { display:block; font-size:.75rem; color:var(--svag); margin:8px 0 3px; font-weight:500; }
+  input[type=text], input[type=number], input[type=date], textarea, select {
+    width:100%; font:inherit; font-size:.95rem; padding:8px 10px; border:1px solid transparent; border-radius:8px; background:var(--falt); color:var(--text); }
+  textarea { resize:vertical; min-height:2.6em; line-height:1.35; }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--svart); background:#fff; box-shadow:0 0 0 3px rgba(171,138,69,.35); }
+  button { font:inherit; cursor:pointer; }
+  .knapp { background:var(--gul); color:var(--svart); border:none; border-radius:8px; padding:9px 12px; font-weight:600; font-size:.88rem; }
+  .knapp:active { transform:scale(.98); }
+  .knapp.ljus { background:var(--falt); color:var(--svart); }
+  .knapp.grå { background:#fff; color:var(--svart); box-shadow:inset 0 0 0 1px var(--linje); }
+  .knapp.ok { background:var(--gron); color:#fff; }
+  .knappar { display:flex; flex-wrap:wrap; gap:6px; }
+  .knappar .knapp { flex:1 1 auto; }
+
+  .datumRad { display:flex; gap:6px; align-items:center; }
+  .datumRad input { flex:1; text-align:center; font-weight:600; }
+  .pil { width:40px; height:38px; font-size:1.15rem; border-radius:8px; border:none; background:var(--falt); color:var(--svart); }
+  #dagInfo { text-align:center; font-weight:700; font-size:1rem; margin:6px 0 0; }
+  #dagInfo small { display:inline; font-weight:500; color:var(--svag); font-size:.8rem; margin-left:6px; }
+
+  .chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { border:none; background:var(--falt); border-radius:999px; padding:6px 11px; font-size:.85rem; color:var(--text); box-shadow:inset 0 0 0 1px var(--linje); }
+  .chip.på { background:var(--svart); color:#fff; box-shadow:none; }
+  .chip.på::before { content:"✓ "; color:var(--gul); font-weight:700; }
+  .chipRoll { font-size:.78em; opacity:.6; margin-left:3px; }
+  .chipRoll::before { content:"· "; }
+  .chip.på .chipRoll { opacity:.8; color:var(--gul); }
+
+  .post { border-radius:10px; padding:8px; margin-bottom:6px; background:var(--falt); }
+  .post textarea, .post input[type=text], .post select { background:#fff; }
+  .postTopp { display:flex; gap:6px; align-items:flex-start; }
+  .postTopp textarea { flex:1; }
+  .bort { flex:0 0 34px; height:34px; border-radius:8px; border:none; background:#fff; font-size:1.05rem; color:var(--rod); box-shadow:inset 0 0 0 1px var(--linje); }
+  .post .chips { margin-top:6px; }
+  .post .chip { background:#fff; }
+  .post .chip.på { background:var(--svart); }
+  .rad3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+  .rad2t { display:grid; grid-template-columns:1.4fr 1fr; gap:6px; }
+  .ataRad { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px; align-items:end; }
+  .kryss { display:flex; align-items:center; gap:6px; font-size:.85rem; color:var(--text); margin:6px 0 2px; }
+  .kryss input { width:18px; height:18px; accent-color:var(--svart); }
+  .summa { margin-top:4px; font-weight:700; font-size:.85rem; color:var(--svart); }
+  .summa:not(:empty) { display:inline-block; background:var(--gulLjus); padding:2px 8px; border-radius:6px; }
+
+  .resRad { display:flex; gap:6px; align-items:center; margin-bottom:5px; }
+  .resRad .chip { flex:0 0 auto; }
+  .resRad input { flex:1; padding:6px 9px; font-size:.82rem; }
+  .resRad.andra { flex-wrap:wrap; padding-bottom:5px; border-bottom:1px solid var(--linje); margin-bottom:6px; }
+  .resRad select { flex:1 1 120px; min-width:120px; padding:6px 8px; font-size:.85rem; }
+  .taBort { flex:0 0 auto; padding:6px 10px; border-radius:8px; border:none; background:#fee2e2; color:var(--rod); font-weight:600; font-size:.82rem; }
+  .rollChip { display:inline-flex; align-items:center; gap:4px; background:#fff; border-radius:999px; padding:3px 3px 3px 10px; font-size:.85rem; box-shadow:inset 0 0 0 1px var(--linje); }
+  .rollChip button { border:none; background:#fee2e2; color:var(--rod); border-radius:999px; min-width:24px; height:24px; font-weight:700; padding:0 7px; font-size:.8rem; }
+  .nyRollRad { display:flex; gap:6px; margin-top:8px; }
+  .nyRollRad input { flex:1; }
+  .ataReg { display:grid; grid-template-columns:64px 1fr 34px; gap:5px; align-items:center; margin-bottom:5px; }
+  .ataReg input { padding:7px 8px; font-size:.88rem; }
+  .ataReg .bort { height:34px; flex:none; width:34px; }
+  .ataReg.ny { margin-top:8px; grid-template-columns:64px 1fr; }
+  .ataVal { width:100%; }
+
+  pre { white-space:pre-wrap; word-wrap:break-word; background:var(--falt); border-radius:8px; padding:10px;
+        font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.72rem; line-height:1.45; max-height:55vh; overflow:auto; margin:0; }
+  .tips { font-size:.75rem; color:var(--svag); margin:5px 0 0; }
+  .banner { background:var(--gulLjus); border-left:4px solid var(--gul); border-radius:8px; padding:8px 10px; font-size:.82rem; margin-bottom:8px; display:none; }
+  .person { border-radius:10px; padding:8px; margin-bottom:6px; background:var(--falt); }
+  .person input[type=text], .person select { background:#fff; }
+  .rad2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .forh { font-size:.75rem; color:var(--svag); margin-top:5px; }
+  .flytt { display:flex; gap:5px; margin-top:6px; }
+  .flytt button { flex:1; padding:6px; border-radius:7px; border:none; background:#fff; font-size:.8rem; box-shadow:inset 0 0 0 1px var(--linje); }
+  .flytt .bort2 { color:var(--rod); }
+  .dold { display:none !important; }
+  #toast { position:fixed; left:50%; bottom:20px; transform:translateX(-50%) translateY(10px); background:var(--svart); color:#fff; padding:9px 14px;
+           border-radius:10px; font-weight:600; font-size:.85rem; opacity:0; transition:all .2s; pointer-events:none; z-index:20; max-width:90vw; text-align:center;
+           box-shadow:0 6px 20px rgba(0,0,0,.25); border-left:3px solid var(--gul); }
+  #toast.syns { opacity:1; transform:translateX(-50%) translateY(0); }
+  .flikar { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px; }
+  .flikar .chip.på::before { content:""; }
+  .flikar .chip.på { background:var(--gul); color:var(--svart); }
+
+  .knapp.liten { padding:6px 10px; font-size:.8rem; }
+  .klarRad { display:flex; justify-content:flex-end; margin:5px 0 2px; }
+  .klarRad button { background:var(--svart); color:var(--gul); border:none; border-radius:999px; padding:6px 14px; font-weight:700; font-size:.85rem; }
+
+  /* ---------- Inloggning ---------- */
+  #inloggning { display:none; min-height:100vh; min-height:100dvh; align-items:center; justify-content:center; padding:20px; background:var(--svart); }
+  body.utloggad #inloggning { display:flex; }
+  body.utloggad header, body.utloggad main { display:none; }
+  .loggaRuta { width:100%; max-width:360px; background:#fff; border-radius:16px; padding:22px; box-shadow:0 10px 40px rgba(0,0,0,.4); }
+  .logga { font-weight:800; font-size:1.3rem; display:flex; align-items:center; gap:10px; }
+  .logga span { width:16px; height:16px; border-radius:4px; background:var(--gul); display:inline-block; }
+  .loggaText { color:var(--svag); font-size:.85rem; margin:6px 0 4px; }
+  input[type=email], input[type=password] { width:100%; font:inherit; font-size:1rem; padding:10px; border:1px solid transparent; border-radius:8px; background:var(--falt); color:var(--text); }
+  input[type=email]:focus, input[type=password]:focus { outline:none; border-color:var(--svart); background:#fff; box-shadow:0 0 0 3px rgba(171,138,69,.35); }
+  .lankKnapp { background:none; border:none; color:var(--svag); text-decoration:underline; font-size:.85rem; margin-top:10px; padding:4px 0; }
+  .liFel { color:var(--rod); font-size:.85rem; min-height:1.2em; margin:8px 0 0; }
+  .liFel.ok { color:var(--gron); }
+  body.anstalld .adminBara { display:none !important; }
+  .anvRad { display:grid; grid-template-columns:1fr auto; gap:4px 8px; padding:8px 0; border-bottom:1px solid var(--linje); align-items:center; }
+  .anvRad:last-child { border-bottom:none; }
+  .anvNamn { font-weight:600; font-size:.9rem; }
+  .anvEpost { font-size:.78rem; color:var(--svag); word-break:break-all; }
+  .bricka { font-size:.7rem; font-weight:700; padding:2px 7px; border-radius:999px; background:var(--falt); }
+  .bricka.admin { background:var(--gul); }
+  .bricka.av { background:#fee2e2; color:var(--rod); }
+  .anvKnappar { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:5px; }
+  .anvKnappar button { padding:5px 9px; font-size:.78rem; border-radius:7px; border:none; background:var(--falt); }
+  .anvKnappar button.rod { color:var(--rod); }
+
+  /* ---------- Tidrapporten ---------- */
+  .timRad { display:grid; grid-template-columns:68px 1fr 34px; gap:6px; align-items:center; margin-bottom:6px; }
+  .timRad input.tim { text-align:center; font-weight:700; padding:8px 4px; }
+  .timRad select { padding:8px 8px; font-size:.9rem; }
+  .egenText { grid-column:1 / -1; margin-top:-2px; }
+  .dagSumma { text-align:center; margin-top:6px; }
+  .veckaLista { display:grid; gap:4px; }
+  .veckaDag { display:flex; justify-content:space-between; align-items:center; border:none; background:var(--falt); border-radius:8px; padding:8px 10px; font-size:.88rem; color:var(--text); text-align:left; }
+  .veckaDag.vald { background:var(--svart); color:#fff; }
+  .veckaDag.vald b { color:var(--gul); }
+  .veckaDag.tom { color:var(--svag); }
+  .veckaDag span.avs { flex:1; margin:0 8px; font-size:.75rem; color:var(--svag); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .veckaDag.vald span.avs { color:#d4d4d8; }
+  .veckaTot { display:flex; justify-content:space-between; font-weight:700; padding:8px 10px 2px; font-size:.9rem; }
+  .postReg { display:grid; grid-template-columns:90px 1fr 34px; gap:5px; align-items:center; margin-bottom:5px; }
+  .postReg input { padding:7px 8px; font-size:.88rem; }
+  .postReg.ny { margin-top:8px; grid-template-columns:90px 1fr; }
+  .rad2d { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .knapp.svart { background:var(--svart); color:var(--gul); }
+  .knapp:disabled { opacity:.45; }
+  .inskick { margin-top:10px; border-radius:10px; padding:10px; background:var(--falt); font-size:.85rem; }
+  .inskick.klar { background:#dcfce7; color:#14532d; }
+  .inskick b { display:block; font-size:.92rem; margin-bottom:2px; }
+  .inskick .knapp { width:100%; margin-top:8px; }
+  .last input, .last select { pointer-events:none; opacity:.6; }
+  .personBar { display:flex; align-items:center; gap:8px; background:var(--gulLjus); border-radius:10px; padding:6px 8px 6px 12px; margin-bottom:8px; }
+  .personBar label { margin:0; white-space:nowrap; color:var(--svart); font-weight:700; }
+  .personBar select { background:#fff; padding:6px 8px; }
+  .oversikt { width:100%; border-collapse:collapse; font-size:.82rem; }
+  .oversiktWrap { overflow-x:auto; }
+  .oversikt th { background:var(--gul); text-align:center; padding:6px 5px; font-size:.75rem; white-space:nowrap; }
+  .oversikt th:first-child, .oversikt td:first-child { text-align:left; }
+  .oversikt td { border-bottom:1px solid var(--linje); padding:7px 5px; text-align:center; white-space:nowrap; }
+  .oversikt td.namn button { border:none; background:none; padding:0; font-weight:600; text-decoration:underline; color:var(--text); font-size:.85rem; }
+  .oversikt tr.sumRad td { background:var(--gulLjus); font-weight:700; border-top:2px solid var(--svart); }
+  .st { display:inline-block; font-size:.68rem; font-weight:700; padding:1px 5px; border-radius:999px; margin-left:3px; }
+  .st.in { background:#dcfce7; color:#14532d; }
+  .st.ej { background:#fee2e2; color:var(--rod); }
+
+  .projRubrik { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--svart); margin:8px 0 5px; padding-left:8px; border-left:3px solid var(--gul); }
+  .projRubrik:first-child { margin-top:0; }
+  #projektVal { margin-bottom:8px; }
+  .projReg { display:grid; grid-template-columns:80px 1fr auto; gap:5px; align-items:center; margin-bottom:5px; }
+  .projReg input { padding:7px 8px; font-size:.88rem; }
+  .projReg.ny { margin-top:8px; grid-template-columns:80px 1fr; }
+  .projReg .taBort { padding:7px 9px; }
+  .projReg .ater { flex:0 0 auto; padding:6px 10px; border-radius:8px; border:none; background:#dcfce7; color:#14532d; font-weight:600; font-size:.82rem; }
+  .projReg.borttagen span { font-size:.85rem; color:var(--svag); grid-column:1 / 3; }
+
+  /* ---------- Veckoremsa ---------- */
+  .veckaTopp { display:flex; align-items:center; gap:6px; }
+  .vRubrik { flex:1; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .vRubrik b { font-size:1rem; }
+  .vRubrik input[type=date] { width:auto; padding:5px 8px; font-size:.8rem; background:var(--falt); }
+  .dagRemsa { display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; margin-top:8px; }
+  .dagKnapp { border:none; background:var(--falt); border-radius:9px; padding:6px 2px; display:flex; flex-direction:column; align-items:center; gap:1px; color:var(--text); }
+  .dagKnapp .vd { font-size:.68rem; color:var(--svag); font-weight:600; }
+  .dagKnapp .dn { font-size:1rem; font-weight:700; }
+  .dagKnapp .th { font-size:.68rem; font-weight:700; color:var(--svag); min-height:1em; }
+  .dagKnapp.har .th { color:var(--svart); }
+  .dagKnapp.idag .dn { text-decoration:underline; text-decoration-color:var(--gul); text-decoration-thickness:3px; text-underline-offset:3px; }
+  .dagKnapp.vald { background:var(--svart); }
+  .dagKnapp.vald .vd, .dagKnapp.vald .dn { color:#fff; }
+  .dagKnapp.vald .th { color:var(--gul); }
+  #dagInfo { text-align:left; font-size:1.05rem; margin:0 0 4px; }
+  #projektRad label { margin-top:4px; }
+  #projektVal { margin-bottom:8px; }
+  #veckaProj { font-size:.8rem; color:var(--svag); padding:0 10px; }
+  #veckaProj div { display:flex; justify-content:space-between; padding:2px 0; }
+
+  /* ---------- Logga ---------- */
+  .loggaBild { display:block; width:78%; max-width:260px; margin:0 auto 6px; }
+  .loggaApp { text-align:center; font-weight:700; letter-spacing:.14em; text-transform:uppercase; font-size:.78rem; color:var(--gul); margin:2px 0 4px; }
+  .loggaText { text-align:center; }
+  .knapp { color:var(--svart); }
+
+  /* ---------- Timmar i veckoremsan ---------- */
+  .dagKol { display:flex; flex-direction:column; gap:4px; }
+  .dagKol .dagKnapp { padding:5px 2px; }
+  .dagKol input.dagTim { width:100%; text-align:center; font-weight:700; font-size:1rem; padding:8px 2px; border-radius:9px; background:#fff; box-shadow:inset 0 0 0 1px var(--linje); }
+  .dagKol input.dagTim:focus { box-shadow:0 0 0 3px rgba(171,138,69,.35); border-color:var(--svart); }
+  .dagKol input.dagTim:disabled { background:var(--falt); color:var(--svag); }
+  .dagKol.vald input.dagTim { box-shadow:inset 0 0 0 2px var(--svart); }
+  .dagKol .sum { font-size:.66rem; color:var(--svag); text-align:center; min-height:1em; font-weight:600; }
+  .remsaTips { font-size:.72rem; color:var(--svag); text-align:center; margin:6px 0 0; }
+  .valRubrik { display:flex; justify-content:space-between; align-items:flex-end; margin-top:6px; }
+  .valRubrik label { margin:4px 0 4px; }
+  .valVerktyg { display:flex; gap:4px; }
+  .valVerktyg button { border:none; background:var(--falt); border-radius:999px; padding:4px 10px; font-size:.75rem; font-weight:600; color:var(--svart); }
+  .valVerktyg button.pa { background:var(--svart); color:#fff; }
+  .flikar .chip .x { display:inline-block; margin-left:6px; color:var(--rod); font-weight:700; }
+  .flikar.redigera .chip { box-shadow:inset 0 0 0 1px #fca5a5; }
+  .nyVal { display:grid; grid-template-columns:70px 1fr auto; gap:5px; margin:2px 0 8px; }
+  .nyVal input { padding:7px 8px; font-size:.88rem; }
+  .nyVal .knapp { padding:7px 10px; }
+  #dagFordelning { margin-top:10px; border-top:1px solid var(--linje); padding-top:8px; }
+  .fordRad { display:flex; align-items:center; gap:8px; padding:5px 0; font-size:.88rem; }
+  .fordRad b { min-width:44px; text-align:right; }
+  .fordRad span { flex:1; }
+  .fordRad small { color:var(--svag); font-size:.72rem; }
+  .fordRad button { border:none; background:none; color:var(--rod); font-size:1.05rem; padding:0 4px; }
+
+  /* "Tim:" framför dagsrutorna */
+  .dagRemsa { grid-template-columns:auto repeat(7, 1fr); }
+  .dagKol .dagKnapp { height:50px; justify-content:center; }
+  .dagKol input.dagTim { height:40px; }
+  .remsaEtikett { display:flex; flex-direction:column; gap:4px; }
+  .remsaEtikett span:first-child { height:50px; }
+  .remsaEtikett b { height:40px; line-height:40px; font-size:.78rem; color:var(--svart); padding-right:1px; }
+  .dagKol .sum { white-space:nowrap; }
+
+  /* ---------- Dagboksnotering ---------- */
+  #notRuta { margin-top:6px; }
+  #notRuta label { color:var(--svart); font-weight:700; }
+  #dagNot { min-height:3.2em; }
+  .notVarning { font-size:.75rem; color:#b45309; margin:4px 0 0; min-height:0; }
+  .notVarning:empty { display:none; }
+  .fordRad { flex-wrap:wrap; }
+  .fordNot { flex-basis:100%; margin:-2px 0 2px 52px; font-size:.78rem; color:var(--svag); font-style:italic; }
+  .fordNot.saknas { color:#b45309; font-style:normal; font-weight:600; }
+</style>
+</head>
+<body class="utloggad anstalld">
+<!-- ================= INLOGGNING ================= -->
+<section id="inloggning">
+  <div class="loggaRuta">
+    <img class="loggaBild" alt="Puttes Invest AB" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjEyMCAyNTAgOTEyIDc1MCI+CjxwYXRoIGZpbGw9IiMxQjI1MjYiIGQ9Ik00NDggMjc4IEg2MjAgQTExNiAxMTYgMCAwIDEgNjI4IDUwOS43IEw1OTYgNDgxIFY0NTAgSDYyMCBBNTYgNTYgMCAwIDAgNjIwIDMzOCBINTE0IFY0MjIgTDQ0OCA0ODEgWiIvPgo8cGF0aCBmaWxsPSIjMUIyNTI2IiBkPSJNNDI2IDUyOCBMNDkyIDQ2OSBWNjUwIEg0MjYgWiIvPgo8cGF0aCBmaWxsPSIjQUI4QTQ1IiBkPSJNNTEwIDQ1MSBMNTc3IDM5MyBWNjUwIEg1MTAgWiIvPgo8cGF0aCBmaWxsPSIjMUIyNTI2IiBkPSJNNTk1IDUwOCBMNjQxIDU0OSBWNjUwIEg1OTUgWiIvPgo8cGF0aCBmaWxsPSIjMUIyNTI2IiBkPSJNMTUyLjAgODI2LjBWNzA2LjBIMjAzLjM1MzE2OTYxMzgyNDNRMjE5LjQ3NzU2MzQwNzc2MDY3IDcwNi4wIDIzMS4xMTU0MDA1NzYwMTE5IDcxMS4yMDQyMTE2OTk4NTQ1UTI0Mi43NTMyMzc3NDQyNjMxMiA3MTYuNDA4NDIzMzk5NzA4OSAyNDkuMDQ0ODQ4NDA5NzczNjQgNzI2LjE1ODAxOTI2MjMzMzFRMjU1LjMzNjQ1OTA3NTI4NDE1IDczNS45MDc2MTUxMjQ5NTc0IDI1NS4zMzY0NTkwNzUyODQxNSA3NDkuMzQyOTI1MjczMjk1OVEyNTUuMzM2NDU5MDc1Mjg0MTUgNzYyLjY2NTYzNDM4NzI5MDUgMjQ5LjA0NDg0ODQwOTc3MzY0IDc3Mi4zODU4MTY0ODEzNzI2UTI0Mi43NTMyMzc3NDQyNjMxMiA3ODIuMTA1OTk4NTc1NDU0NSAyMzEuMTE1NDAwNTc2MDExOSA3ODcuMzM5NjI0MDQzODUxMlEyMTkuNDc3NTYzNDA3NzYwNjcgNzkyLjU3MzI0OTUxMjI0OCAyMDMuMzUzMTY5NjEzODI0MyA3OTIuNTczMjQ5NTEyMjQ4SDE2Ni44MDAyNzI1MjE3NTUzTDE3OC43MTk4MTY2NjcxODI4IDc4MC41NTEyMTI0MTIxMjczVjgyNi4wWk0xNzguNzE5ODE2NjY3MTgyOCA3ODMuNDMxOTQwNzg4NDU1IDE2Ni44MDAyNzI1MjE3NTUzIDc3MC43MTkxMzUzNjI3OTQ1SDIwMi4wMjAzNTI0MjAxNzlRMjE1LjE0OTU5NTg2MjYyNDI3IDc3MC43MTkxMzUzNjI3OTQ1IDIyMS43Njc5OTEwODExMDYyIDc2NS4wODk3ODk3MjQ2OTExUTIyOC4zODYzODYyOTk1ODgxNCA3NTkuNDYwNDQ0MDg2NTg3NiAyMjguMzg2Mzg2Mjk5NTg4MTQgNzQ5LjM0MjkyNTI3MzI5NTlRMjI4LjM4NjM4NjI5OTU4ODE0IDczOS4xMTI4MDU0MjU2NjA0IDIyMS43Njc5OTEwODExMDYyIDczMy40ODM0NTk3ODc1NTdRMjE1LjE0OTU5NTg2MjYyNDI3IDcyNy44NTQxMTQxNDk0NTM0IDIwMi4wMjAzNTI0MjAxNzkgNzI3Ljg1NDExNDE0OTQ1MzRIMTY2LjgwMDI3MjUyMTc1NTNMMTc4LjcxOTgxNjY2NzE4MjggNzE1LjE0MTMwODcyMzc5M1ogTTM2NC45MDc5NzkzMTMxMjEzNiA4MjcuOTU0NjQ5OTAyNDQ5NVEzMzkuNTYwMDAwMDAwMDAwMDYgODI3Ljk1NDY0OTkwMjQ0OTUgMzI1LjI1NzQzODkxNDg2OCA4MTMuODI4NTcxNDI4NTcxNFEzMTAuOTU0ODc3ODI5NzM1OSA3OTkuNzAyNDkyOTU0NjkzMyAzMTAuOTU0ODc3ODI5NzM1OSA3NzMuMjM4NjExMzc3NzgzM1Y3MDYuMEgzMzcuNjc0Njk0NDk2OTE4N1Y3NzIuMzc2NDE0NDgwODE1MVEzMzcuNjc0Njk0NDk2OTE4NyA3ODkuNjkzOTMzMjk0MTA2NyAzNDQuODk4MTQzNzU1MjI2IDc5Ny40NjM2MDkwNTUxNTQ2UTM1Mi4xMjE1OTMwMTM1MzMyNCA4MDUuMjMzMjg0ODE2MjAyNiAzNjUuMTM4MjM1NDIxNjM0NTMgODA1LjIzMzI4NDgxNjIwMjZRMzc4LjIxMzcwNTM2NjgyMDUzIDgwNS4yMzMyODQ4MTYyMDI2IDM4NS40MDc3NDA4NTY1ODU1IDc5Ny40NjM2MDkwNTUxNTQ2UTM5Mi42MDE3NzYzNDYzNTA0NSA3ODkuNjkzOTMzMjk0MTA2NyAzOTIuNjAxNzc2MzQ2MzUwNDUgNzcyLjM3NjQxNDQ4MDgxNTFWNzA2LjBINDE4Ljg2MTA4MDc5NjUwNjhWNzczLjIzODYxMTM3Nzc4MzNRNDE4Ljg2MTA4MDc5NjUwNjggNzk5LjcwMjQ5Mjk1NDY5MzMgNDA0LjU1ODUxOTcxMTM3NDc0IDgxMy44Mjg1NzE0Mjg1NzE0UTM5MC4yNTU5NTg2MjYyNDI2NiA4MjcuOTU0NjQ5OTAyNDQ5NSAzNjQuOTA3OTc5MzEzMTIxMzYgODI3Ljk1NDY0OTkwMjQ0OTVaIE01MDYuNDQ0MjU3NTMzMDU4OCA4MjYuMFY3MjcuOTEyOTQxNjg2NTM4SDQ2Ny44MTA3NjgzMjU1Mzk3VjcwNi4wSDU3MS43OTc1NjM0MDc3NjA3VjcyNy45MTI5NDE2ODY1MzhINTMzLjE2NDA3NDIwMDI0MTdWODI2LjBaIE02NDYuNTQxOTkyNTA1NjUxOCA4MjYuMFY3MjcuOTEyOTQxNjg2NTM4SDYwNy45MDg1MDMyOTgxMzI3VjcwNi4wSDcxMS44OTUyOTgzODAzNTM4VjcyNy45MTI5NDE2ODY1MzhINjczLjI2MTgwOTE3MjgzNDVWODI2LjBaIE03NjEuOTMzNzk3MDMzMjI5MiA4MjYuMFY3MDYuMEg4NTEuOTMyMzg0ODc1MDQyN1Y3MjcuNjE4ODA0MDAxMTE0OUg3ODguNDE4MzAzNTUyMDczNFY4MDQuMzgxMTk1OTk4ODg1MUg4NTQuMjczNTU3MzM3OTU4VjgyNi4wWk03ODYuNDYzNjUzNjQ5NjIzOCA3NzUuNTQ4MDQ3NDQzNTYwMVY3NTQuNjI1MDY1ODA3ODEwMkg4NDQuNjc4NjExMzc3NzgzM1Y3NzUuNTQ4MDQ3NDQzNTYwMVogTTk1MC42MzE3MzYzOTcxMzg1IDgyNy45NTQ2NDk5MDI0NDk1UTkzNi4zMzQyMjkzNTE4MzE4IDgyNy45NTQ2NDk5MDI0NDk1IDkyMy4xNzc4OTQ3Njk0NDA0IDgyNC4wNzU2NzQzMzY1MDI0UTkxMC4wMjE1NjAxODcwNDkxIDgyMC4xOTY2OTg3NzA1NTUzIDkwMi4wNjE4NTYyNDQ3NzQgODE0LjAzNTM3ODI3ODc3NzNMOTExLjE0OTM5MTQ3MTMwNzggNzkzLjc4Mjk0ODgwOTI2NTdROTE4LjcwNzQxMDczMzY0MDkgNzk5LjMxNzM4MjU1MjQxNCA5MjkuMzA2NTY4MzkzNjcgODAyLjg4MDM4NzcyNDEzMzdROTM5LjkwNTcyNjA1MzY5OTEgODA2LjQ0MzM5Mjg5NTg1MzMgOTUwLjc0OTM5MTQ3MTMwNzggODA2LjQ0MzM5Mjg5NTg1MzNROTU5LjI4MDM4NzcyNDEzMzcgODA2LjQ0MzM5Mjg5NTg1MzMgOTY0LjQ4MTE2MTkzMzY2NTggODA0LjcxNDg1NTUzMjUwMTRROTY5LjY4MTkzNjE0MzE5NzggODAyLjk4NjMxODE2OTE0OTMgOTcyLjEyNTYwMTU2MDgwNjQgNzk5Ljk1Mjc2MDgzMTE5MTRROTc0LjU2OTI2Njk3ODQxNSA3OTYuOTE5MjAzNDkzMjMzNSA5NzQuNTY5MjY2OTc4NDE1IDc5My4wNjA0NDQwODY1ODc2UTk3NC41NjkyNjY5Nzg0MTUgNzg4LjExNDI4NTcxNDI4NTggOTcwLjc0NDA2NDkwOTcyNzIgNzg1LjE1ODg2MTYwMjMwNDFROTY2LjkxODg2Mjg0MTAzOTMgNzgyLjIwMzQzNzQ5MDMyMjQgOTYwLjcyMzA3NDU0MDg5MzggNzgwLjM1NDcxODAzMjg4ODRROTU0LjUyNzI4NjI0MDc0ODMgNzc4LjUwNTk5ODU3NTQ1NDQgOTQ3LjA0ODMxMDY3NDgwMTEgNzc2Ljg3OTk1NDE2Njc5NTZROTM5LjU2OTMzNTEwODg1MzkgNzc1LjI1MzkwOTc1ODEzNyA5MzIuMDYwOTQ1Nzc0MzY0NCA3NzIuOTEwMjEwMjc1MzA4OVE5MjQuNTUyNTU2NDM5ODc0OSA3NzAuNTY2NTEwNzkyNDgwOSA5MTguMzU2NzY4MTM5NzI5NCA3NjYuNzkyNTU1MjAxMTM5NlE5MTIuMTYwOTc5ODM5NTgzOCA3NjMuMDE4NTk5NjA5Nzk4MyA5MDguMzM1Nzc3NzcwODk1OSA3NTYuODE1MjMwMjQ5OTE0N1E5MDQuNTEwNTc1NzAyMjA4IDc1MC42MTE4NjA4OTAwMzEzIDkwNC41MTA1NzU3MDIyMDggNzQxLjAxMTg2MDg5MDAzMTJROTA0LjUxMDU3NTcwMjIwOCA3MzAuODgyNDEzMDU2MjY5NiA5MDkuOTc5NTExMzE4OTQzNCA3MjIuNDk5MTkxNzI1MjQ4NVE5MTUuNDQ4NDQ2OTM1Njc4NyA3MTQuMTE1OTcwMzk0MjI3NSA5MjYuNTgyMTA2NDY5Mjk0OSA3MDkuMDgwNjYwMjQ1ODg5UTkzNy43MTU3NjYwMDI5MTExIDcwNC4wNDUzNTAwOTc1NTA1IDk1NC42NTM2MzcyMzYzODE3IDcwNC4wNDUzNTAwOTc1NTA1UTk2NS44MTE2NTY0OTg3MTQ4IDcwNC4wNDUzNTAwOTc1NTA1IDk3Ni43Mzk0MTk2NTI1MzQ3IDcwNi43MjkzNzk3MDMzMjI5UTk4Ny42NjcxODI4MDYzNTQ3IDcwOS40MTM0MDkzMDkwOTU0IDk5NS45Njk3NDM4OTE0ODY4IDcxNC42MTUwOTM5ODkwMzcyTDk4Ny42MjY3NTA0ODc3NTIgNzM0LjkyMTI5Njk1NTgwODFROTc5LjM4ODA3MDk3OTUyOTkgNzMwLjEyNjM1MDk5NTYzMzQgOTcwLjkwNDg4MzcxMzcyODMgNzI3Ljg0MTQ3OTA0OTg5UTk2Mi40MjE2OTY0NDc5MjY3IDcyNS41NTY2MDcxMDQxNDY3IDk1NC40MjMzODExMjc4Njg0IDcyNS41NTY2MDcxMDQxNDY3UTk0Ni4xMTc1ODY5NDM3MzA0IDcyNS41NTY2MDcxMDQxNDY3IDk0MC44ODczOTg5NjU2NTYxIDcyNy40ODU5ODY4MDc0Njk1UTkzNS42NTcyMTA5ODc1ODE3IDcyOS40MTUzNjY1MTA3OTI1IDkzMy4yOTkyNTk4NTU2ODczIDczMi41OTM0NjU2NzE1NDk0UTkzMC45NDEzMDg3MjM3OTMgNzM1Ljc3MTU2NDgzMjMwNjIgOTMwLjk0MTMwODcyMzc5MyA3MzkuNzQyOTI1MjczMjk2UTkzMC45NDEzMDg3MjM3OTMgNzQ0LjYzMDI1NjEwODUxMzIgOTM0Ljc2NjUxMDc5MjQ4MDkgNzQ3LjU1NjI2NjQ1MTk1MjVROTM4LjU5MTcxMjg2MTE2ODcgNzUwLjQ4MjI3Njc5NTM5MiA5NDQuNzg3NTAxMTYxMzE0NCA3NTIuMjQ1MjgxOTY3MTExNlE5NTAuOTgzMjg5NDYxNDU5OSA3NTQuMDA4Mjg3MTM4ODMxMyA5NTguNDkxNjc4Nzk1OTQ5NCA3NTUuNjYxMjE4Mjk2MTE5NlE5NjYuMDAwMDY4MTMwNDM4OSA3NTcuMzE0MTQ5NDUzNDA4IDk3My40NzkwNDM2OTYzODYgNzU5LjYwMTU0ODQxOTA2NDFROTgwLjk1ODAxOTI2MjMzMzIgNzYxLjg4ODk0NzM4NDcyMDIgOTg3LjE1MzgwNzU2MjQ3ODcgNzY1LjYwNjYwMjQ1ODg4OTVROTkzLjM0OTU5NTg2MjYyNDMgNzY5LjMyNDI1NzUzMzA1ODcgOTk3LjE3NDc5NzkzMTMxMjEgNzc1LjQ5ODIxMzEyNDRRMTAwMS4wIDc4MS42NzIxNjg3MTU3NDEyIDEwMDEuMCA3OTEuMTAwNzQwMTQ0MzEyN1ExMDAxLjAgODAxLjA1ODc1OTQwNjY0NTggOTk1LjQ3NDc2Mzg2NjA5MjYgODA5LjQ0MTk4MDczNzY2NjlROTg5Ljk0OTUyNzczMjE4NTQgODE3LjgyNTIwMjA2ODY4NzkgOTc4Ljc4ODk4MTQ0OTkzOTcgODIyLjg4OTkyNTk4NTU2ODdROTY3LjYyODQzNTE2NzY5MzkgODI3Ljk1NDY0OTkwMjQ0OTUgOTUwLjYzMTczNjM5NzEzODUgODI3Ljk1NDY0OTkwMjQ0OTVaIi8+CjxwYXRoIGZpbGw9IiNBQjhBNDUiIGQ9Ik0zMzIuMCA5MDcuMFY4NjguMEgzMzkuMjMwMzU2NzU1NzUyNFY5MDcuMFogTTM3My4zNzkzOTI5NjE2NjExNSA5MDcuMFY4NjguMEgzNzkuMzM2OTY4NzU2Nzc0M0w0MDMuNzc5NzAwMzIyODQ1NCA4OTguMDQwNTgwMDM3NzgxNEg0MDAuODAyODMyNzc0NjEyMVY4NjguMEg0MDcuOTg5OTYzNTU0MDg2M1Y5MDcuMEg0MDIuMDMyMzg3NzU4OTczMUwzNzcuNTg5NjU2MTkyOTAyMDUgODc2Ljk1OTQxOTk2MjIxODZIMzgwLjU2NjUyMzc0MTEzNTNWOTA3LjBaIE00NTMuNTk1NDgzNzY0ODI2MSA5MDcuMCA0MzYuNTcwNDQ1NjczNzE3MTMgODY4LjBINDQ0LjQxNTU3OTkyMTY0OTk2TDQ1OS42Mzc1OTExNjMxNzI0IDkwMy4yNTU2MjA3NjEyMDI5SDQ1NS4xMDU1MzA1MjcwODE4NEw0NzAuNTIzNTAxOTQzMjY1OSA4NjguMEg0NzcuNzI1MDQxMzgxNDk5NDdMNDYwLjc0ODUxMzI0NjcyNTA1IDkwNy4wWiBNNTA2LjMzNjc1MDMxMzU1NDgzIDkwNy4wVjg2OC4wSDUzNC43ODgwMTE4MTA1NjYzVjg3NC4wODQ4NTYzMDY3MTA5SDUxMy41MzgyODk3NTE3ODg0VjkwMC45MTUxNDM2OTMyODkxSDUzNS41NjA4MDc0ODExODY3VjkwNy4wWk01MTIuOTg2NDMwODc0NzAxOSA4OTAuMTYyMjc0NDcyNzYzM1Y4ODQuMjMyMDcyNzEzNzU5M0g1MzIuNDA2NzA2MTgzNjExNVY4OTAuMTYyMjc0NDcyNzYzM1ogTTU3OS4zMzkyNzgzNTkyOTUxIDkwNy41NTE4NTg4NzcwODY1UTU3NC43NzU5OTA5MTA3OCA5MDcuNTUxODU4ODc3MDg2NSA1NzAuNTk1NDk5MTMyODg1MyA5MDYuMjQzNTMzMzM3NDYyNFE1NjYuNDE1MDA3MzU0OTkwNSA5MDQuOTM1MjA3Nzk3ODM4NCA1NjMuOTQ3MjQ5Nzc1NDc5MSA5MDIuODYxMjkwOTE2OTczOEw1NjYuNDgzNjg3MDE4MDU0NSA4OTcuMjU2MjUwMTkzNTUyNFE1NjguODMyODExNjk2NzU3NSA4OTkuMTE0NTE0MjYwOTM5NiA1NzIuMjgzNDk1MjQ2MzUzNCA5MDAuMzMyMDY0MDQyNjEyNVE1NzUuNzM0MTc4Nzk1OTQ5MiA5MDEuNTQ5NjEzODI0Mjg1NCA1NzkuMzUzNjg3MDE4MDU0NSA5MDEuNTQ5NjEzODI0Mjg1NFE1ODIuNDEyMjExNjg0MzcwMiA5MDEuNTQ5NjEzODI0Mjg1NCA1ODQuMjk5MDU0NTM1MzE5MyA5MDAuODg2NTY0OTA5NzI3MlE1ODYuMTg1ODk3Mzg2MjY4NiA5MDAuMjIzNTE1OTk1MTY4OSA1ODcuMDc1NDA1NjA4MzczOCA4OTkuMDcwODA1MTc3OTEzNFE1ODcuOTY0OTEzODMwNDc5IDg5Ny45MTgwOTQzNjA2NTc3IDU4Ny45NjQ5MTM4MzA0NzkgODk2LjQ3MzM2MzYzMDczM1E1ODcuOTY0OTEzODMwNDc5IDg5NC42ODcxNDI4NTcxNDI4IDU4Ni42OTc4OTM5MTc4MDk4IDg5My42MTM0NDExMjkxMDcyUTU4NS40MzA4NzQwMDUxNDA3IDg5Mi41Mzk3Mzk0MDEwNzE1IDU4My4zODc0NTYyNTcxNjE0IDg5MS44NzkzMzI0NzY1NDE0UTU4MS4zNDQwMzg1MDkxODIgODkxLjIxODkyNTU1MjAxMTMgNTc4Ljg2NTcxMjk2OTU1OCA4OTAuNjcyNTg5MTg4OTM4UTU3Ni4zODczODc0Mjk5MzM5IDg5MC4xMjYyNTI4MjU4NjQ4IDU3My45MDU0NTk3MjU2MjAxIDg4OS4zNzA1MDc4MDQwMzIxUTU3MS40MjM1MzIwMjEzMDYyIDg4OC42MTQ3NjI3ODIxOTk0IDU2OS4zODAxMTQyNzMzMjY5IDg4Ny40MDYwOTkxNDUyNzI3UTU2Ny4zMzY2OTY1MjUzNDc1IDg4Ni4xOTc0MzU1MDgzNDYgNTY2LjA2OTY3NjYxMjY3ODQgODg0LjIwNTE2OTcwNjcyOTRRNTY0LjgwMjY1NjcwMDAwOTMgODgyLjIxMjkwMzkwNTExMjkgNTY0LjgwMjY1NjcwMDAwOTMgODc5LjA5MjkwMzkwNTExMjhRNTY0LjgwMjY1NjcwMDAwOTMgODc1LjkwODA2NDk0MDY5NTYgNTY2LjQ5NjY1ODQzNDIzODYgODczLjI2NjkyMDM0OTMyMzNRNTY4LjE5MDY2MDE2ODQ2OCA4NzAuNjI1Nzc1NzU3OTUxMSA1NzEuNjcyMDgxMzg0OTA1OSA4NjkuMDM2OTU4NDQwNDMyM1E1NzUuMTUzNTAyNjAxMzQzOSA4NjcuNDQ4MTQxMTIyOTEzNSA1ODAuNDkxNTA2MDY5ODAyNyA4NjcuNDQ4MTQxMTIyOTEzNVE1ODQuMDEwNjMwNzQ4NTA1NyA4NjcuNDQ4MTQxMTIyOTEzNSA1ODcuNDY2ODM2ODEyMTE0NyA4NjguMzMyMzY1MzY0OTYyNFE1OTAuOTIzMDQyODc1NzIzOCA4NjkuMjE2NTg5NjA3MDExMiA1OTMuNTAyMjI5MDI2NjYzNyA4NzAuODk1MjIyNTA3ODE5NUw1OTEuMTk1ODUzMjU2MzI1MiA4NzYuNTQxNTY4ODU4MTk1OFE1ODguNTg5NzcwMTM3MTg5OCA4NzQuOTQ3NDY3NTYwNjIwNiA1ODUuODE0ODYyMzQ1NTQ1MiA4NzQuMTk4OTI2ODY4MTY3NVE1ODMuMDM5OTU0NTUzOTAwNCA4NzMuNDUwMzg2MTc1NzE0NiA1ODAuNDI4NTg3NDU0NzA4NyA4NzMuNDUwMzg2MTc1NzE0NlE1NzcuNDY3MDgyNzAxMDYyMiA4NzMuNDUwMzg2MTc1NzE0NiA1NzUuNTc2NjM3Njg1NDIzMSA4NzQuMTcyNzUxNTQwNjc2OVE1NzMuNjg2MTkyNjY5Nzg0MSA4NzQuODk1MTE2OTA1NjM5NCA1NzIuODI0NTQxNTkwNTM2IDg3Ni4wODI4ODkxOTUxMzE4UTU3MS45NjI4OTA1MTEyODc5IDg3Ny4yNzA2NjE0ODQ2MjQyIDU3MS45NjI4OTA1MTEyODc5IDg3OC43NjM5MDIxNzA4ODM1UTU3MS45NjI4OTA1MTEyODc5IDg4MC41NDI5MTg2MTUwOTQgNTczLjIyOTkxMDQyMzk1NzEgODgxLjYxMzAxODE3ODQzOThRNTc0LjQ5NjkzMDMzNjYyNjIgODgyLjY4MzExNzc0MTc4NTYgNTc2LjU0MDM0ODA4NDYwNTUgODgzLjMxNTY2NzUyMzQ1ODZRNTc4LjU4Mzc2NTgzMjU4NDggODgzLjk0ODIxNzMwNTEzMTUgNTgxLjA2NTY5MzUzNjg5ODcgODg0LjUxNTIwNjQ4MTY4MjNRNTgzLjU0NzYyMTI0MTIxMjYgODg1LjA4MjE5NTY1ODIzMyA1ODYuMDI1OTQ2NzgwODM2NiA4ODUuODEzNjg1NzAxODk4NFE1ODguNTA0MjcyMzIwNDYwNyA4ODYuNTQ1MTc1NzQ1NTYzOCA1OTAuNTQ3NjkwMDY4NDQgODg3LjcyOTU4NDQwNDMyMzJRNTkyLjU5MTEwNzgxNjQxOTQgODg4LjkxMzk5MzA2MzA4MjYgNTkzLjg1ODEyNzcyOTA4ODYgODkwLjkwMjY1NjcwMDAwOTNRNTk1LjEyNTE0NzY0MTc1NzcgODkyLjg5MTMyMDMzNjkzNiA1OTUuMTI1MTQ3NjQxNzU3NyA4OTUuOTU1NjA2MDUxMjIxN1E1OTUuMTI1MTQ3NjQxNzU3NyA4OTkuMDg0NzMwNzI5OTI0OCA1OTMuNDA2ODkwOTI5MzYxIDkwMS43MjU4NzUzMjEyOTdRNTkxLjY4ODYzNDIxNjk2NDQgOTA0LjM2NzAxOTkxMjY2OTIgNTg4LjE4NjU2MDE4NzA0ODkgOTA1Ljk1OTQzOTM5NDg3NzhRNTg0LjY4NDQ4NjE1NzEzMzUgOTA3LjU1MTg1ODg3NzA4NjUgNTc5LjMzOTI3ODM1OTI5NTEgOTA3LjU1MTg1ODg3NzA4NjVaIE02MzMuODA5MTMxMDQ2NTc2MyA5MDcuMFY4NzQuMTIwODc3OTUzNjA5NEg2MjAuODgzODkzODI4Nzc1N1Y4NjguMEg2NTMuOTY0NzI1MDIwMTI5M1Y4NzQuMTIwODc3OTUzNjA5NEg2NDEuMDM5NDg3ODAyMzI4N1Y5MDcuMFogIE03MTYuNTA4ODM5MDUzNDUxMyA5MDcuMCA3MzQuMDQyNTEwMDQ1MzY4NSA4NjguMEg3NDEuMTk1NTM5NTI3MjY3Nkw3NTguNzc3NzIwNDc1NTE5MyA5MDcuMEg3NTEuMTk4NjY5MzQ2NzIxOUw3MzYuMTMzMjMzMDAyMjI5NiA4NzEuODYzMDEyMTM5NjA1NEg3MzkuMDI3NDg5Mjk2NTUzMUw3MjMuOTYyMDUyOTUyMDYwOCA5MDcuMFpNNzI0LjYxMTQyMDg4NzM5ODggODk3Ljk3MTM5OTE1MTQ2NjQgNzI2LjU0NzQ4OTI5NjU1MzEgODkyLjI4Mzc0NzE3NDEzNTJINzQ3LjU5MjEyNjUwMTk2NjRMNzQ5LjU3NjcwNDg2NzQ1NTIgODk3Ljk3MTM5OTE1MTQ2NjRaIE03ODcuMzg5NDI5NDA3NTc0OSA5MDcuMFY4NjguMEg4MDUuNjU1NTQ0NTc4OTg0OVE4MTIuNjY2ODk2OTY4MTk1NSA4NjguMCA4MTYuMzQxMzk3ODM1MzEwMSA4NzAuNzQ4MDEwODIzNDQ5MlE4MjAuMDE1ODk4NzAyNDI0OCA4NzMuNDk2MDIxNjQ2ODk4NSA4MjAuMDE1ODk4NzAyNDI0OCA4NzguMTQ3MjA0MzI5Mzc5N1E4MjAuMDE1ODk4NzAyNDI0OCA4ODEuMjQ1NTkxMzQxMjQwNiA4MTguNTY2MzY3MDk5MTkxNyA4ODMuNDYwNzE0Mjg1NzE0M1E4MTcuMTE2ODM1NDk1OTU4NiA4ODUuNjc1ODM3MjMwMTg4IDgxNC43MDAyMjk4NjI4MTAxIDg4Ni44Njc0NTAyMTgzMjcxUTgxMi4yODM2MjQyMjk2NjE1IDg4OC4wNTkwNjMyMDY0NjYyIDgwOS40MTI5MDEyNzI4MDA1IDg4OC4wNTkwNjMyMDY0NjYyTDgxMC40MzAxNjcwNzQ0MTcgODg2LjA2OTIwMDg2MDkyMVE4MTMuNzM3NDc5NjM4Mjg5MyA4ODYuMDY5MjAwODYwOTIxIDgxNi4zNDkwODUyNzE0Mzc4IDg4Ny4yNTM2MDk1MTk2ODA0UTgxOC45NjA2OTA5MDQ1ODY0IDg4OC40MzgwMTgxNzg0Mzk4IDgyMC40ODAzNDU0NTIyOTMyIDg5MC43NDAzMTQ3MTYxNzQ4UTgyMi4wIDg5My4wNDI2MTEyNTM5MDk3IDgyMi4wIDg5Ni4zOTI2NzI3MjYxNDY3UTgyMi4wIDkwMS40MTQxNjI3Njk4MTIgODE4LjE1NzM5NjEwMTA4MDggOTA0LjIwNzA4MTM4NDkwNlE4MTQuMzE0NzkyMjAyMTYxNiA5MDcuMCA4MDYuNzY5ODMwMjkzMjcwNiA5MDcuMFpNNzk0LjU5MDk2ODg0NTgwODQgOTAxLjI5OTg1OTcxMzIzMjhIODA2LjMzNDY4Mzk2NzY2OVE4MTAuMzk5NDI5NDA3NTc0OSA5MDEuMjk5ODU5NzEzMjMyOCA4MTIuNTUzMDc3MDE4MzY0MyA4OTkuOTYxOTk1MjE1Mzg1MVE4MTQuNzA2NzI0NjI5MTUzNyA4OTguNjI0MTMwNzE3NTM3NCA4MTQuNzA2NzI0NjI5MTUzNyA4OTUuNzEzMDU2MjY5NTQ4OFE4MTQuNzA2NzI0NjI5MTUzNyA4OTIuODAxOTgxODIxNTYwMiA4MTIuNTUzMDc3MDE4MzY0MyA4OTEuNDM5ODYyMzQ1NTQ1MlE4MTAuMzk5NDI5NDA3NTc0OSA4OTAuMDc3NzQyODY5NTMwMiA4MDYuMzM0NjgzOTY3NjY5IDg5MC4wNzc3NDI4Njk1MzAySDc5NC4wMzkxMDk5Njg3MjJWODg0LjQ0MjQ0MTU0NzE4MDRIODA0Ljg0Mjg4NjU2MjgxOTNRODA4LjYyMzc3NjU5NDA5NzQgODg0LjQ0MjQ0MTU0NzE4MDQgODEwLjY3MzE5OTk2MjgzOCA4ODMuMTA4MTc5MjE0MDIyNVE4MTIuNzIyNjIzMzMxNTc4NSA4ODEuNzczOTE2ODgwODY0NiA4MTIuNzIyNjIzMzMxNTc4NSA4NzkuMDcxMjkwOTE2OTczOFE4MTIuNzIyNjIzMzMxNTc4NSA4NzYuMzYxNDYwNjIzNzAzMiA4MTAuNjczMTk5OTYyODM4IDg3NS4wMzA4MDA0NTUyMzUzUTgwOC42MjM3NzY1OTQwOTc0IDg3My43MDAxNDAyODY3NjcyIDgwNC44NDI4ODY1NjI4MTkzIDg3My43MDAxNDAyODY3NjcySDc5NC41OTA5Njg4NDU4MDg0WiIvPgo8cmVjdCBmaWxsPSIjQUI4QTQ1IiB4PSIxNTIiIHk9Ijg4NS41IiB3aWR0aD0iMTM4IiBoZWlnaHQ9IjQiLz48cmVjdCBmaWxsPSIjQUI4QTQ1IiB4PSI4NjEiIHk9Ijg4NS41IiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjQiLz4KPHBhdGggZmlsbD0iIzJBMzQzNSIgZD0iTTE1Mi4wIDk3Ni4wVjk2MS4wSDE2My41MzY5MzUyMTQxNDYzNVY5NjQuMDQwODg1MjMxMTc5SDE1NS44MTYyMjI3ODY1MzQ5NVY5NzIuOTU5MTE0NzY4ODIxSDE2My44MjUyOTY1MjIyNTA3N1Y5NzYuMFpNMTU1LjU0MTg5NDgwMDQwODc4IDk2OS44NTIwNjAxNzE1NjQ5Vjk2Ni45MjM4NjQyMzQ2MTY0SDE2Mi42Mzg3ODQwMjY1MDg5MlY5NjkuODUyMDYwMTcxNTY0OVogTTE3Mi40NTIzMTA3MDU3Njk0IDk3Ni4wVjk2MS4wSDE3NS42MzA0NjU2MDk2MTI1N0wxODQuMTg5MDc1NTkzODE4NyA5NzEuNDAxMjU1NzY3ODYxSDE4Mi42NzE2NzkxMDU2MzMxM1Y5NjEuMEgxODYuNDY0NjI0NTA4Mzc2OTRWOTc2LjBIMTgzLjI4NjQ2OTYwNDUzMzc1TDE3NC43Mjc4NTk2MjAzMjc2NSA5NjUuNTk4NzQ0MjMyMTM5SDE3Ni4yNDUyNTYxMDg1MTMyVjk3Ni4wWiBNMTk4LjkzNzE0Mjg1NzE0Mjg1IDk3Ni4wVjk2NC4wOTkwNzg2OTA2NTY4SDE5NC4yNDA3OTk0NDg3NjI4Vjk2MS4wSDIwNy40OTYyNjM4MTk2NDAxMlY5NjQuMDk5MDc4NjkwNjU2OEgyMDIuNzk5OTIwNDExMjYwMDhWOTc2LjBaIE0yMTUuMjg1NTAzNTQ1ODc5NjYgOTc2LjBWOTYxLjBIMjIxLjgzMjUyMjA2NDk3MTY3UTIyNS4wNDc1NjQ5NTYxNzk3NCA5NjEuMCAyMjYuNzk4NjE1NTU4NTE0NzcgOTYyLjQ2NzU4NDIzMzk5NzFRMjI4LjU0OTY2NjE2MDg0OTc3IDk2My45MzUxNjg0Njc5OTQyIDIyOC41NDk2NjYxNjA4NDk3NyA5NjYuNDkwNzE0OTA1MDgxOVEyMjguNTQ5NjY2MTYwODQ5NzcgOTY4LjE3NzQ3OTc5MzEzMTIgMjI3Ljc0ODIxNjQ1MzUwMDk2IDk2OS4zOTY3ODY2NDMzMzcxUTIyNi45NDY3NjY3NDYxNTIxOCA5NzAuNjE2MDkzNDkzNTQzMSAyMjUuNDY4NDY4MjI2NDQwOCA5NzEuMjY1Njk0Mzg4NTI5M1EyMjMuOTkwMTY5NzA2NzI5NDMgOTcxLjkxNTI5NTI4MzUxNTUgMjIxLjk0ODkwODk4MzkyNzQyIDk3MS45MTUyOTUyODM1MTU1SDIxNy40MjY5MzQ1OTQ3Nzg3NEwyMTkuMTQ4MjgxMDk5OTk2OSA5NzAuMjY3NDc4NTU0Mzk2Vjk3Ni4wWk0yMjQuNjk0ODI5NjczOTAyOTQgOTc2LjAgMjIwLjk1MDM3NjExMDk5MDY3IDk3MC41NDU1MDQxNjUyNDczSDIyNS4wNjQyMDQyNjc0NDI5M0wyMjguODQxNzI1MDkzNjc5MzQgOTc2LjBaTTIxOS4xNDgyODEwOTk5OTY5IDk3MC42ODc1NjMwOTgwNzY5IDIxNy40MjY5MzQ1OTQ3Nzg3NCA5NjguODkzOTg5ODExNDAyNUgyMjEuNzM1MTY5MDg3MzYxOFEyMjMuMTk2MzQ0MDI3NzQ3NjcgOTY4Ljg5Mzk4OTgxMTQwMjUgMjIzLjkyNTA4MjY4NTU3ODAyIDk2OC4yNTYxMzMyODc5MTNRMjI0LjY1MzgyMTM0MzQwODM3IDk2Ny42MTgyNzY3NjQ0MjM1IDIyNC42NTM4MjEzNDM0MDgzNyA5NjYuNDkwNzE0OTA1MDgxOVEyMjQuNjUzODIxMzQzNDA4MzcgOTY1LjM1MzM2MzE2NjIwNzMgMjIzLjkyNTA4MjY4NTU3ODAyIDk2NC43MjA0MDE1ODI0ODQzUTIyMy4xOTYzNDQwMjc3NDc2NyA5NjQuMDg3NDM5OTk4NzYxMyAyMjEuNzM1MTY5MDg3MzYxOCA5NjQuMDg3NDM5OTk4NzYxM0gyMTcuNDI2OTM0NTk0Nzc4NzRMMjE5LjE0ODI4MTA5OTk5NjkgOTYyLjI4NDA3NjgzMjU1NFogTTIzNy4xNTIwOTk5NjU5MzQ3OCA5NzYuMFY5NjEuMEgyNDguNjg5MDM1MTgwMDgxMTNWOTY0LjA0MDg4NTIzMTE3OUgyNDAuOTY4MzIyNzUyNDY5NzNWOTcyLjk1OTExNDc2ODgyMUgyNDguOTc3Mzk2NDg4MTg1NTVWOTc2LjBaTTI0MC42OTM5OTQ3NjYzNDM1NiA5NjkuODUyMDYwMTcxNTY0OVY5NjYuOTIzODY0MjM0NjE2NEgyNDcuNzkwODgzOTkyNDQzN1Y5NjkuODUyMDYwMTcxNTY0OVogTTI1Ny42MDQ0MTA2NzE3MDQxNiA5NzYuMFY5NjEuMEgyNjQuMjY3ODE2MTA5NzUxOTVRMjY2LjMwOTA3NjgzMjU1Mzk2IDk2MS4wIDI2Ny43ODczNzUzNTIyNjUzNyA5NjEuNjYxMjM5NTg2ODgxN1EyNjkuMjY1NjczODcxOTc2NzMgOTYyLjMyMjQ3OTE3Mzc2MzYgMjcwLjA2NzEyMzU3OTMyNTU0IDk2My41NTgzMTk2NTU2MzE1UTI3MC44Njg1NzMyODY2NzQzIDk2NC43OTQxNjAxMzc0OTk2IDI3MC44Njg1NzMyODY2NzQzIDk2Ni40OTA3MTQ5MDUwODE5UTI3MC44Njg1NzMyODY2NzQzIDk2OC4xNzc0Nzk3OTMxMzEyIDI3MC4wNjcxMjM1NzkzMjU1NCA5NjkuNDA3NTAwOTI5MDUxNFEyNjkuMjY1NjczODcxOTc2NzMgOTcwLjYzNzUyMjA2NDk3MTcgMjY3Ljc4NzM3NTM1MjI2NTM3IDk3MS4zMDQ1ODA5OTc4MDEyUTI2Ni4zMDkwNzY4MzI1NTM5NiA5NzEuOTcxNjM5OTMwNjMwOCAyNjQuMjY3ODE2MTA5NzUxOTUgOTcxLjk3MTYzOTkzMDYzMDhIMjU5Ljc0NTg0MTcyMDYwMzI3TDI2MS40NjcxODgyMjU4MjE0IDk3MC4yNjc0Nzg1NTQzOTZWOTc2LjBaTTI2MS40NjcxODgyMjU4MjE0IDk3MC42ODc1NjMwOTgwNzY5IDI1OS43NDU4NDE3MjA2MDMyNyA5NjguODg0MTk5OTMxODY5NkgyNjQuMDU0MDc2MjEzMTg2M1EyNjUuNTE1MjUxMTUzNTcyMiA5NjguODg0MTk5OTMxODY5NiAyNjYuMjQzOTg5ODExNDAyNTcgOTY4LjI1MTIzODM0ODE0NjZRMjY2Ljk3MjcyODQ2OTIzMjkgOTY3LjYxODI3Njc2NDQyMzUgMjY2Ljk3MjcyODQ2OTIzMjkgOTY2LjQ5MDcxNDkwNTA4MTlRMjY2Ljk3MjcyODQ2OTIzMjkgOTY1LjM1MzM2MzE2NjIwNzMgMjY2LjI0Mzk4OTgxMTQwMjU3IDk2NC43MjA0MDE1ODI0ODQzUTI2NS41MTUyNTExNTM1NzIyIDk2NC4wODc0Mzk5OTg3NjEzIDI2NC4wNTQwNzYyMTMxODYzIDk2NC4wODc0Mzk5OTg3NjEzSDI1OS43NDU4NDE3MjA2MDMyN0wyNjEuNDY3MTg4MjI1ODIxNCA5NjIuMjg0MDc2ODMyNTU0WiBNMjc5LjM4NTI5MjgwNjA0NSA5NzYuMFY5NjEuMEgyODUuOTMyMzExMzI1MTM3MDVRMjg5LjE0NzM1NDIxNjM0NTEgOTYxLjAgMjkwLjg5ODQwNDgxODY4MDEgOTYyLjQ2NzU4NDIzMzk5NzFRMjkyLjY0OTQ1NTQyMTAxNTE1IDk2My45MzUxNjg0Njc5OTQyIDI5Mi42NDk0NTU0MjEwMTUxNSA5NjYuNDkwNzE0OTA1MDgxOVEyOTIuNjQ5NDU1NDIxMDE1MTUgOTY4LjE3NzQ3OTc5MzEzMTIgMjkxLjg0ODAwNTcxMzY2NjM0IDk2OS4zOTY3ODY2NDMzMzcxUTI5MS4wNDY1NTYwMDYzMTc2IDk3MC42MTYwOTM0OTM1NDMxIDI4OS41NjgyNTc0ODY2MDYxNyA5NzEuMjY1Njk0Mzg4NTI5M1EyODguMDg5OTU4OTY2ODk0OCA5NzEuOTE1Mjk1MjgzNTE1NSAyODYuMDQ4Njk4MjQ0MDkyOCA5NzEuOTE1Mjk1MjgzNTE1NUgyODEuNTI2NzIzODU0OTQ0MUwyODMuMjQ4MDcwMzYwMTYyMyA5NzAuMjY3NDc4NTU0Mzk2Vjk3Ni4wWk0yODguNzk0NjE4OTM0MDY4MzUgOTc2LjAgMjg1LjA1MDE2NTM3MTE1NjEgOTcwLjU0NTUwNDE2NTI0NzNIMjg5LjE2Mzk5MzUyNzYwODM0TDI5Mi45NDE1MTQzNTM4NDQ3NSA5NzYuMFpNMjgzLjI0ODA3MDM2MDE2MjMgOTcwLjY4NzU2MzA5ODA3NjkgMjgxLjUyNjcyMzg1NDk0NDEgOTY4Ljg5Mzk4OTgxMTQwMjVIMjg1LjgzNDk1ODM0NzUyNzE2UTI4Ny4yOTYxMzMyODc5MTMwNSA5NjguODkzOTg5ODExNDAyNSAyODguMDI0ODcxOTQ1NzQzMzcgOTY4LjI1NjEzMzI4NzkxM1EyODguNzUzNjEwNjAzNTczNzUgOTY3LjYxODI3Njc2NDQyMzUgMjg4Ljc1MzYxMDYwMzU3Mzc1IDk2Ni40OTA3MTQ5MDUwODE5UTI4OC43NTM2MTA2MDM1NzM3NSA5NjUuMzUzMzYzMTY2MjA3MyAyODguMDI0ODcxOTQ1NzQzMzcgOTY0LjcyMDQwMTU4MjQ4NDNRMjg3LjI5NjEzMzI4NzkxMzA1IDk2NC4wODc0Mzk5OTg3NjEzIDI4NS44MzQ5NTgzNDc1MjcxNiA5NjQuMDg3NDM5OTk4NzYxM0gyODEuNTI2NzIzODU0OTQ0MUwyODMuMjQ4MDcwMzYwMTYyMyA5NjIuMjg0MDc2ODMyNTU0WiBNMzAxLjI1MTg4OTIyNjEwMDEgOTc2LjBWOTYxLjBIMzEyLjc4ODgyNDQ0MDI0NjQ2Vjk2NC4wNDA4ODUyMzExNzlIMzA1LjA2ODExMjAxMjYzNTFWOTcyLjk1OTExNDc2ODgyMUgzMTMuMDc3MTg1NzQ4MzUwOVY5NzYuMFpNMzA0Ljc5Mzc4NDAyNjUwODkgOTY5Ljg1MjA2MDE3MTU2NDlWOTY2LjkyMzg2NDIzNDYxNjRIMzExLjg5MDY3MzI1MjYwOTFWOTY5Ljg1MjA2MDE3MTU2NDlaIE0zMjEuNzA0MTk5OTMxODY5NTQgOTc2LjBWOTYxLjBIMzI0Ljg4MjM1NDgzNTcxMjc2TDMzMy40NDA5NjQ4MTk5MTg4NiA5NzEuNDAxMjU1NzY3ODYxSDMzMS45MjM1NjgzMzE3MzMzVjk2MS4wSDMzNS43MTY1MTM3MzQ0NzcxVjk3Ni4wSDMzMi41MzgzNTg4MzA2MzM5TDMyMy45Nzk3NDg4NDY0Mjc4IDk2NS41OTg3NDQyMzIxMzlIMzI1LjQ5NzE0NTMzNDYxMzRWOTc2LjBaIE0zNDMuMTU2NDY5NjA0NTMzNzUgOTc2LjAgMzQ5LjgxMTUxMTI1NzAwNjYgOTYxLjBIMzUzLjYxNzk0NDE2NDAwODVMMzYwLjI4Mjc3NTY5NjAxNDM3IDk3Ni4wSDM1Ni4yNjgxNDkzMjk1MzQ1NEwzNTAuOTI2MDA4MzMwNDk0NTQgOTYyLjkyMDI5NTkwMjg4MzFIMzUyLjQ0NzEwMjQ0MzQwNTNMMzQ3LjEwNDk2MTQ0NDM2NTMgOTc2LjBaTTM0Ni42NDUyOTQ2NjQxNDc5IDk3Mi45MzUzNzk4MjcxOTY1IDM0Ny42NDcxMDI0NDM0MDUzIDk3MC4wNTYxMzMyODc5MTNIMzU1LjE3MzY1NDczMzUxNzFMMzU2LjE4NTI1MjM5MjMwNzQ2IDk3Mi45MzUzNzk4MjcxOTY1WiBNMzY3LjczMDI0OTkxNDgzNyA5NzYuMFY5NjEuMEgzNzQuNjgyNTYyNDc4NzA5MjZRMzc3LjE1MDU0NTgxNzcyMDIgOTYxLjAgMzc5LjAyMzQyNDA5NjQ5NzU0IDk2MS45MjUzOTkxMDUwMTM4UTM4MC44OTYzMDIzNzUyNzQ5IDk2Mi44NTA3OTgyMTAwMjc1IDM4MS45NDgxNTExODc2Mzc0NSA5NjQuNTI3MTIxNzIxMjIyNlEzODMuMDAwMDAwMDAwMDAwMDYgOTY2LjIwMzQ0NTIzMjQxNzcgMzgzLjAwMDAwMDAwMDAwMDA2IDk2OC41UTM4My4wMDAwMDAwMDAwMDAwNiA5NzAuNzg0OTE2MDc1Njg2NyAzODEuOTQ4MTUxMTg3NjM3NDUgOTcyLjQ2NzA1ODkzMjgyOTZRMzgwLjg5NjMwMjM3NTI3NDkgOTc0LjE0OTIwMTc4OTk3MjUgMzc5LjAyMzQyNDA5NjQ5NzU0IDk3NS4wNzQ2MDA4OTQ5ODYyUTM3Ny4xNTA1NDU4MTc3MjAyIDk3Ni4wIDM3NC42ODI1NjI0Nzg3MDkyNiA5NzYuMFpNMzcxLjU5MzAyNzQ2ODk1NDIzIDk3Mi44ODkyODI2MTc0NDc2SDM3NC41MDc0MzYyODI1NTU1NVEzNzUuOTAxOTMwODc4NTczIDk3Mi44ODkyODI2MTc0NDc2IDM3Ni45MzA2Njk1MzY0MDMzNCA5NzIuMzU5NzY2MjY2MTQyM1EzNzcuOTU5NDA4MTk0MjMzNzMgOTcxLjgzMDI0OTkxNDgzNjkgMzc4LjUzMTc4MTY4ODM5NjIgOTcwLjg0MDY3MDc3NTEzODVRMzc5LjEwNDE1NTE4MjU1ODY2IDk2OS44NTEwOTE2MzU0NDAyIDM3OS4xMDQxNTUxODI1NTg2NiA5NjguNVEzNzkuMTA0MTU1MTgyNTU4NjYgOTY3LjEyNzQ3OTc5MzEzMTIgMzc4LjUzMTc4MTY4ODM5NjIgOTY2LjE0ODYxNDkzOTE0NzFRMzc3Ljk1OTQwODE5NDIzMzczIDk2NS4xNjk3NTAwODUxNjMxIDM3Ni45MzA2Njk1MzY0MDMzNCA5NjQuNjQwMjMzNzMzODU3N1EzNzUuOTAxOTMwODc4NTczIDk2NC4xMTA3MTczODI1NTI0IDM3NC41MDc0MzYyODI1NTU1NSA5NjQuMTEwNzE3MzgyNTUyNEgzNzEuNTkzMDI3NDY4OTU0MjNaIi8+CjxwYXRoIGZpbGw9IiMyQTM0MzUiIGQ9Ik00NTkuOTE1NTQ3Njc1ODIzIDk3Ni4yNzQzMjc5ODYxMjYyUTQ1Ni42NjEzNDUyNjY0ODI5NSA5NzYuMjc0MzI3OTg2MTI2MiA0NTQuODMwNjcyNjMzMjQxNSA5NzQuNDc4NTcxNDI4NTcxNVE0NTMuMCA5NzIuNjgyODE0ODcxMDE2NyA0NTMuMCA5NjkuMzU3Njg4Njc0ODYzVjk2MS4wSDQ1Ni44NjI3Nzc1NTQxMTcyNlY5NjkuMjM3MDU4MzEzNDYyUTQ1Ni44NjI3Nzc1NTQxMTcyNiA5NzEuMjY0NjIwMTcyODAzNiA0NTcuNjgwMDAzNzE2MjA1NzYgOTcyLjE1ODY5NTE0NzI1NDdRNDU4LjQ5NzIyOTg3ODI5NDI2IDk3My4wNTI3NzAxMjE3MDU3IDQ1OS45NDg2MTQ5MzkxNDcxNSA5NzMuMDUyNzcwMTIxNzA1N1E0NjEuNDExNjM4NjkxODk1NiA5NzMuMDUyNzcwMTIxNzA1NyA0NjIuMjIzMDQ1NTA4MDM2MyA5NzIuMTU4Njk1MTQ3MjU0N1E0NjMuMDM0NDUyMzI0MTc3MDQgOTcxLjI2NDYyMDE3MjgwMzYgNDYzLjAzNDQ1MjMyNDE3NzA0IDk2OS4yMzcwNTgzMTM0NjJWOTYxLjBINDY2LjgzMTA5NTM1MTY0NlY5NjkuMzU3Njg4Njc0ODYzUTQ2Ni44MzEwOTUzNTE2NDYgOTcyLjY4MjgxNDg3MTAxNjcgNDY1LjAwMDQyMjcxODQwNDU0IDk3NC40Nzg1NzE0Mjg1NzE1UTQ2My4xNjk3NTAwODUxNjMwNiA5NzYuMjc0MzI3OTg2MTI2MiA0NTkuOTE1NTQ3Njc1ODIzIDk3Ni4yNzQzMjc5ODYxMjYyWiBNNDc5LjU4Njc2OTQ0NzI4MzIgOTc2LjBWOTY0LjA5OTA3ODY5MDY1NjhINDc0Ljg5MDQyNjAzODkwMzJWOTYxLjBINDg4LjE0NTg5MDQwOTc4MDVWOTY0LjA5OTA3ODY5MDY1NjhINDgzLjQ0OTU0NzAwMTQwMDQ1Vjk3Ni4wWiBNNTAwLjg5NDcxNTA3MzY4NzU2IDk3Ni4wIDQ5NC40NDQxNjkyNTU5Njc0NCA5NjEuMEg0OTguNjE0MzQyMDU5NTM1MDNMNTA0LjE0MDg1MzMxNjU0MTYgOTc0LjEzNDE5OTkzMTg2OTZINTAxLjY4ODMyOTM5MzQ2NzFMNTA3LjMyNTY4MTEzMjM0MTcgOTYxLjBINTExLjE0MTkwMzkxODg3NjZMNTA0LjcwMTE0Nzk4MDY4OTUgOTc2LjBaIE01MTguOTkxMzE1NDMzNjA5IDk3Ni4wVjk2MS4wSDUzMC41MjgyNTA2NDc3NTUzVjk2NC4wNDA4ODUyMzExNzlINTIyLjgwNzUzODIyMDE0MzlWOTcyLjk1OTExNDc2ODgyMUg1MzAuODE2NjExOTU1ODU5N1Y5NzYuMFpNNTIyLjUzMzIxMDIzNDAxNzcgOTY5Ljg1MjA2MDE3MTU2NDlWOTY2LjkyMzg2NDIzNDYxNjRINTI5LjYzMDA5OTQ2MDExNzlWOTY5Ljg1MjA2MDE3MTU2NDlaIE01NDcuMTcxOTUxNTkyOTc5MSA5NzYuMjc0MzI3OTg2MTI2MlE1NDUuNDExMTExMTExMTExIDk3Ni4yNzQzMjc5ODYxMjYyIDU0My45MTMyMzI4MzIzMzM3IDk3NS43MDY0NzA4NDMyNjlRNTQyLjQxNTM1NDU1MzU1NjMgOTc1LjEzODYxMzcwMDQxMTggNTQxLjMxNDgyOTI1MjM4ODggOTc0LjA5MzUwODY0MDE3ODRRNTQwLjIxNDMwMzk1MTIyMTMgOTczLjA0ODQwMzU3OTk0NDkgNTM5LjYwMjY2NTI1OTMyNTcgOTcxLjYyNzM3NDExMzUzMDFRNTM4Ljk5MTAyNjU2NzQzMDEgOTcwLjIwNjM0NDY0NzExNTMgNTM4Ljk5MTAyNjU2NzQzMDEgOTY4LjVRNTM4Ljk5MTAyNjU2NzQzMDEgOTY2Ljc5MzY1NTM1Mjg4NDcgNTM5LjYwMjY2NTI1OTMyNTcgOTY1LjM3MjYyNTg4NjQ2OTlRNTQwLjIxNDMwMzk1MTIyMTMgOTYzLjk1MTU5NjQyMDA1NTEgNTQxLjMxOTcyNDE5MjE1NTMgOTYyLjkwNjQ5MTM1OTgyMTZRNTQyLjQyNTE0NDQzMzA4OTQgOTYxLjg2MTM4NjI5OTU4ODIgNTQzLjkyMzAyMjcxMTg2NjcgOTYxLjI5MzUyOTE1NjczMVE1NDUuNDIwOTAwOTkwNjQ0MSA5NjAuNzI1NjcyMDEzODczOCA1NDcuMTgxNzQxNDcyNTEyIDk2MC43MjU2NzIwMTM4NzM4UTU0OS4xOTMwODY3Mzg5OTUgOTYwLjcyNTY3MjAxMzg3MzggNTUwLjgwMzY1NDMxMjAwMjkgOTYxLjQyMzY3NjQ4ODgwNDlRNTUyLjQxNDIyMTg4NTAxMDkgOTYyLjEyMTY4MDk2MzczNiA1NTMuNDg5MzQ4MDgxMTY0NiA5NjMuNDYxMzQ1MjY2NDgyOUw1NTEuMDMwNzMxOTAzMjgyMiA5NjUuNzE0MTYyNjE0OTcwMVE1NTAuMjg4MTI3MTUyNzMyNiA5NjQuODQ5MDc4NjkwNjU2OCA1NDkuMzc2ODY3MDQ5Mjk4MiA5NjQuMzk4MTU0Mjg0NDc1NlE1NDguNDY1NjA2OTQ1ODYzOCA5NjMuOTQ3MjI5ODc4Mjk0MyA1NDcuMzcwMzU1MTcyOTI0IDk2My45NDcyMjk4NzgyOTQzUTU0Ni4zODE3MDA0Mzk0MDY5IDk2My45NDcyMjk4NzgyOTQzIDU0NS41NjI2MjU0NjQ5NTU4IDk2NC4yNzI5MDE4OTIxNjgxUTU0NC43NDM1NTA0OTA1MDQ3IDk2NC41OTg1NzM5MDYwNDE5IDU0NC4xNDU3Nzc4OTEzMjg0IDk2NS4yMDQwMTQ2NjM1Mjg2UTU0My41NDgwMDUyOTIxNTIyIDk2NS44MDk0NTU0MjEwMTUyIDU0My4yMTc0MzgzMzg1MTE5IDk2Ni42NDc4MzcyNDU2NzIyUTU0Mi44ODY4NzEzODQ4NzE2IDk2Ny40ODYyMTkwNzAzMjkyIDU0Mi44ODY4NzEzODQ4NzE2IDk2OC41UTU0Mi44ODY4NzEzODQ4NzE2IDk2OS41MTM3ODA5Mjk2NzA4IDU0My4yMTc0MzgzMzg1MTE5IDk3MC4zNTIxNjI3NTQzMjc4UTU0My41NDgwMDUyOTIxNTIyIDk3MS4xOTA1NDQ1Nzg5ODQ4IDU0NC4xNDU3Nzc4OTEzMjg0IDk3MS43OTU5ODUzMzY0NzE0UTU0NC43NDM1NTA0OTA1MDQ3IDk3Mi40MDE0MjYwOTM5NTgxIDU0NS41NjI2MjU0NjQ5NTU4IDk3Mi43MjcwOTgxMDc4MzE5UTU0Ni4zODE3MDA0Mzk0MDY5IDk3My4wNTI3NzAxMjE3MDU3IDU0Ny4zNzAzNTUxNzI5MjQgOTczLjA1Mjc3MDEyMTcwNTdRNTQ4LjQ2NTYwNjk0NTg2MzggOTczLjA1Mjc3MDEyMTcwNTcgNTQ5LjM3Njg2NzA0OTI5ODIgOTcyLjYwMTg0NTcxNTUyNDRRNTUwLjI4ODEyNzE1MjczMjYgOTcyLjE1MDkyMTMwOTM0MzIgNTUxLjAzMDczMTkwMzI4MjIgOTcxLjI3NjA0NzUwNTQ5NjlMNTUzLjQ4OTM0ODA4MTE2NDYgOTczLjUyODg2NDg1Mzk4NFE1NTIuNDE0MjIxODg1MDEwOSA5NzQuODU2ODkwNDY0ODM1NCA1NTAuODAzNjU0MzEyMDAyOSA5NzUuNTY1NjA5MjI1NDgwOFE1NDkuMTkzMDg2NzM4OTk1IDk3Ni4yNzQzMjc5ODYxMjYyIDU0Ny4xNzE5NTE1OTI5NzkxIDk3Ni4yNzQzMjc5ODYxMjYyWiBNNTY1LjMyMjkyNDY4ODMzNzYgOTcyLjYxOTI4NjMzMzY1MzMgNTY1LjExMjg4MjQxNjQ5NzEgOTY4LjI0NDA3MTg3NzYxMyA1NzEuOTI1MjMxMDU4NTMzNyA5NjEuMEg1NzYuMTg5MDU5MjE0OTg1OEw1NjkuNzQ4MzAzMjc2Nzk4OCA5NjcuOTY2MTM0NTI2NjQ4M0w1NjcuNTk3MDgyMzQ4MzY2NyA5NzAuMjIwODAwNjg3NDk4Wk01NjEuODc4MzgyODY1NTM4NyA5NzYuMFY5NjEuMEg1NjUuNjk0NjA1NjUyMDczNlY5NzYuMFpNNTcyLjA0ODgwMTg2NzczNzQgOTc2LjAgNTY2LjkyOTY0NDgyNzA3NTkgOTY5LjY0Mjc3NTA3NjY0NjggNTY5LjQ1NDM5NTUzMTYwNjYgOTY2LjkyNTE2NzIyOTI1ODkgNTc2LjUzODAwODYxMjY1MDkgOTc2LjBaIE01ODQuMzE4MzQ1MTUyOTMyMSA5NzYuMFY5NjEuMEg1ODguMTgxMTIyNzA3MDQ5M1Y5NzIuOTAwOTIxMzA5MzQzMkg1OTUuNTEwNTc0NDExODU4N1Y5NzYuMFogTTYwMy43Nzk3MzYwMTE3NTQzIDk3Ni4wVjk2MS4wSDYwNy42NDI1MTM1NjU4NzE1Vjk3Ni4wWiBNNjE3LjM5MTEyNjg3MDU3NjMgOTc2LjBWOTYxLjBINjIwLjU2OTI4MTc3NDQxOTRMNjI5LjEyNzg5MTc1ODYyNTUgOTcxLjQwMTI1NTc2Nzg2MUg2MjcuNjEwNDk1MjcwNDRWOTYxLjBINjMxLjQwMzQ0MDY3MzE4MzhWOTc2LjBINjI4LjIyNTI4NTc2OTM0MDZMNjE5LjY2NjY3NTc4NTEzNDQgOTY1LjU5ODc0NDIzMjEzOUg2MjEuMTg0MDcyMjczMzJWOTc2LjBaIE02NDguNTA1NjI4NTAzMjk4MSA5NzYuMjc0MzI3OTg2MTI2MlE2NDYuNzIzMzU5NDUwMDAxNiA5NzYuMjc0MzI3OTg2MTI2MiA2NDUuMjIwNTg2MjMxNDU3NyA5NzUuNzA2NDcwODQzMjY5UTY0My43MTc4MTMwMTI5MTM5IDk3NS4xMzg2MTM3MDA0MTE4IDY0Mi42MTIzOTI3NzE5Nzk4IDk3NC4wOTM1MDg2NDAxNzg0UTY0MS41MDY5NzI1MzEwNDU4IDk3My4wNDg0MDM1Nzk5NDQ5IDY0MC44OTUzMzM4MzkxNTAyIDk3MS42MjczNzQxMTM1MzAxUTY0MC4yODM2OTUxNDcyNTQ3IDk3MC4yMDYzNDQ2NDcxMTUzIDY0MC4yODM2OTUxNDcyNTQ3IDk2OC41UTY0MC4yODM2OTUxNDcyNTQ3IDk2Ni43OTM2NTUzNTI4ODQ3IDY0MC44OTUzMzM4MzkxNTAyIDk2NS4zNzI2MjU4ODY0Njk5UTY0MS41MDY5NzI1MzEwNDU4IDk2My45NTE1OTY0MjAwNTUxIDY0Mi42MjMxMDcwNTc2OTQxIDk2Mi45MDY0OTEzNTk4MjE2UTY0My43MzkyNDE1ODQzNDI0IDk2MS44NjEzODYyOTk1ODgyIDY0NS4yNTM2NTM0OTQ3ODE4IDk2MS4yOTM1MjkxNTY3MzFRNjQ2Ljc2ODA2NTQwNTIyMTMgOTYwLjcyNTY3MjAxMzg3MzggNjQ4LjU4MzQwMTcyMTg0MiA5NjAuNzI1NjcyMDEzODczOFE2NTAuNjM1NzU1MzE4ODE5NSA5NjAuNzI1NjcyMDEzODczOCA2NTIuMjY5NjAwMjc1NjE4NiA5NjEuNDA3MTQyODU3MTQyOFE2NTMuOTAzNDQ1MjMyNDE3OCA5NjIuMDg4NjEzNzAwNDExOSA2NTUuMCA5NjMuMzgzNTcyMDQ3OTM5MUw2NTIuNTM3Njg2MTk3MzkyNSA5NjUuNjM2Mzg5Mzk2NDI2MlE2NTEuNzQyNDM0NDI0NDUyNyA5NjQuNzgyOTQ0MTY0MDA4NSA2NTAuODE0NjQwNjg5MzU2MSA5NjQuMzY1MDg3MDIxMTUxM1E2NDkuODg2ODQ2OTU0MjU5NyA5NjMuOTQ3MjI5ODc4Mjk0MyA2NDguNzcyMDE1NDIyMjU0IDk2My45NDcyMjk4NzgyOTQzUTY0Ny43NTAyOTM0MjU0MTI3IDk2My45NDcyMjk4NzgyOTQzIDY0Ni45MDM5NzA1MzM1ODUyIDk2NC4yNzI5MDE4OTIxNjgxUTY0Ni4wNTc2NDc2NDE3NTc3IDk2NC41OTg1NzM5MDYwNDE5IDY0NS40NDkxNjA3NTY4NjczIDk2NS4yMDQwMTQ2NjM1Mjg2UTY0NC44NDA2NzM4NzE5NzY3IDk2NS44MDk0NTU0MjEwMTUyIDY0NC41MTAxMDY5MTgzMzY0IDk2Ni42NDIwMTc4OTk3MjQ0UTY0NC4xNzk1Mzk5NjQ2OTYxIDk2Ny40NzQ1ODAzNzg0MzM2IDY0NC4xNzk1Mzk5NjQ2OTYxIDk2OC41UTY0NC4xNzk1Mzk5NjQ2OTYxIDk2OS40OTIzNTIzNTgyNDIyIDY0NC41MTAxMDY5MTgzMzY0IDk3MC4zMzA3MzQxODI4OTkzUTY0NC44NDA2NzM4NzE5NzY3IDk3MS4xNjkxMTYwMDc1NTYzIDY0NS40NDkxNjA3NTY4NjczIDk3MS43Nzk0NTE3MDQ4MDk0UTY0Ni4wNTc2NDc2NDE3NTc3IDk3Mi4zODk3ODc0MDIwNjI0IDY0Ni44ODc0MzY5MDE5MjMxIDk3Mi43MjEyNzg3NjE4ODQyUTY0Ny43MTcyMjYxNjIwODg1IDk3My4wNTI3NzAxMjE3MDU3IDY0OC43MjczMDk0NjcwMzQyIDk3My4wNTI3NzAxMjE3MDU3UTY0OS43MjE1MTA2Mzc2MzkgOTczLjA1Mjc3MDEyMTcwNTcgNjUwLjY1MzI3NDkwNjMyMDcgOTcyLjcyOTIxOTgyOTA1NDVRNjUxLjU4NTAzOTE3NTAwMjQgOTcyLjQwNTY2OTUzNjQwMzQgNjUyLjUxNjI1NzYyNTk2MzkgOTcxLjYyOTk5NzUyMjUyOTVMNjU0LjY4ODkwNzEyNTgyNDYgOTc0LjM2NzE4NTEyODk4MzRRNjUzLjQyNTE2NzIyOTI1ODkgOTc1LjI5ODQwMzU3OTk0NDkgNjUxLjc3NTcxMzA0Njk3OSA5NzUuNzg2MzY1NzgzMDM1NVE2NTAuMTI2MjU4ODY0Njk5MSA5NzYuMjc0MzI3OTg2MTI2MiA2NDguNTA1NjI4NTAzMjk4MSA5NzYuMjc0MzI3OTg2MTI2MlpNNjU0LjY4ODkwNzEyNTgyNDYgOTc0LjM2NzE4NTEyODk4MzQgNjUxLjIyNjA4ODUzODYwMjEgOTczLjg3MTE3NjE3OTEyMTFWOTY4LjIyMDEyNTU3Njc4NjFINjU0LjY4ODkwNzEyNTgyNDZaIi8+CjxwYXRoIGZpbGw9IiMyQTM0MzUiIGQ9Ik03MzAuNDUwNTQ1ODE3NzIwMSA5NzYuMCA3MjQuMCA5NjEuMEg3MjguMTcwMTcyODAzNTY3NUw3MzMuNjk2Njg0MDYwNTc0MiA5NzQuMTM0MTk5OTMxODY5Nkg3MzEuMjQ0MTYwMTM3NDk5Nkw3MzYuODgxNTExODc2Mzc0MiA5NjEuMEg3NDAuNjk3NzM0NjYyOTA5Mkw3MzQuMjU2OTc4NzI0NzIyMSA5NzYuMFogTTc0NS45MzQ3OTMyOTg5NTg0IDk3Ni4wIDc1Mi41ODk4MzQ5NTE0MzEzIDk2MS4wSDc1Ni4zOTYyNjc4NTg0MzMyTDc2My4wNjEwOTkzOTA0MzkgOTc2LjBINzU5LjA0NjQ3MzAyMzk1OTJMNzUzLjcwNDMzMjAyNDkxOTMgOTYyLjkyMDI5NTkwMjg4MzFINzU1LjIyNTQyNjEzNzgyOTlMNzQ5Ljg4MzI4NTEzODc4OTkgOTc2LjBaTTc0OS40MjM2MTgzNTg1NzI1IDk3Mi45MzUzNzk4MjcxOTY1IDc1MC40MjU0MjYxMzc4MyA5NzAuMDU2MTMzMjg3OTEzSDc1Ny45NTE5Nzg0Mjc5NDE4TDc1OC45NjM1NzYwODY3MzIxIDk3Mi45MzUzNzk4MjcxOTY1Wk03NTYuNzE5ODc5NzAwNzQyMiA5NTkuNzM0NjIyNjUwMjc0MVE3NTYuMDUyNDQyMTc5NDUxNSA5NTkuNzM0NjIyNjUwMjc0MSA3NTUuNTg4MzAzMTc3ODcyMSA5NTkuMzAzNTUwOTEyMDE4OVE3NTUuMTI0MTY0MTc2MjkyOCA5NTguODcyNDc5MTczNzYzNiA3NTUuMTI0MTY0MTc2MjkyOCA5NTguMTYyMTg0NTA5NjE1N1E3NTUuMTI0MTY0MTc2MjkyOCA5NTcuNDUxODg5ODQ1NDY3OCA3NTUuNTg4MzAzMTc3ODcyMSA5NTcuMDE0OTk4NzYxMjY0OFE3NTYuMDUyNDQyMTc5NDUxNSA5NTYuNTc4MTA3Njc3MDYxOCA3NTYuNzE5ODc5NzAwNzQyMiA5NTYuNTc4MTA3Njc3MDYxOFE3NTcuMzg3MzE3MjIyMDMzMSA5NTYuNTc4MTA3Njc3MDYxOCA3NTcuODUxNDU2MjIzNjEyNCA5NTcuMDE0OTk4NzYxMjY0OFE3NTguMzE1NTk1MjI1MTkxOCA5NTcuNDUxODg5ODQ1NDY3OCA3NTguMzE1NTk1MjI1MTkxOCA5NTguMTYyMTg0NTA5NjE1N1E3NTguMzE1NTk1MjI1MTkxOCA5NTguODcyNDc5MTczNzYzNiA3NTcuODUxNDU2MjIzNjEyNCA5NTkuMzAzNTUwOTEyMDE4OVE3NTcuMzg3MzE3MjIyMDMzMSA5NTkuNzM0NjIyNjUwMjc0MSA3NTYuNzE5ODc5NzAwNzQyMiA5NTkuNzM0NjIyNjUwMjc0MVpNNzUyLjI3NjAxMjk4ODY1NTMgOTU5LjczNDYyMjY1MDI3NDFRNzUxLjYwODU3NTQ2NzM2NDUgOTU5LjczNDYyMjY1MDI3NDEgNzUxLjE0NDQzNjQ2NTc4NTEgOTU5LjMwMzU1MDkxMjAxODlRNzUwLjY4MDI5NzQ2NDIwNTggOTU4Ljg3MjQ3OTE3Mzc2MzYgNzUwLjY4MDI5NzQ2NDIwNTggOTU4LjE2MjE4NDUwOTYxNTdRNzUwLjY4MDI5NzQ2NDIwNTggOTU3LjQ1MTg4OTg0NTQ2NzggNzUxLjE0NDQzNjQ2NTc4NTEgOTU3LjAxNDk5ODc2MTI2NDhRNzUxLjYwODU3NTQ2NzM2NDUgOTU2LjU3ODEwNzY3NzA2MTggNzUyLjI3NjAxMjk4ODY1NTMgOTU2LjU3ODEwNzY3NzA2MThRNzUyLjk0MzQ1MDUwOTk0NiA5NTYuNTc4MTA3Njc3MDYxOCA3NTMuNDA3NTg5NTExNTI1NCA5NTcuMDE0OTk4NzYxMjY0OFE3NTMuODcxNzI4NTEzMTA0OCA5NTcuNDUxODg5ODQ1NDY3OCA3NTMuODcxNzI4NTEzMTA0OCA5NTguMTYyMTg0NTA5NjE1N1E3NTMuODcxNzI4NTEzMTA0OCA5NTguODcyNDc5MTczNzYzNiA3NTMuNDA3NTg5NTExNTI1NCA5NTkuMzAzNTUwOTEyMDE4OVE3NTIuOTQzNDUwNTA5OTQ2IDk1OS43MzQ2MjI2NTAyNzQxIDc1Mi4yNzYwMTI5ODg2NTUzIDk1OS43MzQ2MjI2NTAyNzQxWiBNNzcwLjE5MTA1NjIwMjQ1MDcgOTc2LjBWOTYxLjBINzc2LjczODA3NDcyMTU0MjZRNzc5Ljk1MzExNzYxMjc1MDcgOTYxLjAgNzgxLjcwNDE2ODIxNTA4NTcgOTYyLjQ2NzU4NDIzMzk5NzFRNzgzLjQ1NTIxODgxNzQyMDggOTYzLjkzNTE2ODQ2Nzk5NDIgNzgzLjQ1NTIxODgxNzQyMDggOTY2LjQ5MDcxNDkwNTA4MTlRNzgzLjQ1NTIxODgxNzQyMDggOTY4LjE3NzQ3OTc5MzEzMTIgNzgyLjY1Mzc2OTExMDA3MjEgOTY5LjM5Njc4NjY0MzMzNzFRNzgxLjg1MjMxOTQwMjcyMzIgOTcwLjYxNjA5MzQ5MzU0MzEgNzgwLjM3NDAyMDg4MzAxMTggOTcxLjI2NTY5NDM4ODUyOTNRNzc4Ljg5NTcyMjM2MzMwMDQgOTcxLjkxNTI5NTI4MzUxNTUgNzc2Ljg1NDQ2MTY0MDQ5ODQgOTcxLjkxNTI5NTI4MzUxNTVINzcyLjMzMjQ4NzI1MTM0OTdMNzc0LjA1MzgzMzc1NjU2NzkgOTcwLjI2NzQ3ODU1NDM5NlY5NzYuMFpNNzc5LjYwMDM4MjMzMDQ3NCA5NzYuMCA3NzUuODU1OTI4NzY3NTYxNiA5NzAuNTQ1NTA0MTY1MjQ3M0g3NzkuOTY5NzU2OTI0MDE0TDc4My43NDcyNzc3NTAyNTAzIDk3Ni4wWk03NzQuMDUzODMzNzU2NTY3OSA5NzAuNjg3NTYzMDk4MDc2OSA3NzIuMzMyNDg3MjUxMzQ5NyA5NjguODkzOTg5ODExNDAyNUg3NzYuNjQwNzIxNzQzOTMyOFE3NzguMTAxODk2Njg0MzE4NyA5NjguODkzOTg5ODExNDAyNSA3NzguODMwNjM1MzQyMTQ5IDk2OC4yNTYxMzMyODc5MTNRNzc5LjU1OTM3Mzk5OTk3OTQgOTY3LjYxODI3Njc2NDQyMzUgNzc5LjU1OTM3Mzk5OTk3OTQgOTY2LjQ5MDcxNDkwNTA4MTlRNzc5LjU1OTM3Mzk5OTk3OTQgOTY1LjM1MzM2MzE2NjIwNzMgNzc4LjgzMDYzNTM0MjE0OSA5NjQuNzIwNDAxNTgyNDg0M1E3NzguMTAxODk2Njg0MzE4NyA5NjQuMDg3NDM5OTk4NzYxMyA3NzYuNjQwNzIxNzQzOTMyOCA5NjQuMDg3NDM5OTk4NzYxM0g3NzIuMzMyNDg3MjUxMzQ5N0w3NzQuMDUzODMzNzU2NTY3OSA5NjIuMjg0MDc2ODMyNTU0WiBNNzkxLjc0MDEzNTIxNTY5NDkgOTc2LjBWOTYxLjBINzk4LjY5MjQ0Nzc3OTU2NzFRODAxLjE2MDQzMTExODU3OCA5NjEuMCA4MDMuMDMzMzA5Mzk3MzU1NCA5NjEuOTI1Mzk5MTA1MDEzOFE4MDQuOTA2MTg3Njc2MTMyNyA5NjIuODUwNzk4MjEwMDI3NSA4MDUuOTU4MDM2NDg4NDk1MyA5NjQuNTI3MTIxNzIxMjIyNlE4MDcuMDA5ODg1MzAwODU3OCA5NjYuMjAzNDQ1MjMyNDE3NyA4MDcuMDA5ODg1MzAwODU3OCA5NjguNVE4MDcuMDA5ODg1MzAwODU3OCA5NzAuNzg0OTE2MDc1Njg2NyA4MDUuOTU4MDM2NDg4NDk1MyA5NzIuNDY3MDU4OTMyODI5NlE4MDQuOTA2MTg3Njc2MTMyNyA5NzQuMTQ5MjAxNzg5OTcyNSA4MDMuMDMzMzA5Mzk3MzU1NCA5NzUuMDc0NjAwODk0OTg2MlE4MDEuMTYwNDMxMTE4NTc4IDk3Ni4wIDc5OC42OTI0NDc3Nzk1NjcxIDk3Ni4wWk03OTUuNjAyOTEyNzY5ODEyMSA5NzIuODg5MjgyNjE3NDQ3Nkg3OTguNTE3MzIxNTgzNDEzNFE3OTkuOTExODE2MTc5NDMwOCA5NzIuODg5MjgyNjE3NDQ3NiA4MDAuOTQwNTU0ODM3MjYxMyA5NzIuMzU5NzY2MjY2MTQyM1E4MDEuOTY5MjkzNDk1MDkxNiA5NzEuODMwMjQ5OTE0ODM2OSA4MDIuNTQxNjY2OTg5MjU0IDk3MC44NDA2NzA3NzUxMzg1UTgwMy4xMTQwNDA0ODM0MTY1IDk2OS44NTEwOTE2MzU0NDAyIDgwMy4xMTQwNDA0ODM0MTY1IDk2OC41UTgwMy4xMTQwNDA0ODM0MTY1IDk2Ny4xMjc0Nzk3OTMxMzEyIDgwMi41NDE2NjY5ODkyNTQgOTY2LjE0ODYxNDkzOTE0NzFRODAxLjk2OTI5MzQ5NTA5MTYgOTY1LjE2OTc1MDA4NTE2MzEgODAwLjk0MDU1NDgzNzI2MTMgOTY0LjY0MDIzMzczMzg1NzdRNzk5LjkxMTgxNjE3OTQzMDggOTY0LjExMDcxNzM4MjU1MjQgNzk4LjUxNzMyMTU4MzQxMzQgOTY0LjExMDcxNzM4MjU1MjRINzk1LjYwMjkxMjc2OTgxMjFaIE04MTUuMTc0OTI4NTE0NjUzMyA5NzYuMFY5NjEuMEg4MjYuNzExODYzNzI4Nzk5NlY5NjQuMDQwODg1MjMxMTc5SDgxOC45OTExNTEzMDExODgyVjk3Mi45NTkxMTQ3Njg4MjFIODI3LjAwMDIyNTAzNjkwNFY5NzYuMFpNODE4LjcxNjgyMzMxNTA2MiA5NjkuODUyMDYwMTcxNTY0OVY5NjYuOTIzODY0MjM0NjE2NEg4MjUuODEzNzEyNTQxMTYyMlY5NjkuODUyMDYwMTcxNTY0OVogTTg0MC40MDMyOTUxMDAyODYgOTc2LjI3NDMyNzk4NjEyNjJRODM4LjU4NjEwOTk3MTMwMjYgOTc2LjI3NDMyNzk4NjEyNjIgODM2LjkwNzI4NjE1MDQyMzcgOTc1LjgwNjU5NzAzOTQyMjdRODM1LjIyODQ2MjMyOTU0NDkgOTc1LjMzODg2NjA5MjcxOTMgODM0LjE5MDY0NjgzOTE2MDUgOTc0LjU5NDQxMjUyOTgwNzFMODM1LjQ3NjU3MjQ4NDA3NzEgOTcxLjcxMTQ2ODM2NTc5ODVRODM2LjQ1OTg5MjEzOTcwODcgOTcyLjM4MTg0NjMzNDg5MjEgODM3Ljc4MjY0NDIyMjMzMjQgOTcyLjgwNTc5NTczMjU1N1E4MzkuMTA1Mzk2MzA0OTU2IDk3My4yMjk3NDUxMzAyMjIgODQwLjQyNjU3MjQ4NDA3NyA5NzMuMjI5NzQ1MTMwMjIyUTg0MS4zOTAxMDEwMjE0NDA0IDk3My4yMjk3NDUxMzAyMjIgODQxLjk2OTQ5MTE3NjU5MiA5NzMuMDUwMTAyNTgyNzYzUTg0Mi41NDg4ODEzMzE3NDM2IDk3Mi44NzA0NjAwMzUzMDQgODQyLjgyMDA1NzUxMDg2NDcgOTcyLjU1MTI1ODg2NDY5OTFRODQzLjA5MTIzMzY4OTk4NTkgOTcyLjIzMjA1NzY5NDA5NDQgODQzLjA5MTIzMzY4OTk4NTkgOTcxLjgxODI3Njc2NDQyMzZRODQzLjA5MTIzMzY4OTk4NTkgOTcxLjI2NDI4NTcxNDI4NTcgODQyLjYyMTY1MzkzMDkxOTggOTcwLjkzNTU2NzU3MzAwOFE4NDIuMTUyMDc0MTcxODUzOSA5NzAuNjA2ODQ5NDMxNzMwMiA4NDEuMzg4MzEzNzU4NzM1NiA5NzAuMzk3MTg1NzQ4MzUwOVE4NDAuNjI0NTUzMzQ1NjE3NCA5NzAuMTg3NTIyMDY0OTcxNiA4MzkuNzA2ODIyMzk4OTE0IDk2OS45OTA2OTQzODg1MjkzUTgzOC43ODkwOTE0NTIyMTA2IDk2OS43OTM4NjY3MTIwODY5IDgzNy44NjU1NDExNTk1NTk0IDk2OS40OTg3NjE2NTE4NTM0UTgzNi45NDE5OTA4NjY5MDgyIDk2OS4yMDM2NTY1OTE2MiA4MzYuMTc4MjMwNDUzNzkgOTY4LjcyNTQ4NDI2ODA2MjJRODM1LjQxNDQ3MDA0MDY3MTcgOTY4LjI0NzMxMTk0NDUwNDYgODM0Ljk0NDg5MDI4MTYwNTcgOTY3LjQ2MzMyMDI3NDk5OTJRODM0LjQ3NTMxMDUyMjUzOTggOTY2LjY3OTMyODYwNTQ5MzggODM0LjQ3NTMxMDUyMjUzOTggOTY1LjQ3OTMyODYwNTQ5MzhRODM0LjQ3NTMxMDUyMjUzOTggOTY0LjE3NDU4MDM3ODQzMzYgODM1LjE4ODkyNDIyMjk1MTYgOTYzLjA5NjY4MDk2MzczNTlRODM1LjkwMjUzNzkyMzM2MzUgOTYyLjAxODc4MTU0OTAzODQgODM3LjM0MzUyNTczNzMwNTUgOTYxLjM3MjIyNjc4MTQ1NjFRODM4Ljc4NDUxMzU1MTI0NzUgOTYwLjcyNTY3MjAxMzg3MzggODQwLjk2MTc0MDk1MjA3MTMgOTYwLjcyNTY3MjAxMzg3MzhRODQyLjM5NTA2MDYwNzcwMjggOTYwLjcyNTY3MjAxMzg3MzggODQzLjc5NTMxMzAwMDAxMDMgOTYxLjA1Njg5MDQ2NDgzNTNRODQ1LjE5NTU2NTM5MjMxNzggOTYxLjM4ODEwODkxNTc5NjkgODQ2LjI3NjIzODAyNTU1OTIgOTYyLjA0MjYwNDc1MDU0OTdMODQ1LjA4NzY2NTM1ODI1MjUgOTY0LjkyMzcwMDEwMjE5NTdRODQ0LjAzMjExODkyMTE2NDkgOTY0LjMzNzE4NzYwNjQ1MzggODQyLjk3ODE0ODM4NzU3OTYgOTY0LjA1MzcyMTIzODExNTlRODQxLjkyNDE3Nzg1Mzk5NDQgOTYzLjc3MDI1NDg2OTc3OCA4NDAuOTI4NjczNjg4NzQ3MiA5NjMuNzcwMjU0ODY5Nzc4UTgzOS45ODQ3MjQ5MTA0NDk3IDk2My43NzAyNTQ4Njk3NzggODM5LjM5OTUxNTQwOTM1MDMgOTYzLjk3NzE0NTMzNDYxMzRRODM4LjgxNDMwNTkwODI1MSA5NjQuMTg0MDM1Nzk5NDQ4OCA4MzguNTUzODQ0MDE0ODQ0MSA5NjQuNTI1NTg5OTQ3NjYzNFE4MzguMjkzMzgyMTIxNDM3MyA5NjQuODY3MTQ0MDk1ODc4MSA4MzguMjkzMzgyMTIxNDM3MyA5NjUuMjkwNzE0OTA1MDgxOVE4MzguMjkzMzgyMTIxNDM3MyA5NjUuODMzMDY3MjYzMzI0MSA4MzguNzYyOTYxODgwNTAzMyA5NjYuMTU1OTY2MDU4NjU0UTgzOS4yMzI1NDE2Mzk1NjkzIDk2Ni40Nzg4NjQ4NTM5ODQxIDgzOS45OTYzMDIwNTI2ODc1IDk2Ni42Nzc4MTQyNTE2NDkxUTg0MC43NjAwNjI0NjU4MDU3IDk2Ni44NzY3NjM2NDkzMTQxIDg0MS42ODM2MTI3NTg0NTcgOTY3LjA3MjY2NjkxOTU3NTFRODQyLjYwNzE2MzA1MTEwODIgOTY3LjI2ODU3MDE4OTgzNjIgODQzLjUyNDg5Mzk5NzgxMTUgOTY3LjU1ODc4MDMxMDMwMzJRODQ0LjQ0MjYyNDk0NDUxNDkgOTY3Ljg0ODk5MDQzMDc3MDIgODQ1LjIwNjM4NTM1NzYzMzIgOTY4LjMyMjI2NzgxNDU2MTNRODQ1Ljk3MDE0NTc3MDc1MTQgOTY4Ljc5NTU0NTE5ODM1MjQgODQ2LjQzOTcyNTUyOTgxNzUgOTY5LjU3MzcxNzUyMTkxMDFRODQ2LjkwOTMwNTI4ODg4MzQgOTcwLjM1MTg4OTg0NTQ2NzggODQ2LjkwOTMwNTI4ODg4MzQgOTcxLjUzMDQ2MTI3NDAzOTJRODQ2LjkwOTMwNTI4ODg4MzQgOTcyLjgxMzc4MDkyOTY3MDggODQ2LjE5MDc5NjY0ODcwNDkgOTczLjg5MTY4MDM0NDM2ODNRODQ1LjQ3MjI4ODAwODUyNjYgOTc0Ljk2OTU3OTc1OTA2NTkgODQ0LjAzMjIyNDYwMDc2NTkgOTc1LjYyMTk1Mzg3MjU5NjFRODQyLjU5MjE2MTE5MzAwNTMgOTc2LjI3NDMyNzk4NjEyNjIgODQwLjQwMzI5NTEwMDI4NiA5NzYuMjc0MzI3OTg2MTI2MlogTTg1OC4yNDYxOTk3OTI1MTE5IDk3Mi42MTkyODYzMzM2NTMzIDg1OC4wMzYxNTc1MjA2NzE0IDk2OC4yNDQwNzE4Nzc2MTMgODY0Ljg0ODUwNjE2MjcwOCA5NjEuMEg4NjkuMTEyMzM0MzE5MTYwMUw4NjIuNjcxNTc4MzgwOTczMSA5NjcuOTY2MTM0NTI2NjQ4M0w4NjAuNTIwMzU3NDUyNTQxIDk3MC4yMjA4MDA2ODc0OThaTTg1NC44MDE2NTc5Njk3MTMgOTc2LjBWOTYxLjBIODU4LjYxNzg4MDc1NjI0NzlWOTc2LjBaTTg2NC45NzIwNzY5NzE5MTE3IDk3Ni4wIDg1OS44NTI5MTk5MzEyNTAyIDk2OS42NDI3NzUwNzY2NDY4IDg2Mi4zNzc2NzA2MzU3ODA5IDk2Ni45MjUxNjcyMjkyNTg5IDg2OS40NjEyODM3MTY4MjUyIDk3Ni4wWiBNODc0LjYyOTI2NzM3ODQyMzMgOTc2LjAgODgxLjI4NDMwOTAzMDg5NjEgOTYxLjBIODg1LjA5MDc0MTkzNzg5ODFMODkxLjc1NTU3MzQ2OTkwMzkgOTc2LjBIODg3Ljc0MDk0NzEwMzQyNDFMODgyLjM5ODgwNjEwNDM4NDEgOTYyLjkyMDI5NTkwMjg4MzFIODgzLjkxOTkwMDIxNzI5NDhMODc4LjU3Nzc1OTIxODI1NDggOTc2LjBaTTg3OC4xMTgwOTI0MzgwMzc0IDk3Mi45MzUzNzk4MjcxOTY1IDg3OS4xMTk5MDAyMTcyOTQ4IDk3MC4wNTYxMzMyODc5MTNIODg2LjY0NjQ1MjUwNzQwNjZMODg3LjY1ODA1MDE2NjE5NyA5NzIuOTM1Mzc5ODI3MTk2NVogTTg5OC44ODU1MzAyODE5MTU1IDk3Ni4wVjk2MS4wSDkwNS41NDg5MzU3MTk5NjMyUTkwNy41OTAxOTY0NDI3NjUyIDk2MS4wIDkwOS4wNjg0OTQ5NjI0NzY2IDk2MS42NjEyMzk1ODY4ODE3UTkxMC41NDY3OTM0ODIxODggOTYyLjMyMjQ3OTE3Mzc2MzYgOTExLjM0ODI0MzE4OTUzNjggOTYzLjU1ODMxOTY1NTYzMTVROTEyLjE0OTY5Mjg5Njg4NTcgOTY0Ljc5NDE2MDEzNzQ5OTYgOTEyLjE0OTY5Mjg5Njg4NTcgOTY2LjQ5MDcxNDkwNTA4MTlROTEyLjE0OTY5Mjg5Njg4NTcgOTY4LjE3NzQ3OTc5MzEzMTIgOTExLjM0ODI0MzE4OTUzNjggOTY5LjQwNzUwMDkyOTA1MTRROTEwLjU0Njc5MzQ4MjE4OCA5NzAuNjM3NTIyMDY0OTcxNyA5MDkuMDY4NDk0OTYyNDc2NiA5NzEuMzA0NTgwOTk3ODAxMlE5MDcuNTkwMTk2NDQyNzY1MiA5NzEuOTcxNjM5OTMwNjMwOCA5MDUuNTQ4OTM1NzE5OTYzMiA5NzEuOTcxNjM5OTMwNjMwOEg5MDEuMDI2OTYxMzMwODE0NUw5MDIuNzQ4MzA3ODM2MDMyNyA5NzAuMjY3NDc4NTU0Mzk2Vjk3Ni4wWk05MDIuNzQ4MzA3ODM2MDMyNyA5NzAuNjg3NTYzMDk4MDc2OSA5MDEuMDI2OTYxMzMwODE0NSA5NjguODg0MTk5OTMxODY5Nkg5MDUuMzM1MTk1ODIzMzk3NlE5MDYuNzk2MzcwNzYzNzgzNCA5NjguODg0MTk5OTMxODY5NiA5MDcuNTI1MTA5NDIxNjEzOCA5NjguMjUxMjM4MzQ4MTQ2NlE5MDguMjUzODQ4MDc5NDQ0MiA5NjcuNjE4Mjc2NzY0NDIzNSA5MDguMjUzODQ4MDc5NDQ0MiA5NjYuNDkwNzE0OTA1MDgxOVE5MDguMjUzODQ4MDc5NDQ0MiA5NjUuMzUzMzYzMTY2MjA3MyA5MDcuNTI1MTA5NDIxNjEzOCA5NjQuNzIwNDAxNTgyNDg0M1E5MDYuNzk2MzcwNzYzNzgzNCA5NjQuMDg3NDM5OTk4NzYxMyA5MDUuMzM1MTk1ODIzMzk3NiA5NjQuMDg3NDM5OTk4NzYxM0g5MDEuMDI2OTYxMzMwODE0NUw5MDIuNzQ4MzA3ODM2MDMyNyA5NjIuMjg0MDc2ODMyNTU0WiBNOTE4LjQ1NTk5NjgzMzQ4MyA5NzYuMCA5MjUuMTExMDM4NDg1OTU1OSA5NjEuMEg5MjguOTE3NDcxMzkyOTU3OUw5MzUuNTgyMzAyOTI0OTYzNiA5NzYuMEg5MzEuNTY3Njc2NTU4NDgzOEw5MjYuMjI1NTM1NTU5NDQzOSA5NjIuOTIwMjk1OTAyODgzMUg5MjcuNzQ2NjI5NjcyMzU0NUw5MjIuNDA0NDg4NjczMzE0NSA5NzYuMFpNOTIxLjk0NDgyMTg5MzA5NzEgOTcyLjkzNTM3OTgyNzE5NjUgOTIyLjk0NjYyOTY3MjM1NDYgOTcwLjA1NjEzMzI4NzkxM0g5MzAuNDczMTgxOTYyNDY2NEw5MzEuNDg0Nzc5NjIxMjU2NyA5NzIuOTM1Mzc5ODI3MTk2NVogTTk0Mi43MTIyNTk3MzY5NzUzIDk3Ni4wVjk2MS4wSDk0NS44OTA0MTQ2NDA4MTg0TDk1NC40NDkwMjQ2MjUwMjQ1IDk3MS40MDEyNTU3Njc4NjFIOTUyLjkzMTYyODEzNjgzOVY5NjEuMEg5NTYuNzI0NTczNTM5NTgyOFY5NzYuMEg5NTMuNTQ2NDE4NjM1NzM5N0w5NDQuOTg3ODA4NjUxNTMzNCA5NjUuNTk4NzQ0MjMyMTM5SDk0Ni41MDUyMDUxMzk3MTlWOTc2LjBaIE05NjUuNzM5OTEwMTc4NzkwOSA5NzYuMFY5NjEuMEg5NzIuNjkyMjIyNzQyNjYzMVE5NzUuMTYwMjA2MDgxNjc0IDk2MS4wIDk3Ny4wMzMwODQzNjA0NTEzIDk2MS45MjUzOTkxMDUwMTM4UTk3OC45MDU5NjI2MzkyMjg3IDk2Mi44NTA3OTgyMTAwMjc1IDk3OS45NTc4MTE0NTE1OTEzIDk2NC41MjcxMjE3MjEyMjI2UTk4MS4wMDk2NjAyNjM5NTM4IDk2Ni4yMDM0NDUyMzI0MTc3IDk4MS4wMDk2NjAyNjM5NTM4IDk2OC41UTk4MS4wMDk2NjAyNjM5NTM4IDk3MC43ODQ5MTYwNzU2ODY3IDk3OS45NTc4MTE0NTE1OTEzIDk3Mi40NjcwNTg5MzI4Mjk2UTk3OC45MDU5NjI2MzkyMjg3IDk3NC4xNDkyMDE3ODk5NzI1IDk3Ny4wMzMwODQzNjA0NTEzIDk3NS4wNzQ2MDA4OTQ5ODYyUTk3NS4xNjAyMDYwODE2NzQgOTc2LjAgOTcyLjY5MjIyMjc0MjY2MzEgOTc2LjBaTTk2OS42MDI2ODc3MzI5MDgxIDk3Mi44ODkyODI2MTc0NDc2SDk3Mi41MTcwOTY1NDY1MDk0UTk3My45MTE1OTExNDI1MjY4IDk3Mi44ODkyODI2MTc0NDc2IDk3NC45NDAzMjk4MDAzNTcyIDk3Mi4zNTk3NjYyNjYxNDIzUTk3NS45NjkwNjg0NTgxODc2IDk3MS44MzAyNDk5MTQ4MzY5IDk3Ni41NDE0NDE5NTIzNSA5NzAuODQwNjcwNzc1MTM4NVE5NzcuMTEzODE1NDQ2NTEyNSA5NjkuODUxMDkxNjM1NDQwMiA5NzcuMTEzODE1NDQ2NTEyNSA5NjguNVE5NzcuMTEzODE1NDQ2NTEyNSA5NjcuMTI3NDc5NzkzMTMxMiA5NzYuNTQxNDQxOTUyMzUgOTY2LjE0ODYxNDkzOTE0NzFROTc1Ljk2OTA2ODQ1ODE4NzYgOTY1LjE2OTc1MDA4NTE2MzEgOTc0Ljk0MDMyOTgwMDM1NzIgOTY0LjY0MDIzMzczMzg1NzdROTczLjkxMTU5MTE0MjUyNjggOTY0LjExMDcxNzM4MjU1MjQgOTcyLjUxNzA5NjU0NjUwOTQgOTY0LjExMDcxNzM4MjU1MjRIOTY5LjYwMjY4NzczMjkwODFaIE05ODkuMTc0NzAzNDc3NzQ5MyA5NzYuMFY5NjEuMEgxMDAwLjcxMTYzODY5MTg5NTZWOTY0LjA0MDg4NTIzMTE3OUg5OTIuOTkwOTI2MjY0Mjg0MlY5NzIuOTU5MTE0NzY4ODIxSDEwMDEuMFY5NzYuMFpNOTkyLjcxNjU5ODI3ODE1OCA5NjkuODUyMDYwMTcxNTY0OVY5NjYuOTIzODY0MjM0NjE2NEg5OTkuODEzNDg3NTA0MjU4MlY5NjkuODUyMDYwMTcxNTY0OVoiLz4KPHJlY3QgZmlsbD0iIzJBMzQzNSIgeD0iNDE1IiB5PSI5NTkiIHdpZHRoPSIyLjYiIGhlaWdodD0iMTkiLz48cmVjdCBmaWxsPSIjMkEzNDM1IiB4PSI2ODgiIHk9Ijk1OSIgd2lkdGg9IjIuNiIgaGVpZ2h0PSIxOSIvPgo8L3N2Zz4K">
+    <div class="loggaApp">Tidrapportering</div>
+    <p class="loggaText">Logga in med din e-post och ditt lösenord.</p>
+    <form id="loggaInForm" autocomplete="on">
+      <label for="liEpost">E-post</label>
+      <input type="email" id="liEpost" autocomplete="username" inputmode="email" required>
+      <label for="liLosen">Lösenord</label>
+      <input type="password" id="liLosen" autocomplete="current-password" required>
+      <button class="knapp" type="submit" id="liKnapp" style="width:100%;margin-top:14px;padding:12px">Logga in</button>
+    </form>
+    <button class="lankKnapp" id="glomtLosen" type="button">Glömt lösenord?</button>
+    <p class="liFel" id="liFel"></p>
+  </div>
+</section>
+
+<header>
+  <div class="toppRad">
+    <h1 id="rubrik">Tidrapport</h1>
+    <span id="sparStatus">Laddar …</span>
+  </div>
+  <nav>
+    <button data-vy="dag" class="vald">Dag</button>
+    <button data-vy="rapport">Rapport</button>
+    <button data-vy="inst">Inställningar</button>
+  </nav>
+</header>
+
+<main>
+  <div class="banner" id="banner"></div>
+
+  <!-- Administratören: välj vems tid som visas -->
+  <div class="personBar adminBara" id="personBar">
+    <label for="personVal">Visar tid för</label>
+    <select id="personVal"></select>
+  </div>
+
+  <!-- ================= DAG ================= -->
+  <section id="vy-dag">
+    <div class="kort">
+      <div class="veckaTopp">
+        <button class="pil" id="veckaForeg" aria-label="Föregående vecka">‹</button>
+        <div class="vRubrik"><b id="veckaRubrik">Vecka</b><input type="date" id="datum" aria-label="Välj datum"></div>
+        <button class="pil" id="veckaNasta" aria-label="Nästa vecka">›</button>
+      </div>
+      <div class="dagRemsa" id="dagRemsa"></div>
+    </div>
+
+    <div class="kort" id="timKort">
+      <div id="dagInfo"></div>
+      <div id="projektRad">
+        <div class="valRubrik"><label>Projekt</label><span class="valVerktyg adminBara" id="projVerktyg"></span></div>
+        <div class="flikar" id="projektVal"></div>
+        <div class="nyVal dold" id="nyProjRuta">
+          <input type="text" id="dNyProjNr" placeholder="Nr" aria-label="Projektnummer">
+          <input type="text" id="dNyProjNamn" placeholder="Projektnamn" aria-label="Projektnamn">
+          <button class="knapp" id="dNyProjOk">Lägg till</button>
+        </div>
+      </div>
+      <div class="valRubrik"><label>Skede / ÄTA</label><span class="valVerktyg adminBara" id="postVerktyg"></span></div>
+      <div class="flikar" id="avserVal"></div>
+      <div class="nyVal dold" id="nyPostRuta">
+        <input type="text" id="dNyKod" placeholder="ÄTA 050" aria-label="Kod">
+        <input type="text" id="dNyText" placeholder="Beskrivning (valfritt)" aria-label="Beskrivning">
+        <button class="knapp" id="dNyPostOk">Lägg till</button>
+      </div>
+      <p class="tips" id="valTips"></p>
+      <div id="notRuta">
+        <label for="dagNot" id="notEtikett">Dagboksnotering</label>
+        <textarea id="dagNot" rows="2" placeholder="Vad gjordes? T.ex. schakt för dagvatten vid hus B, 12 m"></textarea>
+        <p class="notVarning" id="notVarning"></p>
+      </div>
+      <div id="dagFordelning"></div>
+    </div>
+
+    <div class="kort">
+      <div class="veckaTot"><span>Summa vecka <span id="veckaNr2"></span></span><span id="veckaSumma">0 h</span></div>
+      <div id="veckaProj"></div>
+      <div class="inskick" id="inskick"></div>
+    </div>
+  </section>
+
+  <!-- ================= RAPPORT ================= -->
+  <section id="vy-rapport" class="dold">
+    <div class="kort adminBara">
+      <h2>Rapport för</h2>
+      <div class="flikar" id="rapportVem">
+        <button class="chip på" data-v="alla">Alla – samlad sammanställning</button>
+        <button class="chip" data-v="en">Enskild person</button>
+      </div>
+      <div id="medDetaljRad">
+        <label class="kryss"><input type="checkbox" id="medDetalj"> Bifoga dag-för-dag-timmar per person</label>
+        <p class="tips" style="margin:2px 0 0 24px">Lägger till en bilaga sist i rapporten och PDF:en, med varje persons timmar dag för dag. Bra som underlag om någon ifrågasätter en faktura.</p>
+      </div>
+    </div>
+
+    <div class="kort dold" id="rapportProjektKort">
+      <h2>Projekt</h2>
+      <div class="flikar" id="rapportProjekt" style="margin-bottom:0"></div>
+    </div>
+
+    <div class="kort">
+      <h2>Period</h2>
+      <div class="flikar" id="snabbPeriod">
+        <button class="chip" data-p="denna">Denna vecka</button>
+        <button class="chip" data-p="forra">Förra veckan</button>
+        <button class="chip på" data-p="tva">Senaste 2 veckorna</button>
+        <button class="chip" data-p="manad">Denna månad</button>
+      </div>
+      <div class="rad2d">
+        <div><label for="rFran">Från</label><input type="date" id="rFran"></div>
+        <div><label for="rTill">Till</label><input type="date" id="rTill"></div>
+      </div>
+      <label class="kryss"><input type="checkbox" id="medSammanst" checked> Ta med sammanställning per ÄTA / skede</label>
+    </div>
+
+    <div class="kort dold" id="oversiktKort">
+      <h2>Översikt <small>tryck på ett namn för att se och rätta personens tid</small></h2>
+      <div class="oversiktWrap" id="oversikt"></div>
+      <p class="tips">Grön = inskickad, röd = inte inskickad än.</p>
+    </div>
+
+    <div class="kort">
+      <h2>Kopiera eller spara</h2>
+      <div class="knappar">
+        <button class="knapp" id="kopText">📋 Kopiera text</button>
+        <button class="knapp ljus" id="kopExcel">📋 Kopiera till Excel</button>
+      </div>
+      <div class="knappar" style="margin-top:6px">
+        <button class="knapp svart" id="nerPdf">⬇︎ PDF</button>
+        <button class="knapp grå" id="nerCsv">⬇︎ CSV</button>
+        <button class="knapp grå" id="nerTxt">⬇︎ Text</button>
+      </div>
+      <p class="tips">"Kopiera till Excel" klistras in som en tabell i Excel, Numbers eller Google Kalkylark.</p>
+    </div>
+
+    <div class="kort">
+      <h2>Förhandsvisning</h2>
+      <pre id="forhand"></pre>
+    </div>
+  </section>
+
+  <!-- ================= INSTÄLLNINGAR ================= -->
+  <section id="vy-inst" class="dold">
+    <div class="kort">
+      <h2>Konto</h2>
+      <p id="kontoInfo" style="margin:0 0 8px;font-size:.9rem"></p>
+      <div class="knappar">
+        <button class="knapp grå" id="bytLosen">Byt lösenord</button>
+        <button class="knapp grå" id="loggaUt">Logga ut</button>
+      </div>
+    </div>
+
+    <div class="kort adminBara">
+      <h2>Användare <small>lägg till anställda, skicka lösenord och stäng av konton</small></h2>
+      <div id="anvLista"></div>
+      <div class="post" style="margin-top:10px">
+        <label style="margin-top:0">Ny användare</label>
+        <div class="rad2"><div><label for="nyNamn">Namn</label><input type="text" id="nyNamn" placeholder="Anna Berg"></div>
+        <div><label for="nyRoll">Roll i appen</label><select id="nyRoll"><option value="anstalld">Anställd</option><option value="admin">Administratör</option></select></div></div>
+        <label for="nyEpost">E-post</label><input type="email" id="nyEpost" inputmode="email" placeholder="anna@foretag.se">
+        <label for="nyLosen">Lösenord (minst 6 tecken)</label><input type="text" id="nyLosen" autocomplete="off">
+        <button class="knapp" id="skapaKonto" style="width:100%;margin-top:8px">Skapa konto</button>
+      </div>
+      <div class="post dold" id="nyttKontoInfo" style="margin-top:8px"></div>
+      <p class="tips">Anställda ser bara sin egen tid. Administratörer ser allas, kan rätta och låsa upp inskickade veckor och hanterar användare. Ett avstängt konto kan inte logga in, men dess tid finns kvar.</p>
+    </div>
+
+    <div class="kort adminBara">
+      <h2>Företag</h2>
+      <input type="text" id="iForetag" placeholder="Schaktmiljö AB" aria-label="Företag">
+    </div>
+
+    <div class="kort adminBara">
+      <h2>Projekt <small>alla kan rapportera tid på projekten i listan</small></h2>
+      <div id="projLista"></div>
+      <div class="projReg ny">
+        <input type="text" id="nyProjNr" placeholder="Nr, t.ex. 4012" aria-label="Projektnummer">
+        <input type="text" id="nyProjNamn" placeholder="Namn, t.ex. Solgläntan" aria-label="Projektnamn">
+      </div>
+      <button class="knapp ljus" id="nyttProj" style="width:100%;margin-top:4px">+ Lägg till projekt</button>
+      <button class="lankKnapp dold" id="visaBorttagna" type="button"></button>
+      <div id="borttagnaLista" class="dold"></div>
+      <p class="tips">Ett borttaget projekt försvinner ur listorna, men timmar som redan rapporterats finns kvar i rapporterna och projektet kan återställas.</p>
+    </div>
+
+    <div class="kort adminBara">
+      <h2>Avser-listan <small>skeden, ÄTA och annat – varje projekt har en egen lista</small></h2>
+      <div class="flikar" id="postProjekt"></div>
+      <div id="postLista"></div>
+      <div class="postReg ny">
+        <input type="text" id="nyKod" placeholder="ÄTA 050">
+        <input type="text" id="nyText" placeholder="Beskrivning (valfritt)">
+      </div>
+      <button class="knapp ljus" id="nyPost" style="width:100%;margin-top:4px">+ Lägg till i listan</button>
+      <p class="tips">I rapporten visas t.ex. "ÄTA 036 – kabel under byggväg för belysning". Byter du namn på en post följer redan inlagda timmar med.</p>
+    </div>
+
+    <div class="kort">
+      <h2>Säkerhetskopia</h2>
+      <p class="tips" id="lagringsInfo" style="margin:0 0 8px"></p>
+      <div class="knappar">
+        <button class="knapp ljus" id="backupNer">⬇︎ Ladda ner</button>
+        <button class="knapp ljus" id="backupKop">📋 Kopiera</button>
+      </div>
+      <div class="adminBara" style="margin-top:10px">
+        <label style="margin-top:0">Läs in timmar <small>(t.ex. från prototypen) till den person som visas</small></label>
+        <input type="file" id="backupFil" accept=".json,application/json">
+        <p class="tips">Säkerhetskopior från prototypen "Tidrapportering prototyp" fungerar. Timmarna läggs till hos personen som är vald överst.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script src="config.js"></script>
+<script>window.fbKlar = new Promise(r => { window.fbKlarSatt = r; });</script>
+<script type="module">
+// =====================================================
+//  FIREBASE – inloggning och databas
+//  Ger appen samma enkla databas-gränssnitt som förut:
+//  db.doc(sökväg).get/set/delete och db.collection(sökväg).get
+// =====================================================
+import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, getDoc, setDoc, deleteDoc, collection, getDocs }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+try {
+  const cfg = window.FIREBASE_CONFIG;
+  if (!cfg || !cfg.apiKey || String(cfg.apiKey).includes("KLISTRA")) throw new Error("config.js är inte ifylld");
+  const app = initializeApp(cfg);
+  const auth = getAuth(app);
+  auth.languageCode = "sv";
+
+  // Spara en kopia i telefonen, så att appen fungerar även utan täckning
+  let fs;
+  try { fs = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); }
+  catch (e) { fs = initializeFirestore(app, {}); }
+
+  const snap = s => ({ id: s.id, exists: s.exists(), data: () => s.data() });
+  const ren = d => JSON.parse(JSON.stringify(d));                 // Firestore tål inte "undefined"
+  // Utan nät: skrivningen sparas lokalt och skickas när nätet är tillbaka – vänta inte på servern
+  const skicka = p => navigator.onLine ? p : (p.catch(() => {}), Promise.resolve());
+
+  const db = {
+    doc: p => ({
+      path: p,
+      get: async () => snap(await getDoc(doc(fs, p))),
+      set: d => skicka(setDoc(doc(fs, p), ren(d))),
+      delete: () => skicka(deleteDoc(doc(fs, p)))
+    }),
+    collection: p => ({
+      path: p,
+      get: async () => { const q = await getDocs(collection(fs, p)); return { docs: q.docs.map(snap), empty: q.empty, size: q.size }; }
+    })
+  };
+
+  window.fbKlarSatt({
+    db,
+    onAuth: f => onAuthStateChanged(auth, f),
+    loggaIn: (e, p) => signInWithEmailAndPassword(auth, e, p),
+    loggaUt: () => signOut(auth),
+    aterstall: e => sendPasswordResetEmail(auth, e),
+    // Skapa ett konto åt någon annan utan att själv bli utloggad (en andra, tillfällig app-instans)
+    skapaKonto: async (e, p) => {
+      const sek = initializeApp(cfg, "sek" + Date.now());
+      try {
+        const sa = getAuth(sek);
+        const c = await createUserWithEmailAndPassword(sa, e, p);
+        await signOut(sa);
+        return c.user.uid;
+      } finally { await deleteApp(sek); }
+    }
+  });
+} catch (e) {
+  console.error(e);
+  window.fbKlarSatt({ fel: String(e && e.message || e) });
+}
+
+</script>
+<script>
+// =====================================================
+//  TIDRAPPORTERING – webbapp med inloggning (Firebase)
+//  Varje anställd har sin egen tidrapport och skickar in veckan.
+//  Administratören (Putte) ser allas tider, rättar, låser upp
+//  och tar ut en samlad sammanställning.
+// =====================================================
+
+const $ = id => document.getElementById(id);
+const nyId = () => Math.random().toString(36).slice(2, 10);
+
+// ---------- Datum ----------
+const VECKODAGAR = ["söndag", "måndag", "tisdag", "onsdag", "torsdag", "fredag", "lördag"];
+const VD_KORT = ["Sön", "Mån", "Tis", "Ons", "Tors", "Fre", "Lör"];
+const MANADER = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"];
+const stor = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+function tillDatum(iso) { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d); }
+function tillIso(dt) { return dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0"); }
+function plusDagar(iso, n) { const d = tillDatum(iso); d.setDate(d.getDate() + n); return tillIso(d); }
+function idagIso() { return tillIso(new Date()); }
+function isoVecka(iso) {
+  const t = tillDatum(iso);
+  t.setDate(t.getDate() - ((t.getDay() + 6) % 7) + 3);
+  const ar = t.getFullYear();
+  const forstaTors = new Date(ar, 0, 4);
+  return { vecka: 1 + Math.round(((t - forstaTors) / 86400000 - 3 + ((forstaTors.getDay() + 6) % 7)) / 7), ar };
+}
+// Veckans id i databasen, t.ex. "2026-V47"
+function veckaId(iso) { const v = isoVecka(iso); return v.ar + "-V" + String(v.vecka).padStart(2, "0"); }
+const veckaNr = vid => Number(vid.split("-V")[1]);
+function veckansMandag(iso) { const d = tillDatum(iso); return plusDagar(iso, -((d.getDay() + 6) % 7)); }
+function dagRubrik(iso) { const d = tillDatum(iso); return stor(VECKODAGAR[d.getDay()]) + " " + d.getDate() + " " + MANADER[d.getMonth()] + " " + d.getFullYear(); }
+function kortDag(iso) { const d = tillDatum(iso); return VD_KORT[d.getDay()] + " " + d.getDate() + "/" + (d.getMonth() + 1); }
+function dm(iso) { const d = tillDatum(iso); return d.getDate() + "/" + (d.getMonth() + 1); }
+function tidText(t) { if (!t) return ""; const d = new Date(t); return d.getDate() + "/" + (d.getMonth() + 1) + " kl " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+function datumIntervall(a, b) {
+  const x = tillDatum(a), y = tillDatum(b);
+  if (a === b) return x.getDate() + " " + MANADER[x.getMonth()] + " " + x.getFullYear();
+  if (x.getMonth() === y.getMonth() && x.getFullYear() === y.getFullYear()) return x.getDate() + "–" + y.getDate() + " " + MANADER[y.getMonth()] + " " + y.getFullYear();
+  if (x.getFullYear() === y.getFullYear()) return x.getDate() + " " + MANADER[x.getMonth()] + " – " + y.getDate() + " " + MANADER[y.getMonth()] + " " + y.getFullYear();
+  return x.getDate() + " " + MANADER[x.getMonth()] + " " + x.getFullYear() + " – " + y.getDate() + " " + MANADER[y.getMonth()] + " " + y.getFullYear();
+}
+
+// ---------- Tal ----------
+function tolkaTim(s) { const n = parseFloat(String(s ?? "").replace(",", ".").replace(/[^\d.]/g, "")); return isFinite(n) ? n : 0; }
+function fmt(n) { n = Math.round(n * 100) / 100; return Number.isInteger(n) ? String(n) : String(n).replace(".", ","); }
+const arAta = s => /^\s*ä\s*t\s*a\b/i.test(s || "");
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+// =====================================================
+//  DATA
+// =====================================================
+// foretag/standard          = { foretag, projekten:[{id, nr, namn, poster:[{id,kod,text}], borttagen}] }
+// anvandare/{uid}           = { namn, epost, roll: "admin"|"anstalld", aktiv }
+// tid/{uid}/veckor/{vecka}  = { vecka:"2026-V47", status:"oppen"|"inskickad", inskickadTid, dagar:{ "2026-11-18": {datum, rader:[{id,t,avser,p}]} } }
+//   p = projektets id (rader utan p hör till det första projektet, "standard")
+const STANDARD = {
+  foretag: "Schaktmiljö AB",
+  projekten: [{ id: "standard", nr: "3847", namn: "Månstenen",
+    poster: [["Skede 5"], ["Skede 6"], ["ÄTA 036", "kabel under byggväg för belysning"], ["ÄTA 048", "fyll mot garageuppfart"], ["ÄTA 049"]]
+      .map(([kod, text]) => ({ id: nyId(), kod, text: text || "" })) }]
+};
+let inst = JSON.parse(JSON.stringify(STANDARD));
+let aktivtProjekt = "standard";   // projektet nya rader hamnar i (sparas per användare i telefonen)
+let veckor = {};            // veckorna för personen som visas
+let aktuell = idagIso();
+let FB = null, db = null;
+let minId = null, minProfil = null, arAdmin = false;
+let visadId = null;         // vems tid som visas (administratören kan byta)
+let anvandare = [];         // alla användare (bara administratören)
+let alla = null;            // { uid: veckor } för samlad rapport
+
+const postEtikett = p => (p.text || "").trim() ? p.kod.trim() + " – " + p.text.trim() : p.kod.trim();
+const harRader = d => d && (d.rader || []).some(r => tolkaTim(r.t) > 0 || (r.avser || "").trim());
+const dagSumma = d => (d && d.rader || []).reduce((s, r) => s + tolkaTim(r.t), 0);
+// ---------- Projekt ----------
+// Äldre format { nr, projekt, poster } blir ett projekt med id "standard"
+function migreraInst(i) {
+  i = i || {};
+  if (!Array.isArray(i.projekten) || !i.projekten.length)
+    i.projekten = [{ id: "standard", nr: i.nr || "", namn: i.projekt || "", poster: Array.isArray(i.poster) ? i.poster : [] }];
+  delete i.nr; delete i.projekt; delete i.poster;
+  i.projekten.forEach(p => { if (!Array.isArray(p.poster)) p.poster = []; });
+  if (i.foretag === undefined) i.foretag = "";
+  return i;
+}
+const forstaProjekt = () => inst.projekten[0].id;
+const projekt = id => inst.projekten.find(p => p.id === id) || null;
+const synligaProjekt = () => inst.projekten.filter(p => !p.borttagen);
+const projNamn = p => p ? ([p.nr, p.namn].map(x => (x || "").trim()).filter(Boolean).join(" ") || "Namnlöst projekt") : "Okänt projekt";
+const projKort = p => p ? ((p.nr || "").trim() || (p.namn || "").trim() || "?") : "?";
+const radProj = r => (r && r.p) || forstaProjekt();
+function aktivt() {
+  if (!projekt(aktivtProjekt) || projekt(aktivtProjekt).borttagen) aktivtProjekt = (synligaProjekt()[0] || inst.projekten[0]).id;
+  return projekt(aktivtProjekt);
+}
+// Dagens val (projekt + skede/ÄTA): valt för dagen, annars dagens sista rad,
+// annars samma som närmaste dag före, annars första posten i senast använda projekt
+const okProj = id => id && projekt(id) && !projekt(id).borttagen;
+function dagVal(iso) {
+  const d = dagFor(iso);
+  if (d && okProj(d.p) && d.a !== undefined) return { p: d.p, a: d.a };
+  if (d && d.rader.length) { const r = d.rader[d.rader.length - 1]; if (okProj(radProj(r))) return { p: radProj(r), a: r.avser || "" }; }
+  if (d && okProj(d.p)) return { p: d.p, a: forstaPost(d.p) };
+  const fore = Object.keys(allaDagar(veckor)).filter(k => k < iso).sort().pop();
+  if (fore) { const v = dagVal(fore); if (okProj(v.p)) return v; }
+  const p = aktivt().id; return { p, a: forstaPost(p) };
+}
+const forstaPost = pid => { const p = projekt(pid); return p && p.poster[0] ? postEtikett(p.poster[0]) : ""; };
+const dagProjektId = iso => dagVal(iso).p;
+// Timmar för ett visst val en viss dag
+const valRad = (d, v) => d && d.rader.find(r => radProj(r) === v.p && (r.avser || "") === v.a);
+function sattAktivt(id) { aktivtProjekt = id; try { localStorage.setItem("tid_projekt_" + minId, id); } catch (e) {} }
+// Rubriken: det aktiva projektet
+function projektNamn() { return projNamn(aktivt()); }
+function personNamn(uid) {
+  if (uid === minId && minProfil) return minProfil.namn || minProfil.epost;
+  const a = anvandare.find(x => x.id === uid); return a ? (a.namn || a.epost) : "";
+}
+function vecka(vid) { return veckor[vid] || (veckor[vid] = { vecka: vid, status: "oppen", dagar: {} }); }
+function dag() { const v = vecka(veckaId(aktuell)); return v.dagar[aktuell] || (v.dagar[aktuell] = { datum: aktuell, rader: [] }); }
+function dagFor(iso, karta) { const v = (karta || veckor)[veckaId(iso)]; return v && v.dagar[iso]; }
+const arLast = vid => (veckor[vid] && veckor[vid].status) === "inskickad";
+const kanAndra = vid => !arLast(vid) || arAdmin;
+// Alla dagar i en persons veckor (dagar som inte hör till veckan ignoreras)
+function allaDagar(karta) {
+  const ut = {};
+  Object.entries(karta || {}).forEach(([vid, v]) => Object.entries(v.dagar || {}).forEach(([iso, d]) => { if (veckaId(iso) === vid && harRader(d)) ut[iso] = d; }));
+  return ut;
+}
+
+// =====================================================
+//  LAGRING
+// =====================================================
+function status(t) { $("sparStatus").textContent = t; }
+function visaBanner(t) { const b = $("banner"); b.textContent = t; b.style.display = t ? "block" : "none"; }
+function toast(t) { const el = $("toast"); el.textContent = t; el.classList.add("syns"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("syns"), 2600); }
+const vanta = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
+
+const koer = {};
+function skriv(vag, data) {
+  const nu = (koer[vag] || Promise.resolve()).catch(() => {}).then(() => data === null ? db.doc(vag).delete() : db.doc(vag).set(data));
+  koer[vag] = nu; return nu;
+}
+const timers = {}, vantande = {};
+function planera(nyckel, fn, ms) {
+  status("Sparar …"); clearTimeout(timers[nyckel]);
+  vantande[nyckel] = fn;
+  timers[nyckel] = setTimeout(() => { delete vantande[nyckel]; fn(); }, ms ?? 600);
+}
+async function sparaNu() {   // skicka allt som väntar direkt
+  const fns = Object.entries(vantande); fns.forEach(([k]) => { clearTimeout(timers[k]); delete vantande[k]; });
+  await Promise.all(fns.map(([, f]) => f()));
+}
+function felVidSparning(e) {
+  status("⚠️ Kunde inte spara");
+  const kod = e && e.code;
+  if (kod === "permission-denied") visaBanner("Det gick inte att spara. Veckan kan ha blivit inskickad eller låst – ladda om sidan.");
+  else visaBanner("Det gick inte att spara just nu. Prova igen om en stund.");
+}
+// Veckan sparas som en post; tomma dagar tas bort
+function veckaData(v) {
+  const dagar = {};
+  Object.entries(v.dagar).forEach(([iso, d]) => {
+    if (harRader(d)) dagar[iso] = { datum: iso, ...(d.p ? { p: d.p } : {}), ...(d.a !== undefined ? { a: d.a } : {}), rader: d.rader.map(r => ({ id: r.id, t: String(r.t ?? ""), avser: r.avser || "", p: radProj(r), ...((r.not || "").trim() ? { not: r.not } : {}), ...(r.egen ? { egen: true } : {}) })) };
+  });
+  const ut = { vecka: v.vecka, status: v.status || "oppen", dagar, andrad: new Date().toISOString() };
+  if (v.inskickadTid) ut.inskickadTid = v.inskickadTid;
+  if (v.upplastTid) ut.upplastTid = v.upplastTid;
+  return ut;
+}
+function sparaVecka(vid, direkt) {
+  const uid = visadId, v = veckor[vid];
+  if (!db || !v) return;
+  const fn = async () => {
+    const data = veckaData(v);
+    const tom = !Object.keys(data.dagar).length && data.status === "oppen";
+    if (tom && !v.finns) { status("Sparat ✓"); return; }
+    try { await skriv("tid/" + uid + "/veckor/" + vid, tom ? null : data); v.finns = !tom; status("Sparat ✓"); if (!$("banner").dataset.fast) visaBanner(""); }
+    catch (e) { felVidSparning(e); }
+  };
+  if (direkt) { clearTimeout(timers[uid + vid]); delete vantande[uid + vid]; status("Sparar …"); return fn(); }
+  planera(uid + vid, fn);
+}
+function sparaInst() {
+  ritaRapport();
+  planera("inst", async () => {
+    try { await skriv("foretag/standard", JSON.parse(JSON.stringify(inst))); status("Sparat ✓"); }
+    catch (e) { felVidSparning(e); }
+  });
+}
+
+async function hamtaVeckor(uid) {
+  const q = await db.collection("tid/" + uid + "/veckor").get();
+  const ut = {};
+  q.docs.forEach(d => { const v = d.data(); if (v && v.vecka) { const k = JSON.parse(JSON.stringify(v)); k.dagar = k.dagar || {}; k.finns = true; ut[k.vecka] = k; } });
+  return ut;
+}
+async function laddaPerson(uid) {
+  await sparaNu();
+  visadId = uid; veckor = {};
+  ritaAllt();
+  status("Hämtar …");
+  try {
+    const v = await vanta(hamtaVeckor(uid), 12000);
+    if (!v) throw { code: "timeout" };
+    if (visadId !== uid) return;
+    veckor = v; status("Sparat ✓");
+  } catch (e) {
+    status("⚠️ Kunde inte hämta");
+    visaBanner("Det gick inte att hämta tidrapporten just nu. Ladda om sidan om en stund.");
+  }
+  ritaAllt();
+}
+
+// =====================================================
+//  INLOGGNING
+// =====================================================
+async function starta() {
+  const fb = await vanta(window.fbKlar, 20000);
+  if (!fb || fb.fel) {
+    visaInloggning(fb && fb.fel && fb.fel.includes("config")
+      ? "Appen är inte färdiginställd: config.js saknar uppgifterna från Firebase."
+      : "Appen kunde inte ansluta. Kontrollera internetanslutningen och ladda om sidan.");
+    return;
+  }
+  FB = fb; db = fb.db;
+  fb.onAuth(async user => { if (user) await inloggad(user); else utloggad(); });
+}
+
+async function inloggad(user) {
+  minId = user.uid;
+  let prof = null;
+  try { const s = await db.doc("anvandare/" + minId).get(); prof = s.exists ? s.data() : null; } catch (e) {}
+  if (!prof) {
+    // Första inloggningen för administratören: reglerna tillåter bara hans e-post att skapa sig själv
+    const ny = { namn: (user.email || "").split("@")[0], epost: user.email || "", roll: "admin", aktiv: true };
+    try { await db.doc("anvandare/" + minId).set(ny); const s = await db.doc("anvandare/" + minId).get(); prof = s.exists ? s.data() : null; } catch (e) { prof = null; }
+  }
+  if (!prof) { await FB.loggaUt(); visaInloggning("Ditt konto är inte aktiverat. Kontakta administratören."); return; }
+  if (prof.aktiv === false) { await FB.loggaUt(); visaInloggning("Ditt konto är avstängt. Kontakta administratören."); return; }
+  minProfil = prof; arAdmin = prof.roll === "admin";
+  document.body.classList.remove("utloggad");
+  document.body.classList.toggle("anstalld", !arAdmin);
+  visaBanner(""); aktuell = idagIso();
+  visaVy("dag"); ritaKonto();
+  // Företagets inställningar
+  try {
+    const s = await db.doc("foretag/standard").get();
+    if (s.exists) {
+      const gammalt = !Array.isArray(s.data().projekten);
+      inst = migreraInst(JSON.parse(JSON.stringify(s.data())));
+      if (gammalt && arAdmin) await skriv("foretag/standard", JSON.parse(JSON.stringify(inst)));
+    } else if (arAdmin) await skriv("foretag/standard", JSON.parse(JSON.stringify(inst)));
+  } catch (e) {}
+  inst = migreraInst(inst);
+  try { aktivtProjekt = localStorage.getItem("tid_projekt_" + minId) || forstaProjekt(); } catch (e) { aktivtProjekt = forstaProjekt(); }
+  aktivt();
+  $("lagringsInfo").textContent = "Tiden sparas säkert i molnet och finns på alla dina enheter. Den fungerar även utan täckning och skickas när du har nät igen. " +
+    (arAdmin ? "Som administratör ser du allas tider." : "Bara du och administratören ser din tid.");
+  if (arAdmin) await hamtaAnvandare();
+  await laddaPerson(minId);
+}
+
+function utloggad() {
+  minId = null; minProfil = null; arAdmin = false; visadId = null; veckor = {}; alla = null; anvandare = [];
+  inst = JSON.parse(JSON.stringify(STANDARD));
+  document.body.classList.add("anstalld");
+  visaInloggning("");
+}
+function visaInloggning(fel) {
+  document.body.classList.add("utloggad");
+  $("liFel").textContent = fel || ""; $("liFel").classList.remove("ok");
+  $("liKnapp").disabled = false; $("liKnapp").textContent = "Logga in";
+}
+const AUTHFEL = {
+  "auth/invalid-credential": "Fel e-post eller lösenord.",
+  "auth/wrong-password": "Fel e-post eller lösenord.",
+  "auth/user-not-found": "Fel e-post eller lösenord.",
+  "auth/invalid-email": "E-postadressen ser inte rätt ut.",
+  "auth/user-disabled": "Kontot är avstängt.",
+  "auth/too-many-requests": "För många försök. Vänta en stund och prova igen.",
+  "auth/network-request-failed": "Ingen internetanslutning.",
+  "auth/email-already-in-use": "Det finns redan ett konto med den e-postadressen.",
+  "auth/weak-password": "Lösenordet måste vara minst 6 tecken.",
+  "auth/missing-email": "Skriv din e-postadress först."
+};
+const authFel = e => AUTHFEL[e && e.code] || "Något gick fel (" + ((e && e.code) || "okänt fel") + ").";
+$("loggaInForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!FB) return;
+  $("liKnapp").disabled = true; $("liKnapp").textContent = "Loggar in …"; $("liFel").textContent = "";
+  try { await FB.loggaIn($("liEpost").value.trim(), $("liLosen").value); $("liLosen").value = ""; }
+  catch (err) { visaInloggning(authFel(err)); }
+});
+$("glomtLosen").onclick = async () => {
+  const ep = $("liEpost").value.trim();
+  if (!ep) { $("liFel").textContent = "Skriv din e-postadress ovan och tryck igen."; return; }
+  try { await FB.aterstall(ep); $("liFel").textContent = "Ett mejl för att välja nytt lösenord har skickats till " + ep + "."; $("liFel").classList.add("ok"); }
+  catch (err) { $("liFel").textContent = authFel(err); }
+};
+function ritaKonto() {
+  if (!minProfil) return;
+  $("kontoInfo").textContent = "Inloggad som " + (minProfil.namn || minProfil.epost) + " (" + minProfil.epost + ") · " + (arAdmin ? "Administratör" : "Anställd");
+}
+$("loggaUt").onclick = async () => { await sparaNu(); if (FB) await FB.loggaUt(); };
+$("bytLosen").onclick = async () => {
+  if (!FB || !minProfil) return;
+  try { await FB.aterstall(minProfil.epost); toast("Ett mejl för att byta lösenord har skickats till " + minProfil.epost); }
+  catch (err) { toast(authFel(err)); }
+};
+// Hämta det senaste när appen öppnas igen (t.ex. om administratören låst upp en vecka)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && db && visadId && !Object.keys(vantande).length) laddaPerson(visadId);
+});
+
+// =====================================================
+//  ANVÄNDARE (administratören)
+// =====================================================
+function slumpLosen() {
+  const t = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = ""; crypto.getRandomValues(new Uint32Array(10)).forEach(x => s += t[x % t.length]); return s;
+}
+$("nyLosen").value = slumpLosen();
+async function hamtaAnvandare() {
+  try { const q = await db.collection("anvandare").get(); anvandare = q.docs.map(d => ({ id: d.id, ...d.data() })); }
+  catch (e) { anvandare = []; }
+  ritaAnvandare(); ritaPersonVal();
+}
+const sorteradeAnv = () => anvandare.slice().sort((x, y) => (x.namn || "").localeCompare(y.namn || "", "sv"));
+function ritaAnvandare() {
+  const box = $("anvLista"); box.innerHTML = "";
+  if (!anvandare.length) { box.innerHTML = '<p class="tips">Inga användare ännu.</p>'; return; }
+  sorteradeAnv().forEach(a => {
+    const rad = document.createElement("div"); rad.className = "anvRad";
+    const jag = a.id === minId;
+    rad.innerHTML = '<div><div class="anvNamn"></div><div class="anvEpost"></div></div><div class="brickor"></div><div class="anvKnappar"></div>';
+    rad.querySelector(".anvNamn").textContent = (a.namn || "Namnlös") + (jag ? " (du)" : "");
+    rad.querySelector(".anvEpost").textContent = a.epost || "";
+    rad.querySelector(".brickor").innerHTML = '<span class="bricka ' + (a.roll === "admin" ? "admin" : "") + '">' + (a.roll === "admin" ? "Admin" : "Anställd") + '</span>' +
+      (a.aktiv === false ? ' <span class="bricka av">Avstängd</span>' : "");
+    const k = rad.querySelector(".anvKnappar");
+    const knapp = (txt, fn, rod) => { const b = document.createElement("button"); b.textContent = txt; if (rod) b.className = "rod"; b.onclick = () => fn(b); k.appendChild(b); return b; };
+    knapp("Visa tid", () => { visaVy("dag"); valjPerson(a.id); });
+    knapp("Ändra namn", () => {
+      const n = rad.querySelector(".anvNamn"); if (n.querySelector("input")) return;
+      const inp = document.createElement("input"); inp.type = "text"; inp.value = a.namn || ""; inp.setAttribute("aria-label", "Namn");
+      n.textContent = ""; n.appendChild(inp); inp.focus(); inp.select();
+      let klar = false;
+      const spara = async () => {
+        if (klar) return; klar = true;
+        const namn = inp.value.trim();
+        if (!namn || namn === a.namn) { ritaAnvandare(); return; }
+        await sparaAnvandare(a, { namn });
+        if (jag && minProfil) { minProfil.namn = namn; ritaKonto(); }
+        ritaRapport();
+      };
+      inp.addEventListener("blur", spara);
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); inp.blur(); } });
+    });
+    knapp("Skicka lösenordslänk", async () => { try { await FB.aterstall(a.epost); toast("Länk skickad till " + a.epost); } catch (err) { toast(authFel(err)); } });
+    if (!jag) {
+      knapp(a.roll === "admin" ? "Gör till anställd" : "Gör till admin", () => sparaAnvandare(a, { roll: a.roll === "admin" ? "anstalld" : "admin" }));
+      knapp(a.aktiv === false ? "Aktivera" : "Stäng av", b => {
+        if (a.aktiv !== false && !b.dataset.saker) { b.dataset.saker = "1"; b.textContent = "Säker? Tryck igen"; return; }
+        sparaAnvandare(a, { aktiv: a.aktiv === false });
+      }, a.aktiv !== false);
+    }
+    box.appendChild(rad);
+  });
+}
+async function sparaAnvandare(a, andring) {
+  const ny = { namn: a.namn, epost: a.epost, roll: a.roll, aktiv: a.aktiv !== false, ...andring };
+  try { await db.doc("anvandare/" + a.id).set(ny); Object.assign(a, ny); ritaAnvandare(); ritaPersonVal(); toast("Sparat"); }
+  catch (err) { toast("Kunde inte spara (" + (err.code || "fel") + ")"); }
+}
+$("skapaKonto").onclick = async () => {
+  const namn = $("nyNamn").value.trim(), epost = $("nyEpost").value.trim().toLowerCase(), losen = $("nyLosen").value, roll = $("nyRoll").value;
+  if (!namn || !epost) { toast("Fyll i namn och e-post"); return; }
+  if (losen.length < 6) { toast("Lösenordet måste vara minst 6 tecken"); return; }
+  const k = $("skapaKonto"); k.disabled = true; k.textContent = "Skapar …";
+  try {
+    const uid = await FB.skapaKonto(epost, losen);
+    const prof = { namn, epost, roll, aktiv: true };
+    await db.doc("anvandare/" + uid).set(prof);
+    anvandare.push({ id: uid, ...prof }); alla = null;
+    ritaAnvandare(); ritaPersonVal();
+    const adress = location.href.split("#")[0].split("?")[0];
+    const text = "Hej " + namn.split(" ")[0] + "!\n\nHär är din inloggning till tidrapporteringen:\n\nAdress: " + adress + "\nE-post: " + epost + "\nLösenord: " + losen +
+      "\n\nÖppna adressen i Safari eller Chrome och logga in. Lägg gärna appen på hemskärmen (Dela → Lägg till på hemskärmen).\n" +
+      "Skriv in dina timmar varje dag och tryck \"Skicka in vecka\" när veckan är klar.\nVill du byta lösenord trycker du på \"Glömt lösenord?\" på inloggningssidan.";
+    const info = $("nyttKontoInfo"); info.classList.remove("dold");
+    info.innerHTML = '<label style="margin-top:0">Kontot är skapat. Skicka uppgifterna till ' + esc(namn) + ':</label><pre></pre>' +
+      '<div class="knappar" style="margin-top:6px"><button class="knapp" id="kopNyttKonto">📋 Kopiera meddelandet</button><button class="knapp grå" id="stangNyttKonto">Stäng</button></div>';
+    info.querySelector("pre").textContent = text;
+    $("kopNyttKonto").onclick = () => kopiera(text, "Meddelandet kopierat – skicka det med sms eller mejl");
+    $("stangNyttKonto").onclick = () => { info.classList.add("dold"); info.innerHTML = ""; };
+    $("nyNamn").value = ""; $("nyEpost").value = ""; $("nyLosen").value = slumpLosen(); $("nyRoll").value = "anstalld";
+  } catch (err) { toast(authFel(err)); }
+  k.disabled = false; k.textContent = "Skapa konto";
+};
+
+// ---------- Byta person (administratören) ----------
+function ritaPersonVal() {
+  const val = $("personVal");
+  val.innerHTML = sorteradeAnv().map(a => '<option value="' + esc(a.id) + '">' + esc((a.namn || a.epost) + (a.id === minId ? " (du)" : "") + (a.aktiv === false ? " (avstängd)" : "")) + '</option>').join("");
+  val.value = visadId || minId || "";
+}
+$("personVal").onchange = e => valjPerson(e.target.value);
+async function valjPerson(uid) {
+  $("personVal").value = uid;
+  await laddaPerson(uid);
+  visaBanner(uid !== minId ? "Du tittar på " + personNamn(uid) + "s tid. Ändringar sparas hos " + personNamn(uid) + "." : "");
+}
+
+// =====================================================
+//  DAG-VYN
+// =====================================================
+function ritaDag() {
+  if (!visadId) return;
+  const vid = veckaId(aktuell), las = !kanAndra(vid);
+  $("dagInfo").innerHTML = esc(dagRubrik(aktuell));
+  const val = dagVal(aktuell), akt = projekt(val.p);
+  aktivtProjekt = akt.id;
+  const valj = (p, a) => {
+    const d = dag(); d.p = p; d.a = a; sattAktivt(p);
+    if (harRader(d)) sparaVecka(vid);
+    ritaDag();
+  };
+  // ---- Projekt ----
+  const pv = $("projektVal"); pv.innerHTML = ""; pv.classList.toggle("redigera", redigeraProjChips);
+  $("projektRad").classList.toggle("dold", synligaProjekt().length < 2 && !arAdmin);
+  synligaProjekt().forEach(p => {
+    const c = document.createElement("button"); c.className = "chip" + (p.id === akt.id ? " på" : "");
+    c.textContent = projNamn(p); c.disabled = las && !redigeraProjChips;
+    if (redigeraProjChips) {
+      const x = document.createElement("span"); x.className = "x"; x.textContent = "×"; c.append(x);
+      c.onclick = () => {
+        if (synligaProjekt().length < 2) { toast("Det måste finnas minst ett projekt"); return; }
+        if (c.dataset.saker !== "1") { c.dataset.saker = "1"; c.firstChild.textContent = "Ta bort " + projNamn(p) + "?"; return; }
+        p.borttagen = true; sparaInst(); ritaDag(); toast(projNamn(p) + " är borttaget – timmarna finns kvar och det kan återställas under Inställningar");
+      };
+    } else c.onclick = () => { const d = dagFor(aktuell); const r = d && d.rader.find(x => radProj(x) === p.id); valj(p.id, r ? r.avser : forstaPost(p.id)); };
+    pv.append(c);
+  });
+  ritaVerktyg("projVerktyg", redigeraProjChips, () => { redigeraProjChips = !redigeraProjChips; ritaDag(); }, () => { $("nyProjRuta").classList.toggle("dold"); if (!$("nyProjRuta").classList.contains("dold")) $("dNyProjNr").focus(); });
+  // ---- Skede / ÄTA för valt projekt ----
+  const av = $("avserVal"); av.innerHTML = ""; av.classList.toggle("redigera", redigeraPostChips);
+  const lista = akt.poster.filter(p => (p.kod || "").trim());
+  lista.forEach(p => {
+    const et = postEtikett(p);
+    const c = document.createElement("button"); c.className = "chip" + (et === val.a ? " på" : "");
+    c.textContent = p.kod.trim(); c.title = et; c.disabled = las && !redigeraPostChips;
+    if (redigeraPostChips) {
+      const x = document.createElement("span"); x.className = "x"; x.textContent = "×"; c.append(x);
+      c.onclick = () => {
+        if (c.dataset.saker !== "1") { c.dataset.saker = "1"; c.firstChild.textContent = "Ta bort " + p.kod.trim() + "?"; return; }
+        akt.poster = akt.poster.filter(x => x !== p);
+        const d = dagFor(aktuell);
+        if (d && d.a === et && !valRad(d, { p: akt.id, a: et })) d.a = forstaPost(akt.id);
+        sparaInst(); ritaDag(); toast(p.kod.trim() + " är borttaget ur listan – inlagda timmar finns kvar");
+      };
+    } else c.onclick = () => valj(akt.id, et);
+    av.append(c);
+  });
+  // Ett val som inte längre finns i listan (t.ex. borttaget) visas ändå
+  if (val.a && !lista.some(p => postEtikett(p) === val.a)) {
+    const c = document.createElement("button"); c.className = "chip på"; c.textContent = val.a; c.disabled = true; av.append(c);
+  }
+  if (!lista.length) av.innerHTML = '<p class="tips" style="margin:0">' + (arAdmin ? "Listan är tom – tryck + för att lägga till skeden och ÄTA." : "Listan är tom – be administratören lägga till skeden och ÄTA.") + "</p>";
+  ritaVerktyg("postVerktyg", redigeraPostChips, () => { redigeraPostChips = !redigeraPostChips; ritaDag(); }, () => { $("nyPostRuta").classList.toggle("dold"); if (!$("nyPostRuta").classList.contains("dold")) $("dNyKod").focus(); });
+  $("valTips").textContent = las ? "Veckan är inskickad och låst." :
+    "Skriv timmarna för " + (val.a ? val.a.split(" – ")[0] : "valet") + " i dagens ruta i veckan ovanför. Byt val för att dela upp dagen.";
+  ritaNotering(las);
+  ritaFordelning(las);
+  ritaVecka();
+}
+// Dagboksnotering för dagens val (en notering per dag, projekt och skede/ÄTA)
+function ritaNotering(las) {
+  const val = dagVal(aktuell), r = valRad(dagFor(aktuell), val);
+  const kort = val.a ? val.a.split(" – ")[0] : "";
+  $("notEtikett").textContent = "Dagboksnotering" + (kort ? " – " + kort : "");
+  const t = $("dagNot");
+  if (document.activeElement !== t) t.value = r ? (r.not || "") : "";
+  t.disabled = las || !val.a;
+  t.placeholder = arAta(val.a) ? "Beskriv ÄTA-arbetet, t.ex. schakt för dagvatten vid hus B, 12 m" : "Vad gjordes? T.ex. fyllning mot grundmur hus A";
+  notVarning();
+}
+function notVarning() {
+  const val = dagVal(aktuell), r = valRad(dagFor(aktuell), val);
+  $("notVarning").textContent = arAta(val.a) && r && tolkaTim(r.t) > 0 && !(r.not || "").trim()
+    ? "⚠ ÄTA-timmar behöver en notering som beskriver arbetet." : "";
+}
+$("dagNot").addEventListener("input", () => {
+  const iso = aktuell, vid = veckaId(iso);
+  if (!kanAndra(vid)) return;
+  const val = dagVal(iso); if (!val.a) return;
+  const v = vecka(vid), d = v.dagar[iso] || (v.dagar[iso] = { datum: iso, rader: [] });
+  d.p = val.p; d.a = val.a;
+  let r = valRad(d, val);
+  const txt = $("dagNot").value;
+  if (!r) { if (!txt.trim()) return; r = { id: nyId(), t: "", avser: val.a, p: val.p }; d.rader.push(r); }
+  r.not = txt;
+  if (!txt.trim() && !tolkaTim(r.t)) d.rader = d.rader.filter(x => x !== r);
+  sparaVecka(vid); notVarning(); ritaFordelning(false);
+});
+// Knapparna "+" och "✎" bredvid rubrikerna (bara administratören)
+let redigeraProjChips = false, redigeraPostChips = false;
+function ritaVerktyg(id, redigerar, vaxla, ny) {
+  const box = $(id); box.innerHTML = "";
+  if (!arAdmin) return;
+  const plus = document.createElement("button"); plus.textContent = "+ Ny"; plus.onclick = ny;
+  const andra = document.createElement("button"); andra.textContent = redigerar ? "Klar" : "✎ Ta bort"; if (redigerar) andra.className = "pa"; andra.onclick = vaxla;
+  box.append(plus, andra);
+}
+// Dagens fördelning: alla rader med timmar
+function ritaFordelning(las) {
+  const d = dagFor(aktuell), box = $("dagFordelning"), flera = inst.projekten.length > 1;
+  const rader = d ? d.rader.filter(r => tolkaTim(r.t) > 0 || (r.not || "").trim()) : [];
+  if (!rader.length) { box.innerHTML = '<p class="tips" style="margin:0">Inga timmar ' + (aktuell === idagIso() ? "idag" : "den här dagen") + " än.</p>"; return; }
+  box.innerHTML = "";
+  rader.forEach(r => {
+    const rad = document.createElement("div"); rad.className = "fordRad";
+    rad.innerHTML = "<b>" + fmt(tolkaTim(r.t)) + " h</b><span>" + esc(r.avser || "(ej angivet)") + (flera ? " <small>" + esc(projKort(projekt(radProj(r)))) + "</small>" : "") + "</span>";
+    if (!las) {
+      const x = document.createElement("button"); x.textContent = "×"; x.setAttribute("aria-label", "Ta bort");
+      x.onclick = () => { d.rader = d.rader.filter(y => y !== r); sparaVecka(veckaId(aktuell)); ritaDag(); };
+      rad.append(x);
+    }
+    const not = (r.not || "").trim();
+    if (not || arAta(r.avser)) {
+      const n = document.createElement("div"); n.className = "fordNot" + (not ? "" : " saknas");
+      n.textContent = not ? "📝 " + not : "⚠ Notering saknas"; rad.append(n);
+    }
+    box.append(rad);
+  });
+  const s = dagSumma(d);
+  const sum = document.createElement("div"); sum.className = "fordRad"; sum.innerHTML = '<b>' + fmt(s) + ' h</b><span><b style="min-width:0">Summa dagen</b></span>';
+  box.append(sum);
+}
+function senasteDagFore(iso) { const a = allaDagar(veckor); return Object.keys(a).filter(k => k < iso).sort().pop() || null; }
+// Veckoremsan: dagnamn (välj dag) och en ruta per dag där timmarna skrivs
+function ritaVecka() {
+  const m = veckansMandag(aktuell), vid = veckaId(aktuell), idag = idagIso(), las = !kanAndra(vid);
+  $("veckaRubrik").textContent = "Vecka " + veckaNr(vid);
+  $("veckaNr2").textContent = veckaNr(vid);
+  $("datum").value = aktuell;
+  const box = $("dagRemsa");
+  const fokus = document.activeElement && document.activeElement.classList.contains("dagTim") ? document.activeElement.dataset.iso : null;
+  box.innerHTML = '<div class="remsaEtikett"><span></span><b>Tim:</b><span></span></div>';
+  for (let i = 0; i < 7; i++) {
+    const iso = plusDagar(m, i);
+    const kol = document.createElement("div"); kol.className = "dagKol" + (iso === aktuell ? " vald" : "");
+    const b = document.createElement("button");
+    b.className = "dagKnapp" + (iso === aktuell ? " vald" : "") + (iso === idag ? " idag" : "");
+    b.innerHTML = `<span class="vd">${VD_KORT[(i + 1) % 7]}</span><span class="dn">${tillDatum(iso).getDate()}</span>`;
+    b.setAttribute("aria-label", dagRubrik(iso));
+    b.onclick = () => byt(iso);
+    const inp = document.createElement("input");
+    inp.type = "text"; inp.inputMode = "decimal"; inp.className = "dagTim"; inp.dataset.iso = iso; inp.disabled = las;
+    inp.placeholder = "–"; inp.setAttribute("aria-label", "Timmar " + dagRubrik(iso));
+    const sum = document.createElement("div"); sum.className = "sum";
+    kol.append(b, inp, sum); box.append(kol);
+    fyllDagKol(iso, inp, sum);
+    inp.addEventListener("focus", () => { if (aktuell !== iso) { aktuell = iso; ritaDagUtanRemsa(); markeraVald(); fyllDagKol(iso, inp, sum); } });
+    inp.addEventListener("input", () => { skrivTimmar(iso, inp.value); fyllDagKol(iso, null, sum); ritaFordelning(false); ritaSummor(); });
+  }
+  if (fokus) { const f = box.querySelector(`[data-iso="${fokus}"]`); if (f) f.focus(); }
+  ritaSummor();
+}
+// Rutan visar timmarna för dagens val; under står dagens summa om dagen är uppdelad
+function fyllDagKol(iso, inp, sum) {
+  const d = dagFor(iso), v = dagVal(iso), r = valRad(d, v), s = dagSumma(d), egna = r ? tolkaTim(r.t) : 0;
+  if (inp) inp.value = r ? r.t : "";
+  sum.textContent = s && s !== egna ? "Tot:" + fmt(s) : "";
+}
+function markeraVald() {
+  document.querySelectorAll("#dagRemsa .dagKol").forEach(k => {
+    const iso = k.querySelector(".dagTim").dataset.iso, v = iso === aktuell;
+    k.classList.toggle("vald", v); k.querySelector(".dagKnapp").classList.toggle("vald", v);
+  });
+}
+// Rita om valrutan utan att röra remsan (så att fältet man skriver i behåller fokus)
+function ritaDagUtanRemsa() { const r = ritaVecka; ritaVecka = () => ritaSummor(); try { ritaDag(); } finally { ritaVecka = r; } }
+function skrivTimmar(iso, varde) {
+  const vid = veckaId(iso);
+  if (!kanAndra(vid)) return;
+  const v = vecka(vid), d = v.dagar[iso] || (v.dagar[iso] = { datum: iso, rader: [] });
+  const val = dagVal(iso);
+  d.p = val.p; d.a = val.a;
+  let r = valRad(d, val);
+  const t = String(varde || "").trim();
+  if (!t || !tolkaTim(t)) { if (r) { if ((r.not || "").trim()) r.t = ""; else d.rader = d.rader.filter(x => x !== r); } }
+  else if (r) r.t = t;
+  else d.rader.push({ id: nyId(), t, avser: val.a, p: val.p });
+  sparaVecka(vid);
+}
+function ritaSummor() {
+  const m = veckansMandag(aktuell), vid = veckaId(aktuell);
+  let tot = 0; const perProj = {};
+  for (let i = 0; i < 7; i++) {
+    const d = dagFor(plusDagar(m, i)); tot += dagSumma(d);
+    if (d) d.rader.forEach(r => { const t = tolkaTim(r.t); if (t) perProj[radProj(r)] = (perProj[radProj(r)] || 0) + t; });
+  }
+  $("veckaSumma").textContent = fmt(tot) + " h";
+  $("veckaProj").innerHTML = inst.projekten.length > 1 && Object.keys(perProj).length
+    ? inst.projekten.filter(p => perProj[p.id]).map(p => "<div><span>" + esc(projNamn(p)) + "</span><span>" + fmt(perProj[p.id]) + " h</span></div>").join("") : "";
+  ritaInskick(vid, tot);
+}
+// Lägg till projekt / skede direkt i dagvyn (administratören)
+function dagNyttProj() {
+  const nr = $("dNyProjNr").value.trim(), namn = $("dNyProjNamn").value.trim();
+  if (!nr && !namn) { $("dNyProjNr").focus(); return; }
+  const p = { id: "p" + nyId(), nr, namn, poster: [] };
+  inst.projekten.push(p); $("dNyProjNr").value = ""; $("dNyProjNamn").value = ""; $("nyProjRuta").classList.add("dold");
+  const d = dag(); d.p = p.id; d.a = ""; sattAktivt(p.id);
+  sparaInst(); ritaDag(); toast("Projekt " + projNamn(p) + " är tillagt – lägg till dess skeden och ÄTA med + Ny");
+}
+function dagNyPost() {
+  const kod = $("dNyKod").value.trim(); if (!kod) { $("dNyKod").focus(); return; }
+  const akt = projekt(dagVal(aktuell).p);
+  const post = { id: nyId(), kod, text: $("dNyText").value.trim() };
+  akt.poster.push(post); $("dNyKod").value = ""; $("dNyText").value = ""; $("nyPostRuta").classList.add("dold");
+  const d = dag(); d.p = akt.id; d.a = postEtikett(post);
+  sparaInst(); ritaDag(); toast("Tillagt i " + projNamn(akt) + ": " + kod);
+}
+$("dNyProjOk").onclick = dagNyttProj;
+$("dNyPostOk").onclick = dagNyPost;
+$("dNyProjNamn").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); dagNyttProj(); } });
+$("dNyText").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); dagNyPost(); } });
+// ÄTA-rader med timmar men utan notering i en vecka
+function ataUtanNotering(vid) {
+  const v = veckor[vid]; if (!v) return 0;
+  let n = 0;
+  Object.entries(v.dagar).forEach(([iso, d]) => { if (veckaId(iso) === vid) d.rader.forEach(r => { if (arAta(r.avser) && tolkaTim(r.t) > 0 && !(r.not || "").trim()) n++; }); });
+  return n;
+}
+// Skicka in veckan / inskickad / lås upp
+let skickaSaker = 0;
+function ritaInskick(vid, tot) {
+  const box = $("inskick"), v = veckor[vid], jag = visadId === minId;
+  const namn = personNamn(visadId);
+  if (v && v.status === "inskickad") {
+    box.className = "inskick klar";
+    box.innerHTML = "<b>✓ Vecka " + veckaNr(vid) + " är inskickad</b>" + (v.inskickadTid ? "Skickades " + esc(tidText(v.inskickadTid)) + ". " : "") +
+      (arAdmin ? (jag ? "" : "Du kan rätta som administratör eller låsa upp så att " + esc(namn) + " kan ändra själv.") : "Veckan är låst. Kontakta administratören om något behöver ändras.");
+    if (arAdmin) {
+      const k = document.createElement("button"); k.className = "knapp grå"; k.textContent = "🔓 Lås upp veckan";
+      k.onclick = async () => {
+        await sparaNu();
+        v.status = "oppen"; v.upplastTid = new Date().toISOString(); delete v.inskickadTid;
+        await sparaVecka(vid, true); ritaDag(); toast("Vecka " + veckaNr(vid) + " är upplåst");
+      };
+      box.append(k);
+    }
+    return;
+  }
+  box.className = "inskick";
+  if (!tot) { box.innerHTML = "När veckan är klar trycker du på <b style='display:inline'>Skicka in</b>, så går den vidare till administratören."; return; }
+  box.innerHTML = "<b>Vecka " + veckaNr(vid) + " är inte inskickad</b>" + (jag ? "Kontrollera timmarna och skicka in när veckan är klar. Sedan låses den." : esc(namn) + " har inte skickat in veckan än.");
+  const k = document.createElement("button"); k.className = "knapp";
+  k.textContent = "📨 Skicka in vecka " + veckaNr(vid) + " (" + fmt(tot) + " h)";
+  k.onclick = async () => {
+    if (Date.now() - skickaSaker > 5000) {
+      skickaSaker = Date.now();
+      const saknas = ataUtanNotering(vid);
+      k.textContent = saknas ? "⚠ " + saknas + " ÄTA-rad" + (saknas > 1 ? "er" : "") + " saknar notering – tryck igen för att skicka ändå" : "Säker? Tryck igen för att skicka in " + fmt(tot) + " h";
+      return;
+    }
+    skickaSaker = 0; k.disabled = true; k.textContent = "Skickar …";
+    await sparaNu();
+    const v2 = vecka(vid); v2.status = "inskickad"; v2.inskickadTid = new Date().toISOString();
+    await sparaVecka(vid, true);
+    ritaDag(); toast("✓ Vecka " + veckaNr(vid) + " är inskickad");
+  };
+  box.append(k);
+}
+function byt(iso) {
+  if (!iso) return;
+  const v = veckor[veckaId(aktuell)];
+  if (v && v.dagar[aktuell] && !v.dagar[aktuell].rader.length && !v.dagar[aktuell].p) delete v.dagar[aktuell];
+  aktuell = iso; ritaDag();
+}
+$("datum").onchange = e => byt(e.target.value);
+$("veckaForeg").onclick = () => byt(plusDagar(aktuell, -7));
+$("veckaNasta").onclick = () => byt(plusDagar(aktuell, 7));
+
+// =====================================================
+//  RAPPORT – uppbyggnad
+// =====================================================
+// Rapporten byggs som en lista med delar som blir text, tabell (Excel/CSV) och PDF.
+// del: {k:"list", text, hoger} | {k:"h", text} | {k:"tabell", kol, huvud, grupper, fot, txt} | {k:"rad", text, gra}
+let rProj = "alla";     // projektfilter i rapporten: "alla" eller ett projekt-id
+const iFilter = r => rProj === "alla" || radProj(r) === rProj;
+// Vilka projekt som har timmar i perioden (efter filtret)
+function projIPeriod(kartor, fran, till) {
+  const ut = new Set();
+  kartor.forEach(k => Object.entries(allaDagar(k)).forEach(([iso, d]) => { if (iso >= fran && iso <= till) d.rader.forEach(r => { if (iFilter(r) && tolkaTim(r.t) > 0) ut.add(radProj(r)); }); }));
+  return ut;
+}
+// "3847 · Skede 5" när rapporten har flera projekt, annars bara "Skede 5"
+const etikett = (r, flera) => { const a = (r.avser || "").trim() || "(ej angivet)"; return flera ? projKort(projekt(radProj(r))) + " · " + a : a; };
+function rapportProjNamn(set) {
+  if (rProj !== "alla") return projNamn(projekt(rProj));
+  if (set.size === 1) return projNamn(projekt([...set][0]));
+  if (set.size === 0 && inst.projekten.length === 1) return projNamn(inst.projekten[0]);
+  return "Alla projekt";
+}
+function personRapport(karta, fran, till, flera) {
+  const dagar = allaDagar(karta);
+  const veckorL = [];
+  Object.keys(dagar).filter(k => k >= fran && k <= till).sort().forEach(iso => {
+    const vid = veckaId(iso);
+    const rader = dagar[iso].rader.filter(r => iFilter(r) && (tolkaTim(r.t) > 0 || (r.avser || "").trim()))
+      .map(r => ({ t: tolkaTim(r.t), avser: etikett(r, flera), ra: (r.avser || "").trim() || "(ej angivet)", pid: radProj(r), not: (r.not || "").trim().replace(/\s+/g, " ") }))
+      .filter(r => r.t > 0);
+    if (!rader.length) return;
+    let w = veckorL[veckorL.length - 1];
+    if (!w || w.vid !== vid) { w = { vid, vecka: veckaNr(vid), dagar: [], summa: 0, status: (karta[vid] || {}).status || "oppen" }; veckorL.push(w); }
+    const s = rader.reduce((a, r) => a + r.t, 0);
+    w.dagar.push({ iso, rader, summa: s }); w.summa += s;
+  });
+  veckorL.forEach(w => { w.fran = w.dagar[0].iso; w.till = w.dagar[w.dagar.length - 1].iso; });
+  return { veckor: veckorL, total: veckorL.reduce((a, w) => a + w.summa, 0) };
+}
+// Sammanställning per "avser": [{avser, per:{kolumn: timmar}, tot}]
+function sammanstall(lista) {   // lista: [{kolumn, avser, t}]
+  const per = {};
+  lista.forEach(x => { const p = per[x.avser] || (per[x.avser] = { avser: x.avser, per: {}, tot: 0 }); p.per[x.kolumn] = (p.per[x.kolumn] || 0) + x.t; p.tot += x.t; });
+  return Object.values(per).sort((a, b) => a.avser.localeCompare(b.avser, "sv", { numeric: true }));
+}
+const veckaRubrik = w => "Vecka " + w.vecka + ": " + dm(w.fran) + " – " + dm(w.till);
+const PDFB = 493.23;  // tabellbredd i PDF:en
+const vKol = [{ b: 95, j: "l" }, { b: 60, j: "c" }, { b: PDFB - 155, j: "l" }];
+const vKolNot = [{ b: 76, j: "l" }, { b: 46, j: "c" }, { b: 150, j: "l" }, { b: PDFB - 272, j: "l" }];
+const harNoteringar = veckorL => veckorL.some(w => w.dagar.some(d => d.rader.some(r => r.not)));
+function veckoTabell(w, medNot) {
+  const txt = [];
+  w.dagar.forEach(d => d.rader.forEach((r, i) => txt.push((i ? "" : kortDag(d.iso)).padEnd(11) + fmt(r.t).padStart(4) + "   " + r.avser + (r.not ? "  · Notering: " + r.not : ""))));
+  txt.push("Summa".padEnd(11) + fmt(w.summa).padStart(4));
+  if (medNot) return { k: "tabell", kol: vKolNot, huvud: ["Dag", "Timmar", "Avser", "Notering"], grupper: w.dagar.map(d => d.rader.map(r => [kortDag(d.iso), fmt(r.t), r.avser, r.not || ""])), fot: ["Summa", fmt(w.summa), "", ""], txt };
+  return { k: "tabell", kol: vKol, huvud: ["Dag", "Timmar", "Avser"], grupper: w.dagar.map(d => d.rader.map(r => [kortDag(d.iso), fmt(r.t), r.avser])), fot: ["Summa", fmt(w.summa), ""], txt };
+}
+// Timmar per projekt (för tabellen "Per projekt")
+function projLista(veckorL) {
+  const ut = []; veckorL.forEach(w => w.dagar.forEach(d => d.rader.forEach(r => ut.push({ kolumn: w.vid, avser: projNamn(projekt(r.pid)), t: r.t }))));
+  return ut;
+}
+function sammanstTabell(sam, kolumner, rubriker, total, forsta) {
+  const visa = kolumner.length > 1 && kolumner.length <= 6;
+  const vb = 46, tb = 56;
+  const kol = [{ b: PDFB - tb - (visa ? vb * kolumner.length : 0), j: "l" }].concat(visa ? kolumner.map(() => ({ b: vb, j: "c" })) : [], [{ b: tb, j: "c" }]);
+  const huvud = [forsta || "Avser"].concat(visa ? rubriker : [], ["Totalt"]);
+  const grupper = sam.map(p => [[p.avser].concat(visa ? kolumner.map(k => p.per[k] ? fmt(p.per[k]) : "–") : [], [fmt(p.tot)])]);
+  const summaPer = k => sam.reduce((a, p) => a + (p.per[k] || 0), 0);
+  const fot = ["Summa"].concat(visa ? kolumner.map(k => fmt(summaPer(k))) : [], [fmt(total)]);
+  return { k: "tabell", kol, huvud, grupper, fot, txt: sam.map(p => p.avser + ": " + fmt(p.tot) + " h") };
+}
+function rubrikDelar(vText, underDelar, sistaAr, proj) {
+  return {
+    titel: (proj ? proj + " – " : "") + "Tidrapport" + (vText ? " " + vText : ""),
+    under: underDelar.map(x => (x || "").trim()).filter(Boolean).join(" · "),
+    sidfot: (proj ? proj + " · " : "") + "Tidrapport" + (vText ? " " + vText : "") + (sistaAr ? " – " + sistaAr : "")
+  };
+}
+const veckoText = nr => !nr.length ? "" : nr.length === 1 ? "vecka " + nr[0] : "vecka " + nr[0] + "–" + nr[nr.length - 1];
+const filnamn = (namn, nr, proj) => ("Tidrapport" + (proj ? "_" + proj : "") + (namn ? "_" + namn : "") +
+  (nr.length ? "_v" + nr[0] + (nr.length > 1 ? "-" + nr[nr.length - 1] : "") : "")).replace(/\s+/g, "_").replace(/[\/\\:*?"<>|]/g, "");
+
+// En persons rapport
+function rapportEn(uid, karta, fran, till) {
+  const set = projIPeriod([karta], fran, till), flera = set.size > 1;
+  const P = personRapport(karta, fran, till, flera), namn = personNamn(uid), proj = rapportProjNamn(set);
+  const nr = P.veckor.map(w => w.vecka);
+  const R = rubrikDelar(veckoText(nr), [inst.foretag, namn, P.veckor.length ? datumIntervall(P.veckor[0].fran, P.veckor[P.veckor.length - 1].till) : ""], P.veckor.length ? P.veckor[P.veckor.length - 1].fran.slice(0, 4) : "", proj);
+  R.filnamn = filnamn(namn, nr, proj);
+  const medNot = harNoteringar(P.veckor);
+  R.delar = [];
+  if (!P.veckor.length) R.delar.push({ k: "rad", text: "Inga timmar under perioden." });
+  P.veckor.forEach(w => {
+    R.delar.push({ k: "list", text: veckaRubrik(w), hoger: fmt(w.summa) + " timmar", txtExtra: w.status === "inskickad" ? " (inskickad)" : " (ej inskickad)" });
+    R.delar.push(veckoTabell(w, medNot));
+  });
+  const lista = []; P.veckor.forEach(w => w.dagar.forEach(d => d.rader.forEach(r => lista.push({ kolumn: w.vid, avser: r.avser, t: r.t }))));
+  const sam = sammanstall(lista), ata = sam.filter(p => arAta(p.avser)).reduce((a, p) => a + p.tot, 0);
+  const perProj = flera ? sammanstall(projLista(P.veckor)) : [];
+  if (flera) {
+    R.delar.push({ k: "list", text: "Per projekt", hoger: fmt(P.total) + " timmar" });
+    R.delar.push(sammanstTabell(perProj, P.veckor.map(w => w.vid), P.veckor.map(w => "v." + w.vecka), P.total, "Projekt"));
+  }
+  if ($("medSammanst").checked && P.veckor.length) {
+    R.delar.push({ k: "list", text: "Sammanställning", hoger: fmt(P.total) + " timmar" });
+    R.delar.push(sammanstTabell(sam, P.veckor.map(w => w.vid), P.veckor.map(w => "v." + w.vecka), P.total));
+  }
+  if (P.veckor.length) {
+    R.delar.push({ k: "rad", text: (P.veckor.length > 1 ? "Totalt alla veckor: " : "Totalt: ") + fmt(P.total) + " timmar", fet: true });
+    if ($("medSammanst").checked && ata && ata !== P.total) R.delar.push({ k: "rad", text: "varav ÄTA " + fmt(ata) + " timmar · övrigt " + fmt(P.total - ata) + " timmar", gra: true });
+  }
+  // Tabell för Excel/CSV
+  R.tabell = [["Vecka", "Datum", "Dag", "Timmar", "Projekt", "Avser", "Notering"]];
+  P.veckor.forEach(w => w.dagar.forEach(d => d.rader.forEach(r => R.tabell.push([w.vecka, d.iso, kortDag(d.iso).split(" ")[0], fmt(r.t), projNamn(projekt(r.pid)), r.ra, r.not]))));
+  if (flera) {
+    R.tabell.push([], ["Per projekt"], ["Projekt", ...P.veckor.map(w => "v." + w.vecka), "Totalt"]);
+    perProj.forEach(p => R.tabell.push([p.avser, ...P.veckor.map(w => fmt(p.per[w.vid] || 0)), fmt(p.tot)]));
+  }
+  if ($("medSammanst").checked && P.veckor.length) {
+    R.tabell.push([], ["Sammanställning"], ["Avser", ...P.veckor.map(w => "v." + w.vecka), "Totalt"]);
+    sam.forEach(p => R.tabell.push([p.avser, ...P.veckor.map(w => fmt(p.per[w.vid] || 0)), fmt(p.tot)]));
+    R.tabell.push(["Summa", ...P.veckor.map(w => fmt(w.summa)), fmt(P.total)]);
+  }
+  return R;
+}
+
+// Alla veckor (måndag–söndag) som perioden berör
+function periodVeckor(fran, till) {
+  const ut = []; let m = veckansMandag(fran);
+  while (m <= till && ut.length < 60) { ut.push(veckaId(m)); m = plusDagar(m, 7); }
+  return ut;
+}
+// Samlad rapport för alla
+function rapportAlla(fran, till) {
+  const vids = periodVeckor(fran, till), nr = vids.map(veckaNr);
+  const set = projIPeriod(Object.values(alla || {}), fran, till), flera = set.size > 1, proj = rapportProjNamn(set);
+  const personer = sorteradeAnv().map(a => ({ a, P: personRapport((alla || {})[a.id] || {}, fran, till, flera), karta: (alla || {})[a.id] || {} }))
+    .filter(x => x.a.aktiv !== false || x.P.total);
+  const total = personer.reduce((s, x) => s + x.P.total, 0);
+  const R = rubrikDelar(veckoText(nr), [inst.foretag, "Alla", datumIntervall(fran, till)], till.slice(0, 4), proj);
+  R.titel = R.titel.replace("Tidrapport", "Samlad tidrapport"); R.sidfot = R.sidfot.replace("Tidrapport", "Samlad tidrapport");
+  R.filnamn = filnamn("Alla", nr, proj);
+  R.personer = personer; R.vids = vids;
+  // Per person och vecka
+  const summaVecka = (x, vid) => x.P.veckor.filter(w => w.vid === vid).reduce((s, w) => s + w.summa, 0);
+  const inskickad = (x, vid) => (x.karta[vid] || {}).status === "inskickad";
+  const visaV = vids.length <= 6, vb = 52, tb = 60;
+  const kol = [{ b: PDFB - tb - (visaV ? vb * vids.length : 0), j: "l" }].concat(visaV ? vids.map(() => ({ b: vb, j: "c" })) : [], [{ b: tb, j: "c" }]);
+  let saknas = false;
+  const grupper = personer.map(x => [[x.a.namn || x.a.epost].concat(visaV ? vids.map(vid => {
+    const s = summaVecka(x, vid); const ok = inskickad(x, vid);
+    if (!ok && s) saknas = true;
+    return (s ? fmt(s) : "–") + (ok || !s ? "" : " *");
+  }) : [], [fmt(x.P.total)])]);
+  R.delar = [];
+  R.delar.push({ k: "list", text: "Per person", hoger: fmt(total) + " timmar" });
+  R.delar.push({
+    k: "tabell", kol, huvud: ["Person"].concat(visaV ? nr.map(n => "v." + n) : [], ["Totalt"]), grupper,
+    fot: ["Summa"].concat(visaV ? vids.map(vid => fmt(personer.reduce((s, x) => s + summaVecka(x, vid), 0))) : [], [fmt(total)]),
+    txt: personer.map(x => (x.a.namn || x.a.epost) + ": " + vids.map(vid => { const s = summaVecka(x, vid); return "v." + veckaNr(vid) + " " + (s ? fmt(s) + " h" : "–") + (inskickad(x, vid) ? " ✓" : s ? " (ej inskickad)" : ""); }).join(" · ") + " · totalt " + fmt(x.P.total) + " h")
+  });
+  if (saknas && visaV) R.delar.push({ k: "rad", text: "* = veckan är inte inskickad än", gra: true, baraPdf: true });
+  // Per projekt för alla
+  const allaVeckor = []; personer.forEach(x => x.P.veckor.forEach(w => allaVeckor.push(w)));
+  const perProj = flera ? sammanstall(projLista(allaVeckor)) : [];
+  if (flera) {
+    R.delar.push({ k: "list", text: "Per projekt", hoger: fmt(total) + " timmar" });
+    R.delar.push(sammanstTabell(perProj, vids, nr.map(n => "v." + n), total, "Projekt"));
+  }
+  // Per avser för alla
+  const lista = []; personer.forEach(x => x.P.veckor.forEach(w => w.dagar.forEach(d => d.rader.forEach(r => lista.push({ kolumn: w.vid, avser: r.avser, t: r.t })))));
+  const sam = sammanstall(lista), ata = sam.filter(p => arAta(p.avser)).reduce((a, p) => a + p.tot, 0);
+  if ($("medSammanst").checked && total) {
+    R.delar.push({ k: "list", text: "Sammanställning", hoger: fmt(total) + " timmar" });
+    R.delar.push(sammanstTabell(sam, vids, nr.map(n => "v." + n), total));
+  }
+  // Varje persons dagliga timmar
+  R.delar.push({ k: "rad", text: "Totalt alla: " + fmt(total) + " timmar", fet: true });
+  if ($("medSammanst").checked && ata && ata !== total) R.delar.push({ k: "rad", text: "varav ÄTA " + fmt(ata) + " timmar · övrigt " + fmt(total - ata) + " timmar", gra: true });
+  if ($("medDetalj").checked && total) R.delar.push({ k: "rad", text: "", baraPdf: true });
+  const bilagaNot = personer.some(x => harNoteringar(x.P.veckor));
+  if ($("medDetalj").checked) personer.filter(x => x.P.total).forEach((x, i) => {
+    if (i === 0) R.delar.push({ k: "h", text: "BILAGA – timmar dag för dag per person", bilaga: true });
+    R.delar.push({ k: "list", text: x.a.namn || x.a.epost, hoger: fmt(x.P.total) + " timmar", nySida: true });
+    x.P.veckor.forEach(w => { R.delar.push({ k: "h", text: veckaRubrik(w) + " · " + fmt(w.summa) + " timmar" + (w.status === "inskickad" ? "" : " (ej inskickad)") }); R.delar.push(veckoTabell(w, bilagaNot)); });
+  });
+  // Excel/CSV: en rad per person, dag och avser – lätt att filtrera och summera
+  R.tabell = [["Person", "Vecka", "Datum", "Dag", "Timmar", "Projekt", "Avser", "Notering", "Status"]];
+  personer.forEach(x => x.P.veckor.forEach(w => w.dagar.forEach(d => d.rader.forEach(r =>
+    R.tabell.push([x.a.namn || x.a.epost, w.vecka, d.iso, kortDag(d.iso).split(" ")[0], fmt(r.t), projNamn(projekt(r.pid)), r.ra, r.not, w.status === "inskickad" ? "Inskickad" : "Ej inskickad"])))));
+  if (flera) {
+    R.tabell.push([], ["Per projekt"], ["Projekt", ...nr.map(n => "v." + n), "Totalt"]);
+    perProj.forEach(p => R.tabell.push([p.avser, ...vids.map(v => fmt(p.per[v] || 0)), fmt(p.tot)]));
+  }
+  if ($("medSammanst").checked && total) {
+    R.tabell.push([], ["Sammanställning"], ["Avser", ...nr.map(n => "v." + n), "Totalt"]);
+    sam.forEach(p => R.tabell.push([p.avser, ...vids.map(v => fmt(p.per[v] || 0)), fmt(p.tot)]));
+    R.tabell.push([], ["Per person"], ["Person", ...nr.map(n => "v." + n), "Totalt"]);
+    personer.forEach(x => R.tabell.push([x.a.namn || x.a.epost, ...vids.map(v => fmt(summaVecka(x, v))), fmt(x.P.total)]));
+  }
+  return R;
+}
+
+function tillText(R) {
+  const ut = [R.titel]; if (R.under) ut.push(R.under);
+  R.delar.forEach(d => {
+    if (d.k === "list") ut.push("", d.text + (d.txtExtra || (["Sammanställning", "Per person", "Per projekt"].includes(d.text) ? "" : " – " + d.hoger)));
+    else if (d.k === "h") ut.push("", d.bilaga ? "────────────────────\n" + d.text + "\n────────────────────" : d.text);
+    else if (d.k === "tabell") d.txt.forEach(l => ut.push(l));
+    else if (d.k === "rad" && !d.baraPdf) ut.push((d.fet ? "\n" : "") + d.text);
+  });
+  return ut.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+const csvCell = v => { v = String(v ?? ""); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+const tillCsv = r => "﻿" + r.map(x => x.map(csvCell).join(";")).join("\r\n");
+const tillTsv = r => r.map(x => x.map(c => String(c ?? "").replace(/[\t\n]/g, " ")).join("\t")).join("\n");
+
+// =====================================================
+//  PDF – samma svart-gula stil som dagböckerna
+// =====================================================
+// Puttes Invest AB:s logga (kompakt, för PDF-rubriken)
+const LOGGA_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA4QAAAKiCAYAAACOzBKkAAAABmJLR0QA/wD/AP+gvaeTAAAgAElEQVR4nOzdeZhkZX33/+9d3T0z7IosQ3eDw1BVPThKjBM1GpeRVVyi/gxqYjSrS0wiyS+JmlVM8jwK/OKjJJpoJC4YxRG3gLiiqCjq48S4jExX18AI3c0gICDLLN1d9+8PMEEEnGG6z13d5/W6Li4vuaDuN1tPf/qcqhMBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUlEoHAFTpqKMe8eC55TvfULoD5kOK9KNeynMpp9mU49bcyDMRcWPkfGPkfEPqDd042Nt+/datW28u3QpAfzIIgVoZaTZHIzWuKd0BFdsZOb6fUtqaI2+NFFtzzlsHGo2JfPvtmyYnJ7eXDgSgDIMQqBWDEH7KXOTYEil/O6Lx7ZTydyPi65OdzlTpMAAWnkEI1IpBCLvt2ojYmHK6rNfIX37w0NDXN23atKt0FADzyyAEasUghAfstoj8uZzTpwYb8cmrO50rSwcBsPcMQqBWDEKYL3ki5fSpXvQuPOKggz6/cePGmdJFAOw5gxCoFYMQFkCKmyLiotzrffDBy5d/yq2lAIuHQQjUikEIC+6HKcVHehHvmu50LisdA8D9MwiBWjEIoUI5OinSv+2a2/WuH1x11XWlcwD4aQYhUCsGIRQxkyMuSineMtXpXFI6BoD/YRACtWIQQnHfTineEnfccd7k5OT20jEAdWcQArViEELfuC7neGsabLxlavPmG0vHANRVo3QAAFBLh6cUr4u53veHW2NvPuzoow8vHQRQRwYhAFDSfinyK4cGh7qGIUD1DEIAoB/snyK/ctngUGe42f6b4eHhfUsHAdSBQQgA9I0ccWBK8bq03/4To+32SyNioHQTwFJmEAIA/Wg453jbSGvs66PNNetLxwAsVQYhANDH8qNy6n1+pNk+f9WqtStL1wAsNQYhAND/Ujx/Zmhm82hr7HS3kQLMH4MQAFgsDsqR3zTSGvv6EcesWVc6BmApMAgBgEUmP6rR6F0+0hr761i/frB0DcBiZhACAIvRUET+25Gp6S8Pj42NlY4BWKwMQgBgMXtM6uVvjjbHXu37GoA95wsnALDY7ZNTfsNIq33hyJo1DykdA7CYGIQAwFLxtJjr/ddIs/m40iEAi4VBCAAsJaORGl+86xZSAH4GgxAAWGoGc8pvGGm2zz/8uOP2Kx0D0M8MQgBgaUrx/MHtO74yvHr1UaVTAPqVQQgALGXHpYHBrx7Zbj+6dAhAPzIIAYCl7oheji+Otlq/VjoEoN8YhABAHazIkd473Bp7VekQgH5iEAIAdZFS5DOHW2NvjohUOgagHxiEAECtpMivHGm23xXr1w+WbgEozSAEAOonxYtHp6cvWLVq1YrSKQAlGYQAQC3lHM/atWzZR5rN5vLSLQClGIQAQG2lHE+9I6WPuVII1JVBCADUWop0yszgsg+7UgjUkUEIAJDi1B3ROH/dunVDpVMAqmQQAgBERE7x7Ot+dOu7fX8E1IkveAAAd8kRvzrSbv9j6Q6AqhiEAAB3l+MVI+32n5TOAKiCQQgAcE85zh5pt3+jdAbAQjMIAQB+Woocbx9tNp9cOgRgIRmEAAD3bllOjQ8d2WweUzoEYKEYhAAA9+0hvdT48OHHHbdf6RCAhWAQAgDcv+MGtu84LyJS6RCA+WYQAgD8DCniOSOt1l+W7gCYbwYhAMBuSa8bbrdPLF0BMJ8MQgCA3dNIOd67atXalaVDAOaLQQgAsPsO3zW0612+hwKWCl/MAAD2QIp0ymhz7M9KdwDMB4MQAGAP5ZT/7ohj1qwr3QGwtwxCAIA9N9Ro9M5btWrVitIhAHvDIAQAeGCOnRlc9jelIwD2hkEIAPBApXjVaLv9mNIZAA+UQQgA8MAN5BzvcusosFgZhAAAe+fYXYPLXlU6AuCBMAgBAPZSSvGao9rt1aU7APaUQQgAsPf2mc35raUjAPaUQQgAMA9SpFOGm2O/XLoDYE8YhAAA8ySl/ObR0dF9SncA7C6DEABg/qyKFfu9snQEwO5KpQMAqjTSbI5GalxTuqOv5PT8iMilM9hTeUVE2j9FHJgjHxgp7xcpPSRytCOiHREPKl1YYzenZUPHTG7a9MPSIQA/y2DpAADKmuqOXxARvdIdzK/Djj768GUDA2ui0RjLOT0qond8RGqV7qqJB+WdM38REX9aOgTgZ3GFEKgVVwh/2tREZ8AgrIeRZnM0Go3jI8fxEXF8RBxZumkJ29GbHVhz7VVXfL90CMD9cYUQAGpiqtudjIj33PVbOqLdfkLqxYtSitPcYjrvVjQG514XEb9ZOgTg/vhQGQCop3xtp/Ol6W7npUMzu464672kF0XEXOmwJeSFRzabx5SOALg/BiEA1NzWrVt3THXHN0xNdJ4520itHOmciNhZumsJGJyLxqtLRwDcH4MQAPhv142PXzU9MX56nptt3zUMt5duWsxSit884uhjH1q6A+C+GIQAwE+ZvvLKq6cnxk8fmhlanVKc69EkD9hQGpz7k9IRAPfFIAQA7tPWrZu2TXY6v5t7jSdExH+V7lmMUsTvHnb00YeX7gC4NwYhAPAzTW/Z/JWpic66lOJlEXFL6Z5FZp/BgaGXlY4AuDcGIQCwu3qTnc7bG430sEjx+dIxi0lK8bJ169YNle4AuCeDEADYI9eMj09PdTonppxe4zEVu2342ltv/X9KRwDck0EIADwQvcnu+JnRSydFxLWlYxaDlOMPSjcA3JNBCAA8YFNbxj8/NDP0qEjxldIti8ATRlqtR5aOALg7gxAA2Ctbt27alu6448SIdGHplr6X0ktKJwDcnUEIAOy1ycnJ7VMT48/JOf61dEtfy/GCZrO5vHQGwI8ZhADAfJmb7nZellK8rnRIHzt4R0pPLx0B8GMGIQAwn/Jkp3NGRPqb0iF9K6UXl04A+DGDEACYd1MT438Xkd9UuqMf5RxPG263DyndARAGIQCwUKYmJv4kcnygdEcfGopePK90BEAYhADAAuqtPOiAF+XInyod0m9SCg+pB/qCQQgALJiNGzfO7Go0TksR3yvd0meedNRRj3hw6QgAgxAAWFA3jI/f2si950WkO0q39JGhuWU7n1E6AsAgBAAW3NXd7qac4w9Ld/SVFM8unQBgEAIAlZjujv9b5HhP6Y4+csro6Og+pSOAejMIAYDKzO674hURsbl0R5/Yr7dixRNLRwD1ZhACAJW57tvfvj2neElE5NIt/aCR0gmlG4B6MwgBgEpNdzqXRY7zSnf0BYMQKMwgBAAqN5vn/ixS3FS6o7Sc4+eH2+1DSncA9WUQAgCVu27Llh/kXvxV6Y4+0Gjk/KTSEUB9GYQAQBHT3c7bIuKbpTuKy+n40glAfRmEAEApcyny35eOKK4Rv1g6AagvgxAAKGZyYuIjEfm7pTtKyjmO8zxCoBSDEAAoKafceEPpiMKG8ooVP1c6AqgngxAAKGqyO35+RJ4o3VFSSukxpRuAejIIAYDS5lJKZ5eOKCmn9OjSDUA9GYQAQHE7Ujo/It1RuqOUlONRpRuAejIIAYDibhgfvzVHfLR0Ryk5orVu3bqh0h1A/RiEAEBfaPTivNINBQ1de9ttq0tHAPVjEAIAfWFyy/inI2KqdEcxc7GmdAJQPwYhANAveinS+0tHlNKIfGzpBqB+DEIAoH/kuYtKJ5SSkyuEQPUMQgCgb6yI+GptP200R7N0AlA/BiEA0De63e7OiPzl0h2FjJYOAOrHIAQA+kuKz5dOKCLFcEQMlM4A6sUgBAD6Ssr5c6UbChl66LHHHlY6AqgXgxAA6CuTIyMbI+L20h0l9Hq9kdINQL0YhABAf7n00tmImCidUULO+cjSDUC9GIQAQP/JMV46oZBDSwcA9WIQAgB9JzXqOQh7OR9UugGoF4MQAOg/OddyEKZoGIRApQxCAKDv9HLeXLqhhOQKIVAxgxAA6DuDu/a5qnRDCbkRBiFQKYMQAOg7V1/9nZsjYrZ0R+VyelDpBKBeDEIAoB/liLipdET18orSBUC9GIQAQL+6pXRA5XIMlE4A6sUgBAD6UorYVbqhcin73gyolC86ANTaB8866VUXn3Pq8tId/LQcsbN0Q9VyJN+bAZUaLB0AACVs2HDaQPr+TedEjldc98Pt55Tu4aelFL2cS1dUK7llFKiYQQhA7Ww4Y/3+aetN749Izyjdwn3LOS+PSKUzqpVcIQSqZRACUCvvP/Ok4Uj5woj0qNIt/Ey1u5U3R54p3QDUi0EIQG1seMOJj0gpLopIR5VuYXek/UoXVC9vL10A1IvbEgCohQ1nnnxSaqTLIsIYXDwOKR1QtRTp9tINQL0YhAAseRvOPvl3Usofj4gDS7ewew5uNg+MiGWlOyqX4o7SCUC9GIQALFk5R/rgmSefkXJ+R0QMle5h9y2LGC3dUEQ2CIFqeQ8hAEvSxeecuvyCs2ffGSn/aukW9txgozFWt0dO3Ml7CIFqGYQALDkb3njKwbfvmPloRHpi6RYemByxpnRDGY0bSxcA9WIQArCknH/W8cek2bmPR6Sx0i3shRy1/OeXUr6udANQL95DCMCSseHsEx43EAOXG4NLQi3/GfZ6ySAEKmUQArAkbDjz5F9JuXFJRBxauoW9liKiXTqihBRzPyjdANSLQQjAorfhrJNOTyl/ICL2Kd3C3lvZbB4bEQeX7ihhdmBgW+kGoF68hxCARevzZ6wfvGHfoX+MiJeXbmH+NBqNp0QtP2E0IpYvd4UQqJRBCMCitOGM9ftfv+/QB1LE00q3ML9SjuNLNxRy/XXf/vbtpSOAejEIAVh03n/mScMp4qKI+PnSLcy7RkQ8qXREIVtKBwD1YxACsKhccPYJx0WOi3LEkaVbmH/DzebPRcQhpTuKSNEtnQDUjw+VAWDRuOANJ56Sc+NLxuDSlRqNp5ZuKCVFXFm6AagfgxCAReGDZ530u7mRLoqIA0u3sIBy/rXSCaXkniuEQPUMQgD6Ws6RPnjmyWdExL96q8PSdsQxa9ZFpIeX7iinZxAClfMLKwB9651nrF9xwVlD74yUX1C6hYWXGvnFpRsK6u1avvw7pSOA+nGFEIC+9OH/fcJD9t9v6DORwhisg/XrB1Pk55fOKGji+k2bbisdAdSPK4QA9J0Nrz+lOTfQuzhytEq3UI3hyWufFikOL91RTI7/Kp0A1JMrhAD0lQ++4eTHp4He5RHGYJ2klP+sdENJKdI3SzcA9WQQAtA3Ljj7xOdFI19S2+fQ1dTIMWNPiYgnlO4oKUVyhRAowiAEoC9sOOuk03NO50fEitItVKyR/6J0QmF5rtHbWDoCqCfvIQSgqM+fsX7whn2H/ikiXla6heqNtlqPzREnlu4obPN0p3ND6QigngxCAIr52Jm/fMANaceGiPzU0i2UkSP9demGPvCl0gFAfRmEABSx4Y3Hj+yc2/7xlOPnSrdQxpHNNaf0ovf00h2lpZwMQqAY7yEEqK+cUrwuInpVH/zhN5zyc2l24GvGYH01m83lveidU7qjH8zNNQxCoBhXCAHqaVfK6XcmJ8bfW/XBG8464alzMbchIh1Q9dn0jx2Nxp9Hjnbpjj5wzbVXXfH90hFAfblCCFA/t6UUz57slhiDJ780ReNCY7Dejmw2j8k5Xl26ox+kFJ8u3QDUmyuEADWSU2yLXu/pUxPd/6zy3A0bThtIV938xoj8yirPpS81eqnxLx4vcpecLy6dANSbQQhQH1saswOnTl7Zmajy0PecffJ+aest/x4pnlXlufSnkXb7NZFr/5iJH9u1o9H4TOkIoN4MQoB6+L9zuff0bVd2rq/y0A1nrV8ZOf9HRDy6ynPpT0e020+MHK8r3dFHvnTD+PitpSOAevMeQoCl7zM7G+mEbd1upWPwgjecsrYRQ5cnY5CIWNlsHtrI8X4/jL6bHB8vnQBgEAIsYSnFuVMjw0+r+irEhrNPPj43epfliFVVnkvfajQajfdExEjpkH6SegMXlW4A8FM6gCUqpzhzqtP58+h0cpXnXnDmyb+Rc357RCyr8lz610ir9Q+R46mlO/pJSrFx8sorKn0/L8C9cYUQYOmZi8i/N93pvCYiKhuDOUf64Jknn5FTfqcxyI+NtFp/FZH+qHRHv+nl/IHSDQDhCiHAkrMzcvr1qW7ngioP3XDGacs+9P/d/I5I+UVVnkt/G2m2XxQRf1u6ow/l3sDAB0tHAIRBCLCEpLgpR/zy9MT4ZVUe+++vf/qD08DNH8451ld5Lv1tpNV6RkT8W0Sk0i19J8dXtm3evLV0BkAYhABLRI7v5xRPne50Nld57IazTz66kXd9PEccW+W59LeR5tivROT3+j7j3qXkdlGgf3gPIcCil78b0XtC5WPwzFMek3K+3Bjk7oabY78dKb8/IpaXbulTO2dzPr90BMCPGYQAi1mKzy+fm3vCVLc7WeWxG84+6Tkp9T4fEYdXeS79bbQ59uqU8rmuDN63HPmCqp8JCnB/fMEGWLzOf9DQ0G9s6nR2VXnohrNOOj3leKMfKvJj69atG7r2llvfklN+SemWfjcQ8fbSDQB3ZxACLEI50jnTE+N/PBXRq+rMDRtOG2h8/+Y35Rx/UNWZ9L/hY445ctstt74/pfil0i2LwOZrJia+VDoC4O4MQoDFJaec/nyqO35mlYe+5+yT94utN78/RzyzynPpb8PN5jNTarwrIg4u3bIo5PS2Kp8NCrA7DEKAxWNXjvybU93O+6s89EP/55QjejO9CyNiXZXn0r/WrVs3tO2WW98QKf7YYyV2220Du5a9u3QEwD0ZhACLw22N3PiVa7qbP1XloR8+++SHz830LoqIh1Z5Lv3ryLGxX9j2o1vfGikeXbplUUnxr1df/Z2bSmcA3JNBCNDncopt0es97Zpu55tVnvuhs088cS7nCyLioCrPpT+Nrl17cG/X7Gt7vfwHPlBoj80NRPxT6QiAe+MLOkB/29xrNB433e1WOgY/eOaJv9XL6WJjkIhojLRaL8+7ZiZS5Ff63uEB+eDVnc6VpSMA7o0rhAD962tzuffMbZs7lT2zLOdIF5x18msj5ddWdSZ9qzHSHHtupPy6iDi2dMxillL8n9INAPfFIAToS/k/0vbtL9g2Obm9qhMvPufU5RecPXNupPzCqs6k/zSbzeXbU/qtFOlVOfLRpXsWuxTp05Od8a+X7gC4LwYhQP95+9TExCsiYq6qAze88ZSDb98x++GI9OSqzqS/rFyzZtXAXH7R9sgvi4gRz0aYL72/KV0AcH8MQoA+klOcOd3pvKbKMz/0+hNX92Z7H4+INVWeS3mrV68+aOfg4LMix4tirneCR0jMt3Th5ETna6UrAO6PQQjQH2ZzTi+fnhg/t8pDP3Tmib/YS+ljEXFYledSznC7vSZ6cXxKccLOiKdFjhWlm5aonPOc9+ICfc8gBCgu3RHRe/50t3NRladecNaJz+1FOi8i9qnyXKozOjq6T95333bupXWpkZ8SOY6PHMOuA1Yhf6jqTwcGeCAMQoCybkjRe8bkxESlt5VtOOuk03PEGz1CYP6tXbt22a23NvZbyDNmV+wcGIw4MCKi12jsF7PxkEhzD4mI4V6kViPSWM55LKc4KnKklHKENwVWaaYX4b2DwKJgEAIUkiKu6jXSqVPjnfGqztyw4bSBtPXmt0TEy6o6s25u2Tn7vLw8n7eQZ6R8t08cmuvd9c6/Oy/7pYjIkb0bsKj81msnJq4oXQGwO/xkGKCEHN+JFE+cHh+vbAxGRAxcfeOoMQgL6ocxMPB3pSMAdpcrhABVy/G57dF7zg873R+VTgHmV07xN9ObN99YugNgd7lCCFClFO990PKhU3/YNQZhCbriiAMOeHvpCIA94QohQEVS5LMmOxOvmfLxHrAU5eil39+4ceNM6RCAPWEQAiy8nCO/empi4uzSIcDCyDneMb1l/POlOwD2lEEIsLB25hS/Od2ZOL90CLAwcoptgzuXv7p0B8ADYRACLJybU+49e2qi+4XSIcDCaeT8B1df/Z2bSncAPBAGIcDCmEoDjVMnN3e+UzoEWDgpx0cnuxMfKt0B8EAZhADzLEV8rzc3e+rUxJVXl24BFtT1g7NDv1c6AmBveOwEwPz6ai/Fk6evNAZhqcu59ztbt27aVroDYG+4QggwT1KOj8aOO35tanJye+kWYKHlf57udi8sXQGwt1whBJgHKcW5k6PDp00ag1AH3V3Llr2qdATAfHCFEGDv5EjxV5Odzv+OTqd0C7DwduTce/71mzbdVjoEYD4YhAAP3GxK8YrJTudfS4cA1Ugp/nBqovufpTsA5otBCPDA3J5SPG+y07m4dAhQkRTnTXY67yidATCfDEKAPXdj5N4zJye6l5cOASrzrXTHHS8rHQEw3wxCgD2zJfXmnjq5ZUu3dAhQmRvnBhrP3uZDo4AlyCAE2E05xzfm8tzTr9uy5QelW4DKzESK52/bvHlr6RCAheCxEwC757M7ondCiTG4du3aZaPt9kjV5wIRKcUfTHU6l5TuAFgoBiHAz5LjPSsPPOBpP+x2f1T10YeuXbv/Tbt2/Uevl9ZVfTaQ/n6y03l76QqAheSWUYD7kSOdM90d/6OpiFz12atWrV05s2vm4oj08znirVWfD7WW4oNTnfG/KZ0BsNAMQoB7N5dTnD7dGX9LicOPbDaPmUkzn4yIZonzodZyfG5oZteLo8APggCqZhAC/LSdkdOLpyfGN5Q4fLTdfkwvx0URcWiJ86HmvrZzID17qrt1R+kQgCp4DyHA3aW4qRH55KlumTE43Gw+M+f0eWMQCsjxnbRs6Gk3jI/fWjoFoCoGIcD/mI6Ip1wzMfHFEocPt1q/lVLjwxF53xLnQ811h2aHTp7ctOmHpUMAqmQQAkRERP5u5N5jpzqdb5U4fbQ59uoU6d/cyg8l5Incmzt+69ZN20qXAFTNNx4AkS8dmpl5ztatW28ucPjASGvsLTnyywqcDURsTimdOLVly1TpEIASDEKg1nLERxrbt79w6+Tk9qrPHh4e3jftt/8HIvIzqj4biEgR3xsYHDjx+1dccW3pFoBSDEKgtnLEP05PdP4oInpVnz26du3BeefMf0TEL1V9NhARkf6zl/Ipk1dccUPpEoCSvIcQqKOcI716eqLzyhJjcOWaNavyrpmvRDIGoZBLls/NHD/d6RiDQO0ZhECtDM0un013PmPwrBLnj65Z84iBud5lETFW4nwqkHqV/5CBPZDivQ9aNvS0K6+88pbSKQD9wC2jQK3c9SmC7y1x9sjY2PEx1/tIRBxY4nyqcdCyZRfcvGvmmRHxgtIt/KQc6ZzpzvgfTxW4MwCgX7lCCFCB0ebYr0cvfyIbg0vepk2bdk1NdF6YI51TuoX/NhuRXz49MX56idvEAfqZQQiwwEZbY6fnlN8dEctKt1CZ3vTE+OkpUpEPLeIn3JhTnDo1MfG20iEA/cggBFg4abQ1dlaO/CZfb+tpcmL8zSmn34iImdItNfWt2UZ69HSn89nSIQD9yjcoAAtg7dq1y0Za7fflyH9WuoWyJrvj740Up6aIH5VuqZnz8+23Pf668fGrSocA9DODEGCeHTI2dsAtu2Yv9KEi/NhUp3NJaqQTIuIHpVtqYGeK9EdTE51fnZ6evqN0DEC/MwgB5tFDjz32iOW9/MUc+eTSLfSXa8bHvzHbSL8YOTqlW5aw8Zx7j5ucGH9z6RCAxcIgBJgnR7Rax87O9r4aEY8s3UJ/um58/KoYbDw+Il1eumXJSXHermVDvzDd7X6zdArAYmIQAsyDkWbzFxuRvhiRjyrdQn+b2rz5xl3LBk9OkT5dumVJSHFTTvGCqU7nxddv2nRb6RyAxcYgBNhLw82xZ0VqfC4iDindwuJw/aZNt02OHPH0lOLc0i2L3MdTxCOmO50PlA4BWKwGSwcALGbDzbHfTim/zddT9till85ORrxktN2ezDleWzpnUUlxU4p4zWSn8/bSKQCLnSuEAA9MGm23z0gpn2sMshfyZKdzhgfY774U8f65Xm/MGASYHwYhwJ4bGG623+aqDvNlcmL8zSnFr0TEjtItfWy8kRtPnZzo/Nq2bvf60jEAS4VBCLAHDj/uuP1GWu2PpRQvKd3C0jLZ6Xwk5capEXFL6ZY+c0vK6TUPWjZ03DXdzZ8qHQOw1BiEALtpZM2ahwzu2PHpiHh66RaWpsnu5ksjxZMjYrp0Sx+YSynOnZmdGZvsjp+5adOmXaWDAJYigxBgNxw+NnZ0zPa+EjkeX7qFpW2q0/lWb3bg8RGxuXRLQZ+NFOsmO53f/cFVV11XOgZgKTMIAX6GI8fGfmGwly+PFO3SLdTDtVdd8f2BncsfHxGXlW6pVI4v91I8aWqic9JUp/Ot0jkAdWAQAtyP4Xb7xNzLl0TE4aVbqJerr/7OTfn2206JSBeWbllwOT6XU5w01e084dpO50ulcwDqxCAEuA8jzfaLUo6Lc8SBpVuop+np6TumJsafE5HeVrplAfQi4qLIvcdNdTsnTHc6ny0dBFBHBiHAvRhtjZ0eKd4dEUOlW6i9uamJ8ZenFH9bOmSebM853pEb6WFTE51nTnW7Xy0dBFBnHqYM8JMGRpvtN+fIv186BO5ustN57XCrtTVFevsi/fW7m3J6R6+Rz52e6NxQOgaAOy3GX1AAFkSz2Vy+vdF4T87xvNItcG+mJybeOdxu35RyvC8i9indsxtmc8SFEfmfpycmPhsRuXQQAD/JIASIiKOOesSD70g7P5pyPKl0C9yf6U7no6Ot1lNypIsi4pDSPfcmRXwvcnrP4Ozgu7du3bStdA8A980gBGrvyLGx4bnezotTxM+VboHdMTkx8bWVzeaTB9LAJyLyUaV77rI553h/I8+9b3LLlm7pGAB2j0EI1NpRzebauV7+REQcWboF9sS2bvd7Dz322F+cnZ27OCIeWSBhLqX4r4i4aLbX223kBm0AACAASURBVLCt2/1egQYA9pJBCNTWSLP5uLnUuDAiHlK6BR6I719xxbWrVq16yszQ8o9G5CdXcORkpLg09dKn8mD6xOTmzTdWcCYAC8ggBGpptN1+Ts7x74vkgzngPm3duvXmVatWPXVmaPl7I/Jz5/fV09WR8hdyL106EHNfuKbb3TK/rw9AaQYhUDujrdYf5hxv8ixW5luz2Vze7XZ3Vn3u1q1bd0TEaSPN9tmR4k8e4MtcGxEbU4qNvV5v47LZ5f/XB8IALH0GIVAnabTdfm3O8drSISxNd8TAC4dbY4dMT4yfVeD4PNXt/OlIu31j5Phfd37Y50+5LSK6kWIiejERKU/k3kAnDcX4lNs/AWrJIATqYf36wdHp6X/JOX6ndApLV6ORGznHmcOtsZHpifE/johe1Q1Tnc7rR1utTs6NI3PqXTcQMTWX0g9mhoYmr9+06baqewDobwYhsOQdunbt/ssmpzfkFKeWbqEeUuRXjrTGRoZmdv76XbdzVmpyYuJDVZ8JwOLk/TPAknbY0Ucfvnxm5tIwBqlcfu7MsmUXr169+qDSJQBwXwxCYMk6qt1ePTQ4+KWcY13pFmoqx1N2DgxcNtJsjpZOAYB7YxACS9KR7faj53JcHpFapVuou/TwSI2vjo6NHVe6BADuySAElpzhVuukXo5LIuKw0i1wl5Gc86VHtNtPLB0CAHdnEAJLyki7/Rsp0scj4oDSLfATcjy4keMzI82x55VOAYAfMwiBJWO0OfbqyPHOiBgq3QL3YXmk/L7hdvv3S4cAQBiEwBIxMNJqvTWn/Ib7eBg39JOBlOOfhltjb/bvKwCleQ4hsKg1m83l21N6b0T6ldItsCdS5FeOtNsPXnnAAb+zcePGmdI9ANSTK4TAonXUUY948PbU+KwxyKKV40XbfnTrJw5uNg8snQJAPRmEwKJ0xNHHPnRu+c6vRMQTSrfAXjphn2hcNtpuj5QOAaB+DEJg0TnymGMf3hicuywi1pRugXmR4hGR40vDY2NjpVMAqBeDEFhURo4Ze0qvMXdZRIyWboH5lCOOTr38leGxsV8q3QJAfRiEwKIx2mo9Nxr54og4qHQLLJCDUy8+PdxsPrN0CAD1YBACi8Joa+z0HGlDRKwo3QILK++bUuMjI63Wy0uXALD0GYRAv0uj7fYZOfKbfM2iRgYi0j8Pt9uerQnAgvIcQqBvrV27dtlNu2bfmXP+tdItUELK8eqRVvvwlQce8FLPKgRgIfhpO9CXDl27dv+bdu36jxTGILX3m9t+dOvHDxkbO6B0CABLj0EI9KWhXbsuSJFOKd0BfeKk5b18yeHHHHNY6RAAlhaDEOhLKdLK0g3QZx492Bi4fHT1sa3SIQAsHQYhACweq/PA3OUjzebjSocAsDQYhACwuDwkUuMzo+3200qHALD4GYQAsPjsl3N8bLTdfknpEAAWN4MQABanwZzjbaPt9hmlQwBYvAxCAFi8Us7x2tFW69xYv96zhQHYYwYhACxyOdJvj05PXzA8PLxv6RYAFheDEACWgJzjWWm//T+3stk8tHQLAIuHQQgAS8djB1LjK6PHHNMsHQLA4mAQAsDS0uwNDHxpuNl8VOkQAPqfQQgAS0zKsTKlxhdGjxl7aukWAPqbQQgAS9P+uZE/Ntoce2HpEAD6l0EIAEvXspzyeZ5VCMB9MQgBYGlLOcdrh1vtc/y6D8A9+YUBAGogRfzhcKt9wejo6D6lWwDoHwYhANREinhO3me/S0bWrHlI6RYA+oNBCAC1kh+X5npfHF69+qjSJQCUZxACQM3kiIelgcGvjrRajyzdAkBZBiEA1NMREenzo83mk0uHAFCOQQgA9fWgnBqfHm63X1A6BIAyDEIAqLdlKcf7hltjryodAkD1DEIAIKXIZ65sNg8tHQJAtQxCACAiInLOqXQDANUyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoKYMQAACgpgxCAACAmjIIAQAAasogBAAAqCmDEAAAoKYMQgAAgJoyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoKYMQAACgpgxCAACAmjIIAQAAasogBAAAqCmDEAAAoKYMQgAAgJoyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoKYMQAACgpgxCAACAmjIIAQAAasogBAAAqCmDEAAAoKYMQgAAgJoyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoKYMQAACgpgxCAACAmjIIAQAAasogBAAAqCmDEAAAoKYMQgAAgJoyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoKYMQAACgpgxCAACAmjIIAQAAasogBAAAqCmDEAAAoKYMQgAAgJoyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoKYMQAACgpgxCAACAmjIIAQAAasogBAAAqCmDEAAAoKYMQgAAgJoyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoKYMQAACgpgxCAACAmjIIAQAAasogBAAAqCmDEAAAoKYMQgAAgJoyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoKYMQAACgpgxCAACAmjIIAQAAasogBAAAqCmDEAAAoKYMQgAAgJoyCAEAAGrKIAQAAKgpgxAAAKCmDEIAAICaMggBAABqyiAEAACoqcHSAQD3Jkf+s5QbDyrd0S8GBuIb8/E6y27b7/od++543ny81lKy38MOnZmP15lJ6ZLBXizav78HpHTLdaUjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALg3qXQAAADAQli7du2ym2ZmVkfEaIoYjoiRnOOIlOJBkfNBEY2DUsr793KsSBH7/MSfnGM2NeLWiIic4+YceTal9IPoxQ+iEdOpl37QS73rcsTkwcuWbdm0adOuUn+de8MgBAAAFr3hY445stFoPDrn9AuR0sMjemsi0tERMVjB8XMRcVVEdCLH5ki5Ezl/a5+Ib3a73Z0VnP+A7fEgHG6335BynLYwOcXdllLM5BxzKdLNOeWbI8fNEen6nPK26KWrc05TjaHYOrV5842lY4kYabX+MiL9dlXnrTzwgDUbN26cqeq8qo0216zPqXduRcddMTXReUZFZy2o0Wb7H3OKp5Xu4GdLOS6e7Hb+sHTH3a1evfqgnQOD/1m6g92Ue78+1e1eXjpjPhx+zDGHDTYGlsRfy2KRcnx7stt5TumOpWJ49eqjojF0Ykr5pJxifcqxsnTTvdgVEd/Mkb7WyPH1RiNffnWnc2XpqLvb47XciDgkR6xemJzycr7rfyNH5P/+vZHynf8Vp5Qj5iJGWu3rI/KmiNicUvrPSOlrk+Pjm+766QBVyengSNX9+7hjx46lfVW90ds3cmV/P2+t6JwFlxtxWIV/39gLuRGHlW64p9nZ/RoxsNO/P4vFwMA+u/FHLQorli0bmJ2d8+9ehXIKFxT20vDY2Fjq9U6LSKdFxHE//oY95Z/5p5ayLCIemyI/NqeIuRwx0mpfGSk+mXu9T87tu+/nrvv2t28vGVjF5dOl6tCItD4i1ud855IcabVvjxRfT734dC96n57udv8rInqlQwEAYLEaHR3dp7fPPi9IkX4vevnRS+Bdb6sjxytSarxicPuOnSOt9mU5xUcj4vzpTueGqmMMwvm1X+R4Sk7xlBSN14+02j+IiI9GI31ganz8C64eAgDA7lnZbB46EI0/zileliIOLt2zQJZHxAkpxwkR8Q+j7fYnIufzVuR8UVXvPTQIF9ZhEfHS6OWXjrTa16VI50Vv9m2TW7Z0S4cBAEA/uvP9rY0/j2i8NCLvW7qnQstyjmdFpGdtb6SbRlqt98wNDLxp2+bNWxfy0MZCvjg/4fAc+U9zY2B8uNX65JHNNaeUDgIAgH6xatWqFaPN9muGGgMTEemPajYGf1KOB0ek0wfmehOjrfb7hpvNRy3UUQZh9Rop0im91PvkSKv99eHm2C97/AcAAHU23G6fODO0bFNO8foccWDpnj4ymCN+NaXGxpFW+zMjzebj5vsAg7CsR6eUPzbSbl92ZLv96NIxAABQpYObzQNHW61zU45PxxJ+ksE8OTFS48sjrfb7jzj62IfO14sahP0gx+N7Ob420my/e7jdPqR0DgAALLSRVuuR+6T0jXznM6XdMbd7UkS8oDE4d8VIs/2/Dl27dv+9fUGDsH+kSPHilOO7o63Wc0vHAADAQhlpt18ckS6PSK3SLYvUPpHiL5btmN3ruwwNwv5zeI50wUiz/e7h4eH6vpEWAIClKI2222dEjndFxIrSMYvcFVNbxi/d2xcxCPtVihenfff/6siaNe3SKQAAMA/SSKv11pzjtW4R3Xsp0tsiIu/t6xiE/SzFI2Ku97XRZvPJpVMAAGAvpNFm+5yI9PLSIUtDumNwZue75+OVDML+96CcGp/0vkIAABar4Wb7b3KKPyjdsVSklN+/devWm+fjtQzCxWFFjvSB4Xb7BaVDAABgTwy32y9IKV5bumMpSSn9y3y9lkG4eAykHO8ZbrefXToEAAB2xxGt1rEpx795z+C8+vo14+PfmK8XMwgXl6GU4/zhsbFfKh0CAAD3Z+3atcsakf49IvYp3bKU5MjzdnUwDMJFaXnq5Q8Nr159VOkQAAC4L7fMzPxlRPx86Y4lJcVNje3bz5/PlzQIF6fD08DQR5rN5vLSIQAAcE+jxxzTzDleVbpjCXrX5OTk9vl8QYNw0cqP2pEG/q50BQAA3FNuDL7Rg+fnXc4pvW2+X3Rwvl+Q6uTIfzLaXHPxZHfzpaVbAAAgImK01XpsjvzM0h33IUfElRGxNVJM54jpRs7TkdKOXi/Npohbf/wHpkY+KCIavZwe1IjeQ3JKw5HzaEQ6IiKOjohlFbd/bnp8fHy+X9QgXNwaOc29vdlsPqLb7e4sHQMAAL2Uzki5dMV/2xURX4wcFzdS3nh7zv/1w273R3v9quvXD66cnGwPxMDaSL1HRDQeGZF/KSIOnpfqe5Ei//NCvG6/D8K5SPHhhTwgRSzLOfa76/8eGJFWRuTDFs8l7tTa3kj/b0S8vnQJ1FbO34lIC/YLwN5KEY/JEQdWdNaPcsTXqzjrAcn5O6UT7mn7Ab2ZZbvis6U77scBEfHYqg5LEd/LEdNVnbfHer0flk5YvPK/pNzYWrqipNzI15ZuWGjD7faalOOU0h0R6fKU4y13xNyF8zIA7+nSS2e3RXwv7vztg3f93saRxxz7sLk096QU8aRoxMmR48HzdOL05MjIx2JiYp5e7n/0+yDcNdXpPK/EwaNr1x6cd+4cyzFwbEq94yIaT4zIPxcRAyV67leOv3josce+6/tXXLHkv8hAP5qamPj7iPj70h33ZaTV/lpEPKaKs3LE5qmJzklVnLVUXL9p020R0bd/z4abzZ9PqfGfVZ3Xy+mN093xc6s6j+r0UnrftRPjXyrdwcJq9OL3cyr4zMEcn+jlxl9fu2XzxgKn967ZcsV3I+K7EfHWWL9+cOTaa58Uvd4vp0i/nO+8zfQBSSn+NS69dHZ+c+/U74OwmMlNm34YEZff9VtERKxevfqgHYODp6Ycp0XEqX30TJX9Z2fm/jQi/qR0CAAA9bRu3bqhbT+69VcLHX9NRP69qe7Exwud/9MuvXR2KuJzcedvfzTSbD4uR+O3U4rn33X3xe6azb3eOxYq06eM7oErr7zylulO5/ypic5zY6BxZKT4y4joj6tyKV62stk8tHQGAAD19INbbj8+Ih5S4OhL5nJv3dREH43BezHV7V4+3e28ZHafFUdE5N+KiK/tzp+XIy6c6nYnF6rLIHyApjZvvnGq0/nf+fbbminF6yJiXp8H8gDsN9ho/H7hBgAAaqqX5p5d+aE5PrHywANO3dbtXl/52Q/Qdd/+9u1TExPvmpro/GIj8pMj4qK7Pv303uXevyxkj0G4l6anp++Y7HTOGEjx8JzjGyVbco7f7sv3OAIAsPTldHzFJ35r1/Kh523cuHGm4nPnzTUTE1+cmug8s9EbOC5SnBcRcz/5R+SJ6W73MwvZYBDOk6s7nSv3jd4Tco4Fu793Nxw50mo9teD5AADU0Gi7PRIp2hUeOdfrNX7nrg/mWvSu2XLFd6c6nRc3egOPjIj/ufX1zgfRL+hDPAzCedTtdndOdzsvjRz/UKohR+PXSp0NAEA99Xq9R1V5XkrxrkKfJLqgrtlyxXenJjrPSLm3PiJ9IRqNdy30mQbh/MtT3c6fRqS3lTg8RX762rVrl5U4GwCAekqNxiOqPTCdU+l5FZvsdr8wNTG+fmrz5hsX+iyDcIE8aNngKyPHlwscfdBNO3euL3AuAAB1lSu9XfSKyfHxb1d43pJmEC6QTZs27Up57jcj0h1Vn91IAydWfSYAALU2Ut1R6YvVnbX0GYQLaHLLlm6k/L+qPjen/EtVnwkAQH2liOHqDsudys6qAYNwge0aGjonIm6o9NAc61atWrWi0jMBAKitHGn/Co9b8PfV1YlBuMCu37Tptpzjnyo+dvnc8uUPr/hMAABqK+9T1UkpwgcoziODsAKDjThvoZ8fck95LtZUeR4AALVW2a7o9Sq8PbUGDMIKXN3pXBkR36jyzBz52CrPAwCgxnJU9oD4lFz4mE8GYUVyis9VfOQxFZ8HAEB9/ajCs54+Ojpa2S2qS51BWJGU82XVHphWVnoeAAD11YhbKzztgLzvvqdVeN6SZhBWZG5g4LvVnpgNQgAAKpFzrnIQRuT4h5XN5qGVnrlEGYQV2bZy5WREzFR4pP9AAACoRk7XVHziIYONxr+uW7duqOJzlxyDsCqXXjobEdsqPNF91QAAVKKRUsV3w0XkHM/a9qNbP+L9hHvHIKxWZZ++FBEr7nxMCwAALKxeypsKHf30vM8+Xx9uNh9V6PxFzyCsVpWDMDWbTQ/tBABgwS3bNVT5FcL/kR6eUuPykdbY3x0yNnZAuY7FySCs1mCVhx100EG9Ks8DAKCetm7dtC0ipgsmLIvIf7W8l68cabf/30PXrt2/YMuiYhBWKcd+FZ42t3Hjxio/xAYAgHr7dOmAiDgkcvzD8l0zU6PN9j8decyxDy8d1O8MwiqlOKjC03ZUeBYAADWXIl9YuuHHcsSBOcXv9xpz3xlttTeNtFp/O9JqPdJnbPy0Sm9hrLPh4eF9I+Kwqs7LqdKHgwIAUHMrcv749ka6KXI8uHTL3eWIh0Wkh0XEXw+329si50si4pLo9T47vWVL1Y/L6DsGYUUG9jlodS/mKvuJRMpxXVVnAQBAt9vdOdwaOy9FfmXplvuScqyMSC+MiBdGYyBGWu3xSHFJyvmSXbOzX/7BVVfV7ntog7AivcbsL1R5hTpHrvKZhwAA96sR8bqRdvuG0h0LrZHSWdeMj3+jdEcpvYH0fwbm8isW0c4YixxjOdIrhgaHYqTZ7kRKX87R+1I0Gl+ZHh8fLx240BbLP6hFL0U8MVd6XqPkpzwBAPykHE8pnVCFuV68t3RDSds2b9460ho7NyK/rHTLA5Li/2/vzuOjKs/2gV/3mSSQACJWRZKAKJkJilJbtBWtFSUJ4lolSV2qVqvVWuuCBMS+r43VqiS4Vy3WpfV16yRgbVUkLMWVKuJahEyCBkgCKiqCJCQz89y/PxL7c8kZMsnMObNc388nf8DzzLmvoIG55zzneXyA+gRyHowiz+v7SIGXReUFo/LipnVr3wIQdjtmLLEhdIZHIcc5WVAUKf9pBhERERElnpAJXZvh8ZQn2rOEfbS3AKdC9FRLFHle33YVvCzAiwq8kGPMysbGxg63Q/YHG0IH5BUWHg2juU7WNMAaJ+sREREREQHAh+vWfZTr810iwONuZ4mDIaI4DsBxAqBdrJ15Xu+/RWWRij7X0tDwdtc+NsmDx044QZ2/ZW5p6D2naxIRERERAUBrIPCEQh5zO4cDBgIySQU3AfJmntfXnO/1PpBXUFg6evTo3d0O1xtsCONshNd7ABSlDpf9uHndunUO1yQiIiIi+q+sYMevBfjA7RwOy1XI+RCtCWZmfZzv9b2Q6y2cObywcD+3g9lhQxhnFqTa6T9nUbycbLeqiYiIiCi1NDU1bTWC4wF84nYWl2QocJRA52QYfT/P63st1+utyPf58twO9lVsCOMo3+s9E8AJTtdVCy85XZOIiIiI6JtaA4G1aqyTAbS7nSUBHCaQKlU05Xp9C0YWjJ2SCP2Y6wFS1T4FBQcq5B43aivwjBt1iYiIiIi+qXXd2ldEMA2QNrezJIgMAU41Yp7L8/oCeV7vxQUFBQPcCsOGMA5Gjx63j0esfwAY6kL5Na2BwFoX6hIRERER9ag5EFgooscA+MjtLAlmDCD3tov1Qa7XO2P4+PGDnA7AhjDGcseMGRnMCD7f9R/XDbLAnbpERERERPaaA4HXLDVHADwvuwcjBFKd0b4zkFtQ+Asn+zQ2hDGUW1h4pFieVyDwuRRBxYT+4lJtIiIiIqKINjY2rgtlD5wA6J+4CWKPckX0/jyv7838grGTnCjIhjAGRo8ePTC3wHetGF0OIN/FKMua161rdLE+EREREVFEH77zzo6WhoZfieAEAJvczpOgxquYZble3525ubk58SzEhrB/rLyCwrJgZtZqEVwHIMPNMAK91836RERERES91RwILOywpBCKmwDsdDtPAhIBfiM5g98c6fMdFq8ibAj7YPiYMXvnewsvz/P6AhD1A9jf7UwCvNfc0PCk2zmIiIiIiHprS3399pbGwDUm5BmrkMcAGLczJRyBzyiez/d6T4vH5dkQ9o5nxJixE7qbwCUZlqdVobe7t3HMtxnoDfwBIiIiIqJktOmDNetbG+rPUsE4KB4GEHI7U4LJVkhNXkHhFbG+sKtLHHtBRo06eFg8C5ghRqxgcHcACANDLGPtY2D2VpERFkyhQg4EMA4wQxL3qVd5o7Uh4Hc7BRERERFRf3Qfn3bu8MLCSo/BFQI9B8DubudKEBZEb8vz+XJaAoEbY3XRRG8IB4YHdHwa1wqdQPgrvzTSdZNNoFBIXEvHiKqR3+Dr3wYRERERUdL6sL7+AwCX5+bmzkbOkDMAvVgEh7qdKyEobsj1eje1NjQ8FIvLcclo8nu4dd3aV9wOQUREREQUa62trW2tjfUPtDYGDlPBAd0bOab7OYYikPvyfb6psbgYG8KkJhsyg50xX0ecZBxdyfsRkOVkPacZZ7+/xF2FTURERAmnNRBY2xwIVLY0BMZCcAgEvwXwUpqulMtQxSN5BQX9PvIu0ZeMkj0Dg583NTVtdTuIyzqcLJa93cp0sp4LBjhYi9tLExERUZ+0BAJvA3gbwI17jRs3OLOj4xgR60QAJwDIczufQ/ZQsR4FcEx/NpdkQ5i09NqWdYF/uZ3CdaLtcPBZTxkUGuhYMReIkw2hoN2xWkRElAi2Q1J/50hLNOh2hnTz8erVXwD4Z/eXNdLnm2BUSxQ4SiBHAhjsdsZ4EeDHeQW+y1saA7f19RpsCJORwN8SaIjZzkJJTaTdyYWHnTtTe8moAAMc++NUNoREROnECE7YFAi86HYOSnlmYyCwEsBKAMCkSRkjW1u/Z4CjoHo0uhrE77gdMqYE148sLPzbxvr61r68nA1h0pEV+sX28/j8VRcFdjq5F6wnywx1sJzjjOpQceyOq7AhJCIiovhavjy0sas5XAngVgAycswB44yYo1TMkQLrKEBHuR2znwaFw3odgAv78mI2hMnlbcnKOLGlobXN7SAJw8hOiHO9sTFmuGPFXGDBGq5OfdYgyoaQiIiInKYb1635D4D/ALgXAPY94IARoaD5kQp+ZIkeqYrvJdvmmyI4N3fMmN+3rlu3MdrXsiFMHm+poLhl9er4nsuYbMS0OfkMoaXW3o4Vc4Gq7u3UH6caLhklIiIi961fs2YTgJruL+SPG7eHdoSKxNISVZQAGOl2xl7IFMu6EMC10b6QDWEyUCxrhzn104bGbW5HSTSWyOfq4OJZhaZ2Q2hhb6duuFoi6b5DLhERESWg5q4bMP7uL4zweg/wwCpR1SkQTAKQ7XbGnsnZAH4X7aNlSXUrNC0JHsmGOf7TRjaDPbKsqG+L94eKjHayntNE4eD3Z5qdq0VERETUN5saGtY0N9Tf0dIYOL4zK3NvhZ4pir87ffxZL4zO9/kOi/ZFvEOYuDpUcFVrIHC320ESmdWW2Rwe4NzPokAPcKyYwyZMmJC5edv2MQ6WZENIRERESaX7iIvHATw+fMyYvTMs60JAfpUoZx8ag+MAvBbNa3iHMDHVW4Kj2Azu2oYN734GYIeDJcc6WMtRrdu2FQDIdKygCBtCIiIiSlofrlv3UUtDwx/22W3IflC5RAWb3c4kgh9F+xo2hIklDMUt0t72ve7zU6h3nGws8vcsLBziYD3HeABH7356PB5Hl/sSERERxcOqVauCLY3194YHDixQwc0AQm5lUcHB0b6GDWHieMmy5PCWxsCM5uZm7r4YHScbC8ky5nAH6znIcvL7Cq5fs+ZDB+sRERERxdWH77yzozUQmC3QHwHa4EYGUeyzT0HBXtG8hg2h+xqh8tOWhsCPN9bXv+52mGSkiiYn6wmsHztZzykKPcrBcusBGAfrERERETmiuaHhVRU5lcmOqQAAIABJREFUApA33KjvUc9B0cxnQ+ietaJydktDYGxLY70/2u1h6WvedLKYQlOuIczNzc0BMMG5ivqWc7WIiIiInNUaCGzJDHZMVmC107XFo95o5rMhdJYB8CygJ7U0BMY1N9Y/AiDsdqhkJzCOfvoiwOGjRh08zMmacZeTM9nJDWVEZZVTtYiIiIjc0NTUtNUSnO/0+32jOjSa+WwIHSDAe6r4XdhjjWlpCJzQ0tDwNJfLxY7s3Pm2ww/vZoUG7PyJg/XiT+SnTpYzDjfxRERERG5oDgReE8FfnKwpsHaLZj7PIYyPMICVIlgEkQXN9fXvuB0olTU3N7fnFfjWoA+7KvWZSDmAhxyrF0f5+fnZCjnZ0aKWxYaQiIiI0oMx/wexfuFUOQXYELpgJxSrALwqoq9YHQOXdZ+PR04RvAE41xCKomjEfgfsu+mDNeudqhkvOjCnFIBzR2ko1rc2BLY4Vo+IiIjIRc2NjS/meX1bAOzpRD2BsiGMEwWwGcBGCNYLsMYA7wmwdp8hQ95btWpV0O2A6UwEL6viXAdLZlgZoSsBXOFgzXgQABWOFhS84mQ9IiIiIpcZAO871RB2v7/rtURvCIOi8r+OVRPshGi7MRK2xGxVka0mbG0V7fx4WHb25tWrV3f29LIWxwJSBM92N+1R/QD0j1yQN3bs9S1r137iXM3Yyvf5jlN1cKktAKg842g9IiIiIpcp0OLcm1SN6kzzRG8IQ82N9XPcDgEArW4HoIiaA4GWPG/hm4B+38GygyRkrgNwqYM1Y2fSpAxtab3Z4aphzZDnHK5JRERELsnNzc3JysoyTU1NO93O4iaBGKdOmRNYX0Qzn7uMUsoQ0aedrqmCi0cWFh7qdN1YyGttvQzAeIfLrkjmO6pEREQUHWvQkAuDmVlv5hUUTHQ7i5sEurdTtVR0UzTz2RBSKnFjKaLHGP1zfn5+tgu1+yxv7FgfFJVO1xUVx5t2IiIico0H0MsBjIVYL+Z7C6uT7T1TjHhUcJBTxTTKJ9rYEFLKaA4EXndpde8hJjv7zy7U7ZM9CwuHSNg86ejOot1CCP/T6ZpERETkjryCwtMU2K/7lx6FztDsnDdyvd5il6M5aqTP930ohjlW0JiGaKazIaRUYgBx5WxAgZyV5/Nd40btaEyYMCFzgMGjChzofHVZsbmx8T3n6xIREZErRKf38LtjBVKX6/U+l19Y6PSjK65Q4CIHy4VygNXRvIANIaUUE7L+DCDsSnHFH/K8hc7tihulgoKCAZu3fTEf0JNcCaB6ryt1iYiIyHG5hYVHAjjcblwgU9ToG/le7wP5Pl+es+mcs8/YsaNV8TMHS65ubGzsiOYFbAgppXQdFC/PupdAf5/n9d6OSZMSagffXJ9vz3ZYz7rWDAJbMkOdNS7VJiIiIoeJ6fHu4Dd5FHK+Ktbl+3z3j/B6D3AgmpMsjzEPAhjgXEldHu0r2BBSyhFx+06UXJ7X3Lo8UT7tyisomCiKNyA41q0MAn0w3bebJiIiShcjCwrGADglipcMUMUvLMjqPK/vnyO93h/HMZ5j8gp8VVAc42RNVV0a7WvYEFLKaQ4EFgFodDWE4EgF3s31+X7dtcOW8/bff/+heV7vbRDrBQAj3cjQLWyJzHOxPhERETlIYV3Rx/c/AuBEA3k+z1u4Kt/r/U2uz7dnHCLGmyevwDcXgqscrvsF2trYEBIBMAL9ndshoBgmij/meX2r8r3eaU41hnuNGzc43+u9rMOTUQ/IFQBcXb6qigc3BALvu5mBiIiInJE/btweKjiv/1fS7yvkTlG05Hp9C3ILCk+eMGFCZiwyxlNeQUF+nrdwqQvNIBT6VGtra1u0r0uo55yIYqW5oeGJfJ9vuiomuJ0FwHcVUpvn9a2D4B4NhWpb339/Q6yL5BYUfM8SzxkaDF6gEOe2No5sh8cjjp93SERERO7QYPAiAINieMksAU6F6Kmbt23fklfgexaQZzJDHXVNTU1bY1inX0aPHr17MCOrAoLLAY3l9x+Nv/blRWwIKVUZFZmJPqyjjqMxUNwinoy5eV7fShEsBPAqMjNfbV69+tNoLzZivwP2lczwRFE9HJCTAOyvUEDjE75v9NaN9QE3zoYkIqIEIwbH5BUU7uN2jkQhAzKW9uXf/0Q2bty4rK2dwUvjWGJPCM4B9JxgZlYoz1v4sgLPeiws23vw4LdXrVoVjGPtHo0YM3aCZYUvCEHOBLCb0/W/Yk1rQ8OSvryQDSGlrJb6+mV5Bb6FEEx1O8s3CIAfqOIHAIDOIPK8vlYImqDYAOiHKrJTgG1iJGygA2EhW4AhAuSpYhSAfYHwHl3Nn7j9/dj5qMOyqt0OQUREiUEE1yXYp5aukmDwBwBSqiHcGgyeASDXoXIZgB4twNHGAJu3be/I8/reVGClKFaGYVYNBtZFewTDrozY74B9LY85DKLFAIoAsz8gCfB/tt6BPv6AsSGklBaGmeGBdayz2/32SS4UuQCOAATS/eOsol3t3pe/djNhlFTlmi319dvdzkFEREQOUVzpYvUBAA4X4HAI4IGFdkDzvL5NUHygIutFtUkttFpAhxr5HGLaVWSnR2QrVCUMDAUAGBkk0N1gYS8Y5ALYC4JCAAcC4SEufo92mnbPynqopY8vZkNIKW1zY+N7eV7v9YDc4HaWNLO4tbH+QbdDEBERkTNyfb4iKL7rdo5vEAC5EOQK9EgIIF8+XSOKLz+EN6r/nYz/jnV/Ep+wC7G+Sq9bvXp1Z19fzV1GKeW15OXNAfCa2znSyFYNhy5IshuaRERE1D+O76pJAIBXWxoaHu7PBdgQUupbvjwUsuR0AAmzE1UKUxGcH49dVImIiCgxjSooGCeKKW7nSENhVXMJANOfi7AhpLTwYX39B6ry8/7+wNAuKG5rDgSedDsGEREROceITE+WxZWpRAR/aG1sfKO/12FDSGmjtbH+KQj+x+0cqUoFz7Xk585yOwcRERE5Z/iYMXtr15EL5CTFy825udfH4lJsCCmttAQCN4ngAbdzpKC3OkXKsXx5yO0gRERE5JwMy7oUwEC3c6SZZssTu/ddbAgp7TQHAhcJ8LjbOVKHNmQGM6fyiAkiIqL0kpubmwPIr9zOkV6kzRKctrG+vjVWV2RDSOkoPHy3IedCUON2kBSwRkSOaWpavdntIEREROQsa/DgowHs6XaO9CFtsHDSxkBgZSyvyoaQ0tKqVauCLYHA6YDe7naWZKXAC56OAUc2BwJ9PQeViIiIklhzILAQKj/lTu6OaFfRU1rq65fF+sJsCCmdmZaGhiuhmM7dR6Mk8OeoKdmw4d3P3I5CRERE7mlprPdrOPRdKBa6nSWFbYGaya2BwJJ4XJwNIaW9lsbAbVA5HcBOt7MkA4HMbQkEzmhsbOxwOwsRERG5r/X99ze0NAaOF5WzAWxyO0+KqRcTntjS2LgiXgXYEBJ1fbpVY6DfB6TfZ7mksI9VcGpzQ30F76gSERHRNzU31j+iO74oEJWruYw0FmT+gHDoh83r1jXGswobQqJumxoa1uyelTFRoFVseL7l2WAoeHBrIPB3t4MQERFR4mptbW1rbqyfA49VAMUtXIHVJ1sBPa+lob70/fff/zzexdgQEn3F6tWrO5sbGmaJmmMF+MDtPAngC6hc0tIQOPGjDz740O0wRERElBxa1q79pKUxMEPDoUIF7hJgm9uZkoEo/m5ZMq6loeEvTtVkQ0jUg+bGxueHZmWOFcFFAD52O48LQgDuywxmelsa6+/t2lSUiIiIKDqt77+/obUhcNlOS/K73lfpf9zOlKDqoVLe3Bg4NZZnDPYGG0IiG6tXr+5sDgTu83QMKBTI3DRa8rBALTmopSFwEc8XJCIioljYUl+/vTkQuK+loWG8CopF8XcAQbdzuU6xXgQXteTlHtTSWO/KGdlsCIl2YcOGdz9rbqivMCHPWAhugyAVj1oIQvE3qJnY0hCY1lpfX+92ICIiIkpJ2hoILGluDJwKjzVCVS5Q6KL0aw61QQQX7j4g09ccCNyH5ctDbiXJcKswUbLZ9MGa9QCmFxQUzG6H52RYegUUR7idqz9UsBnAXxEO3926bt1Gt/MQERFR+mhZu/YTAA8AeGDUqIOHhQd2nARFGYASAFlu54sDA2AZVO5raQwsABBudjsRG0Ki6HWfv1cDoCavoOBwWFY5FCcBKHA7Wy9tgeJZtfBka27u025+IkVERESE7hVZAB4G8PAeBQW7ZYv8GCqTIHIMoIck8cpGA+gLUMsf0tD8D9et+8jtQN/EhpCoH1oaG/8N4N8Apuf6fGOhehIgJwpwRCL9fCmwGoKnATzdGgisABAGAAQCbkcjIiIi+ppPGxu3AV3vWwBg1KiDh4UGdhwNlWOgeoQIxgHIdjunLcV6EV1qgCVGdcnmxsaE3qBQ3A5AlIry8/OzdeDAQ0TkUFU5VAUTBBgLwBP/6rIB0NchWKXGvG4NGPB68+rVn8a/LhEREZEjPLmFhQUSxngIxovowVCMV2C0w/2NAbBBofWiskotrLSAlc2BQIuDGfqNDSGRQ4aPHz9oQFvbaGNZowDkq+pIQEZBMVIsDDWKgdL1adcgCLKgGNJ9l3Fr9x29zwEERfCFGuwUwQZAmgGz0ai1QVWarUw0da/HJyIiIkoro0ePHmiysnJDQC6AfDEYAQsjoRgBYC8R7K4KC8BQQDIgOgSKTACDu64gbRDtAACobIfq5xB83v0ebAsgzSq6CUY2iqXrMzs765uamtJlF3oiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIqJeEbcDEBERuW3BjZO/E/Jk7gmPGWwpMqyw7NSM4NZwyNpafvWSz93OR0REFC9sCIl6UFNVdCsg+T2NCfB86czFdzuf6tv8N07dSzJCPWaxYN08beaiN2Jds6aqeC6AUT2Nieji0oolf451zV2prSq+ToED7MZVzG3lFUtXxDvHs3dOHdC2M/ygQjN7zAHzYPnMpc/FO8c31VYVzVPIMEeLij5aVrHkKUdr9tJDlZMGDhqUOVUMJkFwBAAfgN0ivGQHBG8D+pbCesNjPIumzVrY7GDkHtXMKb4Kgh+6nUNUHiudVfd3t3MkO/+tE7MlNPgBABk9jSvwcvnMxXc4nyw2Iv3bES2BBAHzhYp8pqpbLbFWB0PWu2fMfq4pFtcnSjc9/qVDRDIFwIE9jaigzfk8PQuLDsoAynoaU5jDH/vD5MPO/O3SD2NctgTAwT3WVPkkxrV6R7QZKtfaD1sDAJwS7xht7eHTVfRMm+GOUBC/iXeGnijkRAC5jhY1sgpAQjWE82+bMkKDZpYC50AxLIqPRAdBcQQgRwgURkLqryp+BUANQhmPlV+z8OO4BrehIhMFOs2N2l9lxMT8g6d0ZAUHn6uCM+zGBTjef+uU/yufvuhTZ5PFjO2/HdFSaNefiAICgaoiwxNGTVXxhyKo0bA8XnZ13SuxqEWUDiy3AxBRfCgwMjPLqvVXlmW5nSXejGfHIwC2RJhy4hNVx46Jdw4VvcJ2UPBEHJpz6gW/v8xTM6dktgmaRgUuB9Dfu6UiwJEC3C6Zofdrq4qve+TOqZHuMBJFVFlZaQG4chfTBknIXOxQpGQ1XBWXwtKX/VVFy/w3F8WkASVKdWwIiVKZ4kdWzmd3uR0j3sqnr2gHcF+EKZZHMy6NZwZ/VfHRAA6xGxdLk3apVzJ7as7JQ6Rp6yKI3gggJ+YFFIMVuHbAztCbqnwMg/rmwOyXT1SBb5cTFZc+e+fUAY6ESnICOUYsecM/pyiuf/cTpQI2hEQpTiG/rJlTconbOeJNM8L3AAjaThA976k5Jw+JYwLbu4OqeKH0qiVvxq829cR/68TsTmlfDGCyA+UWikAdqEOp6apezRKM2NEetFuWTt+WISJ31cwpme12EKJExoaQKB2I3t59BytllU9f1gKgNsKUoR1oOzceteffVLS/QE6yGxfw7qAbJDjkDqBPm67Yf7BgwyPypz7UIcL8uZMPE8GPeztfRabzbnSURG9I9X8DifqDm8oQpYdMAWoev+m4H6TyLmwicoeq2m7KYEF+o4q7Y30nx1jWbwD19JgJaDL7DUuozVW+4S2Bvhbzqyreivk1o1BbXfJDVb1g1zP1Rag8I5YsN9q5fvDA7M+Ov2xhh7+yLAs5H+9heTJGaFgmADgUgslQFHzrEoKXTquo+098vhN7oroCAhPNaxQYKcDhEcafFWBHNNe01FobzXz6OhO2pkfT3glwUE315CmA8zsWx4tC/w7LuqE3cyWEAZbH5Kix8mCZcarWFEDH7+Jllgjur6ysLKysrIzqZ4YoHbAhJEofe2V4wk8+XF3yo3Mq6qJ6w5csSivqXq2pKlkB6MSexlXgq72l5DigbmGsaj5y59TdsDN0vt24Kv5YXl4TjlW9WBPIc6UzF6fcciqj+luJfLTSWgUuLp+55PmeBssrazoBbO7+ehPA/ei+m2OMnAHIeQB27yrmzt3BslmLb4n2NbXVReWq8jfbCSKXllXUfdDfbNQ78+ceu68xKLUZDtm/T/NcBSBlGkKBbCmbUbeqjy+f6a+ePFHUugvABNtZioKDs1ccDeBffQ5KlKK4ZJQovRySrfpQKi83UiDy8kyDy2JZL2tn6DzbM+wEX2RkBR+IZT3atcfmTtpTgKkRpqz1iBxdPnNxj81gJNNmLF1ZNnPJ9M5w1v4Q3CRA06BsT6SlykS2jLEuj3Du4PWAbO5pTKBFC26e8t24B0wS5RVLV2jGF0cp8HKkeUb0VOdSESUPNoRE6aesZm7RNW6HiJe92jrnC7DRfoZOqZ1bMjYWtSorKy0LYn+2oOKvp165fGssalHvZWrGkZFXwEjFaRV1H/Wnxlmzn/msrGLxNaZt98LjL1vY0Z9rUXry31w0FJBf2Ay3Z4TM3VDMs3u98ZjebUSTJsqnr2iHZX4ZcZLqt5d8ExEbQqJ0JCq/r60usd0EJZkdU7k8pIq7I0wRNRqTbcjHDXrpJIXanW9owh5zZyzqUJSMdWCE0fbVbUc8G6tS3UtLiaImFi60W10gisdOu2bpJ1aWzAPQ4/9jqvip/9Zj8+IeNImUz1j6HoDVduNqIdfZRETJgQ0hUXqyVPUR/9zJkd44Jy3NtP4MoM12guDcJ2+btHv/C4n9URPAc6dftTTQ7xoUPVH7/7aCFm4qQW6bN29CpkBsl69bXc/DYdqVizYJxG5JcpaEPDFdAp8KFFhvNyYmuk2YiNIFG0Ki9LWbGOvvj950wjC3g8Ra+fRFnwL4P9sJisHBUKbtRjC94a8qPgTAJLtx2dWzjBRPIdsRxQge7E1uG7ZtWJkCI22Gnz/t6kVv//dXgkgrDX4Z3/NVk48Ag+wH5UNHwxAlCTaERKnNdulMN2+Wp/MJv7+sxyMTkllY9Y6uD4t7Jopf9+f7toDLIwy/V1qxeHFfr039I5AtEYYHtbWHznMwDtG3qf1B9AK966u/Lq2oexWA3dEwu3dIe78+3EolD1VOGgjgENsJom86GogoSbAhJEphovI/qnhhF9NKrA+2VjkUyTGnz1qyRgV1EabsL+s/O7Ev137sD5OHK2B73iEEd8b6rEPqPVV9J+K44HZ/dckvUnm3XUpc8+dMOUYg37cZ3vCdttC3zi0VwV09Twcs4Ip/VU7iMWIABuVkXgRgqN24QBL5TFgi17AhJEphxjJBhDNKEeGZCnS9QZ7un1N8tnPJnCEikZdtqv0zPJFkZsnFAOyWHX46cMdA++WqFHeDsjNeArAtwpQBonp/bXXxkpq5JVMrKyv5byE5xkh4uu2g4p5jKpd/a8mz2bG73+4ICgVGf5yTNS3GMZNOTVVxmQA3240r8O/uu61E9A38R5AoxZVfs/BjBX4ScZOVrk+g7/PPmfID55LFX+lVdc8BWBthyrELqksOiuaaz945dQDUuthuXCD3nVT5z4h/1hRf3cdA9Oaw+GNh9NlxOS+vr6kqeqC2qviMBdUlezsQkdJU15E3coLNcLsnbO7vaaC8sqYz0hEUArVvMlPYw9Ulg/zVxafWVJUsBOAHMNBmaqfHMtyAh8gGlxgQpYHymYvfqq0uOk9Vnuh65r5HA0XMgvm3TTls2pWLNjkcMS5EoP4qvVMg99jNCXcdVB/57KqvaGsPnw7RfWyGQ0EPbGslIoVeUVNVfFGsrre67cg9E2EXzyzNvqFT2k8E0JuddPMBOV+B88OqWlNV8q6oLjGWLsOO0PPllcu/cCAypQNjrgSkx7+Dvzxqwu6lVpbMM0GdDSCrh+Ef1FRNOaps5qIXY5rXOZNrqor9vZsqQwAzCJA8qI7uurkRcYW+Avj1tBlLV8YoK1HKibohrJ1Tci6gR8UnDqUqtXRjWcWS69zOkc5KK5b4a6qKvwsg0qH0eSao85+9c+oxqXLY9k6xHs5W/QOAnndTFT1rwY2TZ0d6I/ZVCrXdTEag88+4avHGfsR1w8AIn6onrVNm/WO7/6Ypp4jHvApgjyheKoCOV8F4UZmOnMyQv6r4VQtYasQ8VzZj6b/5fCj1xYLqkr3DqufYjX951ISdaVcu2lRTVVQDyFk9z9CrACRrQ7hf91cvaITPNb+lXVR+VTqr7q/9yOaK2jklNwC2Hz4SRWbpq6UVS/7c2+lRN4Qq5seAcEcrio5a7wBgQ+iy1W1H/u+4nJfGAxJhMxWduKMjdC+AlPg5P6eibkdNVfGfAcy0mZIT9lgXAJizq2v5q4qPBvA9u3E1Fg+iTyDlsxc11lYVH24ENaL4bh8vkyHAkQocKWpdO7+6uKl2jjwqWXJ3qtxJJ2eEDS6B2H748vWjJmyIWHepql1DeNITt0z28fzT//pMRKaWzkzW5wa1TAU+t1NQklLJAdDrhpDPEBKlkcrKStMxMPMsAdZEnKg4r7a6JGWet1Cjd0c8m05wSW926ZPIR028VnZ13St9zUjxUTpzcQM8X0yE4CYI+r30U4HRKvpbEzTraquKb0/Fczwp9vy3TsyG6CV24988asLOLo6gsDxh68o+h0w9w1R1Wc2c4jsemztpT7fDECUyNoREaeZnly3cBuAUAJ9Fmqeqt9TMKZ7sXLL4Kb96yQYAT0aYMurj7KyfRLrG/JuK9gdwst24ivIg+gRVPn1Fe1nF4ms0mLE/oDcIEItlvdkKXD7A0/lGqm3GRHEQGnI2gL1sRns8asKWSqSVCOf6b5xqVycd5UBwWabJ/M/86qIit8MQJao+LBmVp0XR49bHRHZUDZdWJZDSmYsbam8uOkMteQaA3eHsGRD8bf5NRT+YNnvJ+w5HjD0jt8PSMrthsfRyALW2L/fg0gh/Vq2f7fZZTUxyUtyUX7PwYwD/W1lZ+bsDB70ySQxOguhkAAdF81DSVykwWsS86K8qLimfufj52KemZFdZWWkJXra/c2dz1ITt9PahNZLz+Vyb58uykRH6FYDf9zVvihpuVJ6prS4pLa2o+6fbYXpDLb0XKmzuqU9EdJdL0L8q6oawvGLxk7v4pJ2IkkDp1UsW1VQVXQ1IdYRp3wl75Cl/5aSJyb7TYtnVda/4q4pXCnBYjxMUP5pfNeX702YueuObQ0/NOXlIJ9p/YXdtFb3nootWBWMc2REC/MVY8sdYXS8Rdhjdle6My7q/8NgfJg/PyrSOhWIyBJMVGB3lJbMEqH38puMOO2P2c03xSU3JalzOK8cDGGszbHvUhJ3yyprOmjkl8yD4XU/jAvz6ocpJVedVLt/Zp8BuUPgto7OjeUkYHsuTGRqmRkapWgdDdCq6/n63+3AnS9U8+sQtkw9NhucsyyqW3O52BkofPHaCKI2VzVwyt3vn0Z/ZzRHgIORkPqyKacm+u6Ko3AHRR+zGjZjLAPz8m7/fIe3nC7Cbzct2Iph5X0yDOko2l8+oW+V2Cjed+dulHwJ4vPsL/pumFFiWKTIiRQI91naH2q/bM8MK/xFAhA2bKD3pVREGH+3tDsdfu6J0/kmQaXcExd5DBmWcHc2GEq4TbOvHSpSVAOYDqKydU3yoCu4GYLOMW4Z4QnI7gOP7E5co1bAhJEpzmvHFLxEaXGh756zLqbVVJb8D6iodjBZzXUuttlYByO15Ak5fUF0y87SKuo++/K3KykrLwiu/UZteWBSPlnUtRaQUUT57USOARgB/mjdvQuZ3tg07VSGXQ3FExBcKTuAuj/RV/rklE2B0kt24CkbWVhXZHjgfiXY9Bz68xzGV6aq4P9k/xItW6azFrz9UOenoQdmZi0Tw4x4nCaYuqC456LSKuv84HpAoQbEhJEpz5dNXtM+fM/U0I+GVEc88Er22Zk7RO46Gi7HyyppOf3XRPaJyg82UAWHoRQCu//I3xg166SRVGWN7UcvwqIkU1r0U2K+Kmtq5xb+E4jYA2XbzPUaOB8CGkAAAlsH0SB2ZKKZo3x5f3ZWxtdUlJwB1T8fj4onsvMrlO5+4ZfKFnrC11m75aBhmGgA2hETduMsoEWHarIXNKuHTAEQ6jF5gyV8BjHAwWsyFJDQPQLvtBINf+SvL/rsMSzXiURPLSiuWJnWTTL0jAi2rWDwPwLm7mDneqUyU2Pw3F41S2G9kFX8Rl6qmtNOvWhqA4i3bCUYirYghSjtsCIkTXTF9AAAHBklEQVQIAFBesXSFQGzPyQIAKAYDSOrznM6csXyLKB6znSAYgUGflQLAgpunfFcgx9hNVQWPmkgzZTMX1wBYaztBlbsCEgBALLkMQKaLESb555ZMcLG+q1TE9plEFezrbBqixMaGkIj+q3Rm3YOA9OqA5GRmVO/oegSnZ6JyGQCEPcb27qBA1r3XfmTaLcciAMAa2xEVu6NJKI08cufU3QBc4HYOMel7lxAwtj+LAgxxNgtRYmNDSERfs2db5/Qvt+NPVeVXL3l3F9/jD/1zik+G4gy7CQZ6VzIcsZDO/NWTJ8bjuhpp2bQg6h0jKfVkdYQuADDU7RwAyvw3F41yO4QbBGJ31Aeg+NTRMEQJjpvKENHXHFO5PLTgxsnl4QxrJYD93M4TLyJyh6pOth238CgUA22Gt3UOzHgofumov2rmFE+GYnFNdfFfOkNZV501+5nPYnFd/81FowT4XoQp78aiDiWvf1VOytgS6dljQa0F7dPOoj1RWNmqWmtzBEWGJXI5gLS6U1hbXfJDVbVvCIFWB+MQJTw2hET0Ladds/QT/81Fp4hHXul+bjDl/GfHEc+My3m5AYC3xwkRvm8BHvrZZQu3xTMf9dtVAASK87I8wan+OSW3Bk3m/f1pDP2VZVlifXY3gAF2c0RT++467dqWQVmlULW9Kycw10+L8WZUNVVFNYCc1dOYCi7w31z0+/Krl3wey5qJakF1yd5h1QcjTrJ0pWOBiJIAl4wSUY/Kr17yLoyeG+lZu2TWtdxT+/K8pAkhnPLPWSazBdUlB0Fw3P//Hd1HRKuyPJ0ba6qK7/XPLZmgUe71X1s9ebzkbF0ESISD5+Wd0lmLX+9PdkoBGvG5veXx2JlY1RPp+JvdxMKFsa6ZaObNm5BZU1V0jlF9HcCBkeaKWH9zLhlR4uMdQiKyVTZryYKaOSW/h+jv3M4SD1ma85dOab8+ymd9nj595rJ1cYzlKIX+pKaq2P6cxX7wiPzejcOfw9DpNuePDQJwsRi9uLa6uLm2Gv+C4lURrQ+bjI0hz85PNDgonDmgPQdGhkrYGgGRiYBOUsWxdmeafUlFK+P3XVEy8FcVHw3gUNsJ2qcPoXapfNai12qqil8F8MOexgVy2bx5E+7oPlczEe1fU1Uc9REdKrKbqBkNyDh8jmMBDO3FJ5h1pTPq7HcKJkpDbAiJKKLSmXXX1VYXjwdwqttZYu2UWf/YXjun+AEVTO/ta1Qk1Y6aGNv9FXNho/OcPvx5/m1TRpigObMXU/NVcTaAs1UFImFkmkzA0wmEujcnFERzg/zJ8orFT/Y9OaUCQcS/S9brfsOeiltxlbsg2mNDqMDIPbZ+pxzAo3Gr3z/Hdn9FRVR39TnNN+h2yzK/jLYOUarjklEiikgEmqXZ56rDb+ydYiz5I4BwL6e/W15Rx2fEElg4aIYD2OpkTYW+0TEw4+dO1qTE459zXCEA+yXFinvLy2t6+3dN1LR9aA0UmyLMSKuNZXqwQwzKps1Ytt7tIESJhg0hEe3SKbP+sd0T1lOA1NtSv7yi7gMA/+jN3BS8O5hyymcufksRPATA4048/6qQJTA4lpsMkUj4ygjvq9o9YXN/POuXV9Z0woqwe6nge/7qkqjvwqWIVku1qPTqJYvcDkKUiNgQElGvTJu95H0ofgog5HaWWLMsub0X0z6GZ/tjDsShfiqfuXxz2czFZ4rIRABPAojHeZHbVHDVe21HTEmX3RvJnv/GqXsBOCfClEdPu2Zp3D9QUw3NA9AZYUK63SVsg+L6dhHftFlL/u12GKJExYaQiHqtbNbipQrMcDtHrE2bUfcCFG9GmiMq95VPX9HuXCrqr9KKulfLZi4+zbLC+0PlGhW8HYO7hi0AbgxawTHlFYtv7dqtltJeRuhXALLthkWMIzsTl89cvhmA3zYHMNU/d3LEHThTwOcA/iGCszsGZowom7X42nMq6na4HYookXFTGaKeqNSImBE9DRmVFc4H6tkADW43kPvsxjWMDbGuWT5z8R3+qqJsq4dD61Wtl2JdzzGCqwU6zW44CNzjbKCYekSguzte1WO1OF6zB93PDN0E4CZ/1aR9IBnHiuJQBQ4RiBfAPjb/HgYBbFRBg0BXAHhe9x32YjyfA4s3I9Y6S43t3xlBCW53NlFqEGimAD3+uapam0pnxv6oCTtqtMqy0GY3LmGPD8B7TuX5kgK1VtfPUYxIuwI7oNgmwOdGTBOMvFd+9ZKY/7tHlOqiOoeJiIgo1fj9ZZ7gurbdMjOCu3tCRsKCUFAHbM8ck7MtmZs/IiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIkoq/w99bwSR7tya9wAAAABJRU5ErkJggg==";
+const PDF = { svart: [27, 37, 38], gul: [171, 138, 69], gulLjus: [242, 234, 219], gra: [128, 128, 128], rutnat: [187, 187, 187], X0: 51.02, X1: 544.25, topp: 40.5, botten: 785 };
+function skapaPdf(R) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const W = doc.internal.pageSize.getWidth(), B = PDF.X1 - PDF.X0;
+  let y = 0;
+  const font = (stil, st, f) => { doc.setFont("helvetica", stil); doc.setFontSize(st); doc.setTextColor(...(f || PDF.svart)); };
+  const nySida = () => { doc.addPage(); y = PDF.topp; };
+  // Loggan överst, centrerad
+  const lh = 58, lb = lh * 900 / 674;
+  try { doc.addImage(LOGGA_PNG, "PNG", (W - lb) / 2, 24, lb, lh); } catch (e) {}
+  font("bold", 18); y = 108; doc.text(R.titel, W / 2, y, { align: "center", maxWidth: B });
+  if (R.under) { y += 16; font("normal", 10, PDF.gra); doc.text(R.under, W / 2, y, { align: "center" }); }
+  doc.setDrawColor(...PDF.gul); doc.setLineWidth(2); doc.line(PDF.X0, y + 6, PDF.X1, y + 6);
+  y += 20;
+  const RAD = 18, LH = 11.5;
+  const cellRader = (txt, b) => { font("normal", 9.5); return doc.splitTextToSize(String(txt), b - 12); };
+  const radHojd = (celler, kol) => Math.max(RAD, ...celler.map((c, k) => cellRader(c, kol[k].b).length * LH + 6.5));
+  function list(d) {
+    doc.setFillColor(...PDF.svart); doc.rect(PDF.X0, y, B, 26, "F");
+    doc.setFillColor(...PDF.gul); doc.rect(PDF.X0, y, 5, 26, "F");
+    font("bold", 14, PDF.gul); doc.text(d.text, PDF.X0 + 10, y + 18);
+    if (d.hoger) { font("bold", 11, PDF.gul); doc.text(d.hoger, PDF.X1 - 10, y + 17.5, { align: "right" }); }
+    y += 34;
+  }
+  function tabell(t) {
+    const kol = t.kol, xs = [PDF.X0]; kol.forEach(k => xs.push(xs[xs.length - 1] + k.b));
+    const text = (c, k, by, fet) => {
+      font(fet ? "bold" : "normal", 9.5);
+      cellRader(c, kol[k].b).forEach((r, i) => {
+        if (kol[k].j === "c") doc.text(r, xs[k] + kol[k].b / 2, by + i * LH, { align: "center" });
+        else doc.text(r, xs[k] + 6, by + i * LH);
+      });
+    };
+    const huvud = () => {
+      doc.setFillColor(...PDF.gul); doc.rect(PDF.X0, y, B, RAD, "F");
+      t.huvud.forEach((c, k) => text(c, k, y + 12.5, true));
+      doc.setDrawColor(...PDF.rutnat); doc.setLineWidth(0.3);
+      doc.line(PDF.X0, y, PDF.X1, y); xs.forEach(x => doc.line(x, y, x, y + RAD));
+      y += RAD;
+    };
+    huvud();
+    t.grupper.forEach(g => {
+      const hs = g.map(r => radHojd(r, kol)), gh = hs.reduce((a, h) => a + h, 0);
+      if (y + gh > PDF.botten) { nySida(); huvud(); }
+      const topp = y;
+      doc.setDrawColor(...PDF.rutnat); doc.setLineWidth(0.3);
+      g.forEach((r, i) => { r.forEach((c, k) => { if (k > 0) text(c, k, y + 12.5, false); }); doc.line(i ? xs[1] : PDF.X0, y, PDF.X1, y); y += hs[i]; });
+      const n = cellRader(g[0][0], kol[0].b).length;
+      text(g[0][0], 0, topp + gh / 2 - (n * LH) / 2 + 8.5, false);
+      xs.forEach(x => doc.line(x, topp, x, y)); doc.line(PDF.X0, y, PDF.X1, y);
+    });
+    if (t.fot) {
+      if (y + RAD > PDF.botten) nySida();
+      doc.setFillColor(...PDF.gulLjus); doc.rect(PDF.X0, y, B, RAD, "F");
+      t.fot.forEach((c, k) => text(c, k, y + 12.5, true));
+      doc.setDrawColor(...PDF.rutnat); doc.setLineWidth(0.3);
+      xs.forEach(x => doc.line(x, y, x, y + RAD)); doc.line(PDF.X0, y + RAD, PDF.X1, y + RAD);
+      doc.setDrawColor(...PDF.svart); doc.setLineWidth(0.8); doc.line(PDF.X0, y, PDF.X1, y);
+      y += RAD;
+    }
+    y += 18;
+  }
+  const tabellHojd = t => RAD * 2 + t.grupper.reduce((s, g) => s + g.reduce((a, r) => a + radHojd(r, t.kol), 0), 0);
+  R.delar.forEach((d, i) => {
+    const nasta = R.delar[i + 1];
+    if (d.k === "list") {
+      if (d.nySida && y > PDF.topp + 200) nySida();
+      const h = 34 + (nasta && nasta.k === "tabell" ? Math.min(tabellHojd(nasta), RAD * 4) : 40);
+      // Håll ihop rubrik och tabell: får hela tabellen plats på en tom sida, börja på ny sida
+      const hel = 34 + (nasta && nasta.k === "tabell" ? tabellHojd(nasta) : 0);
+      if (y + h > PDF.botten || (y + hel > PDF.botten && hel < PDF.botten - PDF.topp)) nySida();
+      list(d);
+    } else if (d.k === "h" && d.bilaga) {
+      nySida(); font("bold", 13, PDF.gul); doc.text(d.text, PDF.X0, y + 4);
+      doc.setDrawColor(...PDF.gul); doc.setLineWidth(1); doc.line(PDF.X0, y + 10, PDF.X1, y + 10); y += 26;
+    } else if (d.k === "h") {
+      const hel = 20 + (nasta && nasta.k === "tabell" ? tabellHojd(nasta) : 0);
+      if (y + 20 + RAD * 3 > PDF.botten || (y + hel > PDF.botten && hel < PDF.botten - PDF.topp)) nySida();
+      font("bolditalic", 10.5); doc.text(d.text, PDF.X0 + 2, y + 10); y += 18;
+    } else if (d.k === "tabell") tabell(d);
+    else if (d.k === "rad") {
+      if (y + 16 > PDF.botten) nySida();
+      font(d.fet ? "bold" : "normal", d.gra ? 9 : 10, d.gra ? PDF.gra : PDF.svart);
+      doc.text(d.text, PDF.X0, y); y += 14;
+    }
+  });
+  const sidor = doc.getNumberOfPages();
+  for (let s = 1; s <= sidor; s++) {
+    doc.setPage(s);
+    doc.setDrawColor(...PDF.gul); doc.setLineWidth(1); doc.line(PDF.X0, 803, PDF.X1, 803);
+    font("normal", 8, PDF.gra);
+    doc.text(R.sidfot, PDF.X0, 813.5);
+    doc.text("Sida " + s + (sidor > 1 ? " av " + sidor : ""), PDF.X1, 813.5, { align: "right" });
+  }
+  return doc.output("blob");
+}
+
+// =====================================================
+//  RAPPORT-VYN
+// =====================================================
+let rVem = "alla";
+function sattPeriod(p) {
+  const idag = idagIso(), m = veckansMandag(idag);
+  let f, t;
+  if (p === "denna") { f = m; t = plusDagar(m, 6); }
+  else if (p === "forra") { f = plusDagar(m, -7); t = plusDagar(m, -1); }
+  else if (p === "manad") { f = idag.slice(0, 8) + "01"; const d = tillDatum(f); d.setMonth(d.getMonth() + 1); d.setDate(0); t = tillIso(d); }
+  else { f = plusDagar(m, -7); t = plusDagar(m, 6); }
+  $("rFran").value = f; $("rTill").value = t;
+  document.querySelectorAll("#snabbPeriod .chip").forEach(c => c.classList.toggle("på", c.dataset.p === p));
+  ritaRapport();
+}
+document.querySelectorAll("#snabbPeriod .chip").forEach(c => c.onclick = () => sattPeriod(c.dataset.p));
+["rFran", "rTill"].forEach(id => $(id).onchange = () => { document.querySelectorAll("#snabbPeriod .chip").forEach(c => c.classList.remove("på")); ritaRapport(); });
+$("medSammanst").onchange = ritaRapport;
+$("medDetalj").onchange = () => {
+  ritaRapport();
+  if ($("medDetalj").checked) {
+    const n = (aktuellRapport().personer || []).filter(x => x.P.total).length;
+    toast("Bilaga med " + n + " " + (n === 1 ? "person" : "personer") + " lagd sist i rapporten");
+  } else toast("Bilagan är borttagen");
+};
+// Administratören: "Alla" är förvalt, "Enskild person" bara när man trycker på den
+function sattRVem(v) {
+  rVem = v;
+  document.querySelectorAll("#rapportVem .chip").forEach(x => x.classList.toggle("på", x.dataset.v === v));
+  $("medDetaljRad").classList.toggle("dold", v !== "alla");
+  $("personBar").classList.toggle("dold", v === "alla" && !$("vy-rapport").classList.contains("dold"));
+}
+document.querySelectorAll("#rapportVem .chip").forEach(c => c.onclick = async () => {
+  sattRVem(c.dataset.v);
+  if (rVem === "alla") await hamtaAlla();
+  ritaRapport();
+});
+async function hamtaAlla() {
+  await sparaNu();
+  status("Hämtar allas tider …"); $("forhand").textContent = "Hämtar …";
+  const ut = {};
+  try {
+    await Promise.all(anvandare.map(async a => { ut[a.id] = await hamtaVeckor(a.id); }));
+    alla = ut; status("Sparat ✓");
+  } catch (e) { status("⚠️ Kunde inte hämta"); toast("Kunde inte hämta allas tider"); }
+}
+function period() {
+  let f = $("rFran").value || "2000-01-01", t = $("rTill").value || "2099-12-31";
+  if (f > t) [f, t] = [t, f];
+  return [f, t];
+}
+function aktuellRapport() {
+  const [f, t] = period();
+  if (arAdmin && rVem === "alla") return rapportAlla(f, t);
+  return rapportEn(visadId, veckor, f, t);
+}
+function ritaRapportProjekt() {
+  const kort = $("rapportProjektKort"), box = $("rapportProjekt");
+  const lista = synligaProjekt();
+  kort.classList.toggle("dold", inst.projekten.length < 2);
+  if (rProj !== "alla" && !projekt(rProj)) rProj = "alla";
+  box.innerHTML = "";
+  [{ id: "alla", namn: "Alla projekt" }].concat(lista).forEach(p => {
+    const c = document.createElement("button"); c.className = "chip" + (p.id === rProj ? " på" : "");
+    c.textContent = p.id === "alla" ? "Alla projekt" : projNamn(p);
+    c.onclick = () => { rProj = p.id; ritaRapport(); };
+    box.append(c);
+  });
+}
+function ritaRapport() {
+  if (!visadId || $("vy-rapport").classList.contains("dold")) return;
+  ritaRapportProjekt();
+  const R = aktuellRapport();
+  $("forhand").textContent = tillText(R);
+  ritaOversikt(R);
+}
+function ritaOversikt(R) {
+  const kort = $("oversiktKort");
+  if (!(arAdmin && rVem === "alla" && R.personer)) { kort.classList.add("dold"); return; }
+  kort.classList.remove("dold");
+  const vids = R.vids;
+  let html = '<table class="oversikt"><tr><th>Person</th>' + vids.map(v => "<th>v." + veckaNr(v) + "</th>").join("") + "<th>Totalt</th></tr>";
+  const per = vids.map(() => 0); let tot = 0;
+  R.personer.forEach(x => {
+    html += '<tr><td class="namn"><button data-id="' + esc(x.a.id) + '">' + esc(x.a.namn || x.a.epost) + "</button></td>";
+    vids.forEach((vid, i) => {
+      const s = x.P.veckor.filter(w => w.vid === vid).reduce((a, w) => a + w.summa, 0); per[i] += s;
+      const ok = (x.karta[vid] || {}).status === "inskickad";
+      html += "<td>" + (s ? fmt(s) : "–") + (s || ok ? '<span class="st ' + (ok ? "in" : "ej") + '">' + (ok ? "✓" : "ej") + "</span>" : "") + "</td>";
+    });
+    tot += x.P.total;
+    html += "<td><b>" + fmt(x.P.total) + "</b></td></tr>";
+  });
+  html += '<tr class="sumRad"><td>Summa</td>' + per.map(s => "<td>" + fmt(s) + "</td>").join("") + "<td>" + fmt(tot) + "</td></tr></table>";
+  $("oversikt").innerHTML = html;
+  $("oversikt").querySelectorAll("button[data-id]").forEach(b => b.onclick = async () => {
+    sattRVem("en");
+    visaVy("dag"); await valjPerson(b.dataset.id);
+  });
+}
+
+async function kopiera(text, klart) {
+  try { await navigator.clipboard.writeText(text); toast("📋 " + klart); return; } catch (e) {}
+  const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+  ta.remove();
+  toast(ok ? "📋 " + klart : "Kunde inte kopiera – markera texten och kopiera själv");
+}
+async function laddaNer(namn, data) {
+  const typ = namn.endsWith(".pdf") ? "application/pdf" : namn.endsWith(".csv") ? "text/csv" : namn.endsWith(".json") ? "application/json" : "text/plain";
+  const blob = data instanceof Blob ? data : new Blob([data], { type: typ + ";charset=utf-8" });
+  const fil = new File([blob], namn, { type: typ });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [fil] })) { await navigator.share({ files: [fil], title: namn }); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = namn; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  toast("⬇︎ " + namn);
+}
+$("kopText").onclick = () => kopiera(tillText(aktuellRapport()), "Texten är kopierad");
+$("kopExcel").onclick = () => kopiera(tillTsv(aktuellRapport().tabell), "Tabellen är kopierad");
+$("nerTxt").onclick = () => { const r = aktuellRapport(); laddaNer(r.filnamn + ".txt", tillText(r)); };
+$("nerCsv").onclick = () => { const r = aktuellRapport(); laddaNer(r.filnamn + ".csv", tillCsv(r.tabell)); };
+$("nerPdf").onclick = () => {
+  if (!window.jspdf) { toast("PDF-verktyget laddas inte – kontrollera nätet"); return; }
+  const r = aktuellRapport(); laddaNer(r.filnamn + ".pdf", skapaPdf(r));
+};
+
+// =====================================================
+//  INSTÄLLNINGAR
+// =====================================================
+$("iForetag").oninput = e => { inst.foretag = e.target.value; sparaInst(); };
+let redigeraProj = null;   // vilket projekts avser-lista som visas i inställningarna
+let visaBorttagna = false;
+function ritaInst() {
+  if (document.activeElement !== $("iForetag")) $("iForetag").value = inst.foretag || "";
+  // ---- Projektlistan ----
+  const pl = $("projLista"); pl.innerHTML = "";
+  synligaProjekt().forEach(p => {
+    const rad = document.createElement("div"); rad.className = "projReg";
+    const nr = document.createElement("input"); nr.type = "text"; nr.value = p.nr || ""; nr.placeholder = "Nr"; nr.setAttribute("aria-label", "Projektnummer");
+    const namn = document.createElement("input"); namn.type = "text"; namn.value = p.namn || ""; namn.placeholder = "Namn"; namn.setAttribute("aria-label", "Projektnamn");
+    nr.oninput = () => { p.nr = nr.value; sparaInst(); ritaRubrik(); ritaProjektChips(); };
+    namn.oninput = () => { p.namn = namn.value; sparaInst(); ritaRubrik(); ritaProjektChips(); };
+    const bort = document.createElement("button"); bort.className = "taBort"; bort.textContent = "Ta bort";
+    bort.onclick = () => {
+      if (synligaProjekt().length < 2) { toast("Det måste finnas minst ett projekt"); return; }
+      if (!bort.dataset.saker) { bort.dataset.saker = "1"; bort.textContent = "Säker?"; setTimeout(() => { if (bort.isConnected) { delete bort.dataset.saker; bort.textContent = "Ta bort"; } }, 3000); return; }
+      p.borttagen = true; if (redigeraProj === p.id) redigeraProj = null;
+      sparaInst(); ritaInst(); ritaRubrik(); toast(projNamn(p) + " är borttaget – timmarna finns kvar");
+    };
+    rad.append(nr, namn, bort); pl.append(rad);
+  });
+  const bt = inst.projekten.filter(p => p.borttagen);
+  $("visaBorttagna").classList.toggle("dold", !bt.length);
+  $("visaBorttagna").textContent = (visaBorttagna ? "Dölj" : "Visa") + " borttagna projekt (" + bt.length + ")";
+  const bl = $("borttagnaLista"); bl.innerHTML = ""; bl.classList.toggle("dold", !visaBorttagna || !bt.length);
+  bt.forEach(p => {
+    const rad = document.createElement("div"); rad.className = "projReg borttagen";
+    const t = document.createElement("span"); t.textContent = projNamn(p);
+    const k = document.createElement("button"); k.className = "ater"; k.textContent = "Återställ";
+    k.onclick = () => { delete p.borttagen; sparaInst(); ritaInst(); ritaRubrik(); toast(projNamn(p) + " är återställt"); };
+    rad.append(t, k); bl.append(rad);
+  });
+  ritaProjektChips();
+  ritaPoster();
+}
+// Välj vilket projekts avser-lista som redigeras
+function ritaProjektChips() {
+  if (!projekt(redigeraProj) || projekt(redigeraProj).borttagen) redigeraProj = aktivt().id;
+  const pc = $("postProjekt"); pc.innerHTML = "";
+  pc.classList.toggle("dold", synligaProjekt().length < 2);
+  synligaProjekt().forEach(p => {
+    const c = document.createElement("button"); c.className = "chip" + (p.id === redigeraProj ? " på" : ""); c.textContent = projNamn(p);
+    c.onclick = () => { redigeraProj = p.id; ritaProjektChips(); ritaPoster(); };
+    pc.append(c);
+  });
+}
+function ritaPoster() {
+  const proj = projekt(redigeraProj) || aktivt();
+  const box = $("postLista"); box.innerHTML = "";
+  if (!proj.poster.length) box.innerHTML = '<p class="tips" style="margin:0 0 6px">Listan är tom. Lägg till skeden och ÄTA nedan.</p>';
+  proj.poster.forEach(p => {
+    const rad = document.createElement("div"); rad.className = "postReg";
+    const kod = document.createElement("input"); kod.type = "text"; kod.value = p.kod; kod.setAttribute("aria-label", "Kod");
+    const txt = document.createElement("input"); txt.type = "text"; txt.value = p.text || ""; txt.placeholder = "Beskrivning"; txt.setAttribute("aria-label", "Beskrivning");
+    // Namnbyte följer med i tiden som visas, i samma projekt (andras tid behåller sin text)
+    const andra = () => {
+      const gammal = postEtikett(p); p.kod = kod.value; p.text = txt.value; const ny = postEtikett(p);
+      if (gammal && ny && gammal !== ny) Object.entries(veckor).forEach(([vid, v]) => {
+        if (!kanAndra(vid)) return;
+        let andrad = false;
+        Object.values(v.dagar).forEach(d => d.rader.forEach(r => { if (r.avser === gammal && radProj(r) === proj.id) { r.avser = ny; andrad = true; } }));
+        if (andrad) sparaVecka(vid);
+      });
+      sparaInst();
+    };
+    kod.oninput = andra; txt.oninput = andra;
+    const bort = document.createElement("button"); bort.className = "bort"; bort.textContent = "×"; bort.setAttribute("aria-label", "Ta bort ur listan");
+    bort.onclick = () => { proj.poster = proj.poster.filter(x => x !== p); sparaInst(); ritaPoster(); toast("Borttagen ur listan – inlagda timmar finns kvar"); };
+    rad.append(kod, txt, bort); box.append(rad);
+  });
+}
+function laggTillPost() {
+  const kod = $("nyKod").value.trim(); if (!kod) { $("nyKod").focus(); return; }
+  const proj = projekt(redigeraProj) || aktivt();
+  proj.poster.push({ id: nyId(), kod, text: $("nyText").value.trim() });
+  $("nyKod").value = ""; $("nyText").value = "";
+  sparaInst(); ritaPoster(); toast("Tillagd i " + projNamn(proj) + ": " + kod);
+}
+function laggTillProjekt() {
+  const nr = $("nyProjNr").value.trim(), namn = $("nyProjNamn").value.trim();
+  if (!nr && !namn) { $("nyProjNr").focus(); return; }
+  const p = { id: "p" + nyId(), nr, namn, poster: [] };
+  inst.projekten.push(p); redigeraProj = p.id;
+  $("nyProjNr").value = ""; $("nyProjNamn").value = "";
+  sparaInst(); ritaInst(); toast("Projekt " + projNamn(p) + " är tillagt – lägg till dess avser-lista nedan");
+}
+$("nyttProj").onclick = laggTillProjekt;
+$("nyProjNamn").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); laggTillProjekt(); } });
+$("visaBorttagna").onclick = () => { visaBorttagna = !visaBorttagna; ritaInst(); };
+$("nyPost").onclick = laggTillPost;
+$("nyText").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); laggTillPost(); } });
+
+// ---------- Säkerhetskopia ----------
+async function backupJson() {
+  await sparaNu();
+  if (arAdmin) {
+    const tider = {};
+    for (const a of anvandare) { try { tider[a.id] = { namn: a.namn, epost: a.epost, veckor: await hamtaVeckor(a.id) }; } catch (e) {} }
+    return JSON.stringify({ app: "tidrapportering", version: 1, sparad: new Date().toISOString(), foretag: inst, anvandare, tider }, null, 1);
+  }
+  return JSON.stringify({ app: "tidrapportering", version: 1, sparad: new Date().toISOString(), namn: minProfil.namn, veckor }, null, 1);
+}
+$("backupNer").onclick = async () => laddaNer("Tidrapportering_backup_" + idagIso() + ".json", await backupJson());
+$("backupKop").onclick = async () => kopiera(await backupJson(), "Säkerhetskopian är kopierad");
+// Läs in timmar till personen som visas (prototypens format eller en persons kopia)
+$("backupFil").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  let d; try { d = JSON.parse(await f.text()); } catch (err) { toast("Det där ser inte ut som en säkerhetskopia"); return; }
+  let dagar = {};
+  if (d && d.app === "tidrapport" && d.dagar) dagar = d.dagar;                              // prototypen
+  else if (d && d.app === "tidrapportering" && d.veckor) dagar = allaDagar(d.veckor);        // en persons kopia
+  else { toast("Filen innehåller inga timmar som går att läsa in"); return; }
+  // Prototypen hade ett projekt: leta upp det på nummer eller namn, annars skapa det
+  let malProj = null;
+  if (d.app === "tidrapport") {
+    const pi = d.inst || {}, nr = (pi.nr || "").trim(), namn = (pi.projekt || "").trim();
+    malProj = inst.projekten.find(p => !p.borttagen && ((nr && (p.nr || "").trim() === nr) || (!nr && namn && (p.namn || "").trim() === namn)));
+    if (!malProj && (nr || namn)) { malProj = { id: "p" + nyId(), nr, namn, poster: [] }; inst.projekten.push(malProj); }
+    if (!malProj) malProj = aktivt();
+    // Lägg till okända "avser" i projektets lista, så att de går att välja
+    const kanda = new Set(malProj.poster.map(postEtikett));
+    (pi.poster || []).forEach(p => { if (!kanda.has(postEtikett(p))) { malProj.poster.push({ id: nyId(), kod: p.kod, text: p.text || "" }); kanda.add(postEtikett(p)); } });
+  }
+  let n = 0, hoppade = 0; const andrade = new Set();
+  Object.values(dagar).forEach(x => {
+    if (!x || !x.datum || !harRader(x)) return;
+    const vid = veckaId(x.datum), v = vecka(vid);
+    if (v.dagar[x.datum] && harRader(v.dagar[x.datum])) { hoppade++; return; }   // skriv aldrig över befintliga dagar
+    v.dagar[x.datum] = { datum: x.datum, rader: x.rader.map(r => ({ id: r.id || nyId(), t: String(r.t ?? ""), avser: r.avser || "", p: malProj ? malProj.id : (r.p && projekt(r.p) ? r.p : forstaProjekt()) })) };
+    andrade.add(vid); n++;
+  });
+  sparaInst();
+  for (const vid of andrade) await sparaVecka(vid, true);
+  e.target.value = "";
+  ritaAllt();
+  toast("Inläst: " + n + " dagar till " + personNamn(visadId) + (hoppade ? " (" + hoppade + " fanns redan)" : ""));
+};
+
+// =====================================================
+//  FLIKAR
+// =====================================================
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => visaVy(b.dataset.vy));
+function visaVy(v) {
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("vald", b.dataset.vy === v));
+  ["dag", "rapport", "inst"].forEach(x => $("vy-" + x).classList.toggle("dold", x !== v));
+  $("personBar").classList.toggle("dold", v === "inst" || (v === "rapport" && rVem === "alla"));
+  if (v === "rapport") {
+    if (arAdmin) {
+      // Alltid samlad översikt först, med färska siffror
+      sattRVem("alla"); $("personBar").classList.add("dold");
+      hamtaAlla().then(() => { if (!$("vy-rapport").classList.contains("dold") && rVem === "alla") ritaRapport(); });
+    } else ritaRapport();
+  }
+  if (v === "inst") { ritaInst(); if (arAdmin) ritaAnvandare(); }
+  if (v === "dag") ritaDag();
+  window.scrollTo(0, 0);
+}
+function ritaRubrik() { $("rubrik").textContent = "Tidrapport"; }
+function ritaAllt() { ritaRubrik(); ritaDag(); ritaRapport(); if (!$("vy-inst").classList.contains("dold")) ritaInst(); }
+
+// =====================================================
+//  TANGENTBORDET: "Klar"-knapp, tryck utanför och Enter stänger
+// =====================================================
+let klarRad = null;
+function taBortKlarRad() { if (klarRad) { klarRad.remove(); klarRad = null; } }
+document.addEventListener("focusin", e => {
+  const t = e.target;
+  if (!t.matches || !t.matches("main textarea, main input[type=text], main input[type=email]")) return;
+  taBortKlarRad();
+  klarRad = document.createElement("div"); klarRad.className = "klarRad";
+  const k = document.createElement("button"); k.type = "button"; k.textContent = "Klar ✓"; k.setAttribute("aria-label", "Stäng tangentbordet");
+  k.addEventListener("pointerdown", ev => ev.preventDefault());
+  k.addEventListener("mousedown", ev => ev.preventDefault());
+  k.addEventListener("click", () => { t.blur(); taBortKlarRad(); });
+  klarRad.appendChild(k);
+  (t.closest(".dagRemsa, .nyVal, .timRad, .postReg, .projReg, .rad2, .rad2d") || t).insertAdjacentElement("afterend", klarRad);
+  const rad = klarRad;
+  setTimeout(() => { if (rad.isConnected) rad.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, 350);
+});
+document.addEventListener("focusout", () => setTimeout(() => {
+  const a = document.activeElement;
+  if (!a || !a.matches || !a.matches("input, textarea")) taBortKlarRad();
+}, 80));
+let tryckStart = null;
+document.addEventListener("touchstart", e => { const p = e.touches[0]; tryckStart = { x: p.clientX, y: p.clientY }; }, { passive: true });
+document.addEventListener("touchend", e => {
+  if (!tryckStart) return;
+  const p = e.changedTouches[0];
+  const flytt = Math.abs(p.clientX - tryckStart.x) + Math.abs(p.clientY - tryckStart.y);
+  tryckStart = null;
+  if (flytt > 10) return;
+  const a = document.activeElement;
+  if (!a || !a.matches || !a.matches("input, textarea")) return;
+  if (e.target.closest && e.target.closest("input, textarea, select, button, label, .klarRad")) return;
+  a.blur();
+}, { passive: true });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Enter" || e.shiftKey) return;
+  const t = e.target;
+  if (t.closest && t.closest("#loggaInForm")) return;      // Enter loggar in
+  if (t.tagName === "INPUT" && (t.type === "text" || t.type === "email") && t.id !== "nyText" && t.id !== "nyProjNamn") { e.preventDefault(); t.blur(); }
+});
+new MutationObserver(() => document.querySelectorAll("main input[type=text]").forEach(t => t.enterKeyHint = "done"))
+  .observe(document.body, { childList: true, subtree: true });
+
+sattPeriod("tva");
+starta();
+
+</script>
+<script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
+</body>
+</html>
