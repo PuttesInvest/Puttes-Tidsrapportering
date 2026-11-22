@@ -327,6 +327,21 @@
   .ovInfoRad > b { min-width:38px; text-align:right; }
   .ovInfoRad span { flex:1; }
   .ovInfoRad small { display:block; color:var(--svag); font-size:.74rem; }
+
+  /* ---------- Visa PDF direkt i appen (1.1) ---------- */
+  .pdfVisare { position:fixed; inset:0; z-index:900; background:#2a3435; display:flex; flex-direction:column; }
+  .pdfVisare.dold { display:none; }
+  body.pdfOppen { overflow:hidden; }
+  .pdfTopp { display:flex; align-items:center; gap:6px; padding:8px; padding-top:max(8px, env(safe-area-inset-top)); background:var(--svart); color:#fff; }
+  .pdfTitel { flex:1; min-width:0; font-size:.85rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .pdfKnapp { height:40px; min-width:40px; padding:0 12px; border-radius:10px; border:0; background:#3a4647; color:#fff; font-size:1rem; font-weight:600; cursor:pointer; }
+  .pdfKnapp.gul { background:var(--gul); color:var(--svart); }
+  .pdfKnapp:disabled { opacity:.35; }
+  .pdfSidor { --pdfZoom:1; flex:1; overflow:auto; -webkit-overflow-scrolling:touch; padding:12px; padding-bottom:max(12px, env(safe-area-inset-bottom)); }
+  .pdfSida { display:block; width:calc(100% * var(--pdfZoom)); max-width:calc(900px * var(--pdfZoom)); height:auto; margin:0 auto; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,.35); }
+  .pdfSidnr { text-align:center; color:#c9cfce; font-size:.75rem; margin:6px 0 14px; }
+  .pdfLaddar { color:#fff; text-align:center; margin-top:40px; }
+  .pdfRam { width:100%; height:100%; border:0; background:#fff; }
 </style>
 </head>
 <body class="utloggad anstalld">
@@ -461,6 +476,7 @@
 
     <div class="kort">
       <h2>Kopiera eller spara</h2>
+      <button class="knapp svart" id="visaPdf" style="width:100%;margin-bottom:6px">👁 Visa som PDF</button>
       <div class="knappar">
         <button class="knapp" id="kopText">📋 Kopiera text</button>
         <button class="knapp ljus" id="kopExcel">📋 Kopiera till Excel</button>
@@ -479,11 +495,23 @@
     </div>
   </section>
 
+  <div id="pdfVisare" class="pdfVisare dold" role="dialog" aria-label="PDF">
+    <div class="pdfTopp">
+      <button class="pdfKnapp" id="pdfStang" aria-label="Stäng">✕ Stäng</button>
+      <span class="pdfTitel" id="pdfTitel"></span>
+      <button class="pdfKnapp" id="pdfMindre" aria-label="Mindre">−</button>
+      <button class="pdfKnapp" id="pdfStorre" aria-label="Större">+</button>
+      <button class="pdfKnapp gul" id="pdfNer" aria-label="Ladda ner">⬇︎</button>
+    </div>
+    <div class="pdfSidor" id="pdfSidor"></div>
+  </div>
+
   <!-- ================= INSTÄLLNINGAR ================= -->
   <section id="vy-inst" class="dold">
     <div class="kort">
       <h2>Konto</h2>
       <p id="kontoInfo" style="margin:0 0 8px;font-size:.9rem"></p>
+      <p class="tips" style="margin:-4px 0 8px">Puttes tidrapportering version 1.1</p>
       <div class="knappar">
         <button class="knapp grå" id="bytLosen">Byt lösenord</button>
         <button class="knapp grå" id="loggaUt">Logga ut</button>
@@ -1917,6 +1945,72 @@ $("kopText").onclick = () => kopiera(tillText(aktuellRapport()), "Texten är kop
 $("kopExcel").onclick = () => kopiera(tillTsv(aktuellRapport().tabell), "Tabellen är kopierad");
 $("nerTxt").onclick = () => { const r = aktuellRapport(); laddaNer(r.filnamn + ".txt", tillText(r)); };
 $("nerCsv").onclick = () => { const r = aktuellRapport(); laddaNer(r.filnamn + ".csv", tillCsv(r.tabell)); };
+// ---------- Visa PDF direkt i appen (utan att ladda ner) ----------
+// Sidorna ritas med PDF.js (laddas först när man trycker). Går det inte visas PDF:en i en ram.
+let pdfjsLaddning = null, pdfZoom = 1, pdfVisadRapport = null;
+function laddaPdfjs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if (!pdfjsLaddning) pdfjsLaddning = new Promise((res, rej) => {
+    const sc = document.createElement("script");
+    sc.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    sc.onload = () => {
+      if (!window.pdfjsLib) { rej(new Error("pdfjs")); return; }
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      res(window.pdfjsLib);
+    };
+    sc.onerror = () => { pdfjsLaddning = null; rej(new Error("pdfjs")); };
+    document.head.appendChild(sc);
+  });
+  return pdfjsLaddning;
+}
+function pdfSattZoom(z) {
+  pdfZoom = Math.min(3, Math.max(1, z));
+  $("pdfSidor").style.setProperty("--pdfZoom", pdfZoom);
+  $("pdfMindre").disabled = pdfZoom <= 1; $("pdfStorre").disabled = pdfZoom >= 3;
+}
+async function visaPdf() {
+  if (!window.jspdf) { toast("PDF-verktyget laddas inte – kontrollera nätet"); return; }
+  const r = aktuellRapport(); pdfVisadRapport = r;
+  const blob = skapaPdf(r);
+  const box = $("pdfSidor");
+  box.innerHTML = '<p class="pdfLaddar">Öppnar PDF …</p>';
+  $("pdfTitel").textContent = r.filnamn.replace(/_/g, " ");
+  $("pdfVisare").classList.remove("dold"); document.body.classList.add("pdfOppen");
+  pdfSattZoom(1);
+  try {
+    const lib = await laddaPdfjs();
+    const data = new Uint8Array(await blob.arrayBuffer());
+    const pdf = await lib.getDocument({ data }).promise;
+    box.innerHTML = "";
+    const skarp = Math.min(3, (window.devicePixelRatio || 1) * 1.5);
+    for (let n = 1; n <= pdf.numPages; n++) {
+      if ($("pdfVisare").classList.contains("dold")) return;
+      const sida = await pdf.getPage(n);
+      const vp = sida.getViewport({ scale: skarp * Math.max(1, Math.min(box.clientWidth, 900) / 595) });
+      const c = document.createElement("canvas"); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+      c.className = "pdfSida"; c.setAttribute("aria-label", "Sida " + n + " av " + pdf.numPages);
+      box.appendChild(c);
+      await sida.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+      const nr = document.createElement("div"); nr.className = "pdfSidnr"; nr.textContent = "Sida " + n + " av " + pdf.numPages;
+      box.appendChild(nr);
+    }
+  } catch (e) {
+    try {
+      const url = URL.createObjectURL(blob);
+      box.innerHTML = "";
+      const f = document.createElement("iframe"); f.className = "pdfRam"; f.src = url; f.title = "PDF";
+      box.appendChild(f);
+    } catch (e2) { box.innerHTML = '<p class="pdfLaddar">PDF:en kunde inte visas här. Använd ⬇︎ för att ladda ner den.</p>'; }
+  }
+}
+function stangPdf() { $("pdfVisare").classList.add("dold"); document.body.classList.remove("pdfOppen"); $("pdfSidor").innerHTML = ""; }
+$("visaPdf").onclick = visaPdf;
+$("pdfStang").onclick = stangPdf;
+$("pdfMindre").onclick = () => pdfSattZoom(pdfZoom - 0.5);
+$("pdfStorre").onclick = () => pdfSattZoom(pdfZoom + 0.5);
+$("pdfNer").onclick = () => { const r = pdfVisadRapport || aktuellRapport(); laddaNer(r.filnamn + ".pdf", skapaPdf(r)); };
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("pdfVisare").classList.contains("dold")) stangPdf(); });
+
 $("nerPdf").onclick = () => {
   if (!window.jspdf) { toast("PDF-verktyget laddas inte – kontrollera nätet"); return; }
   const r = aktuellRapport(); laddaNer(r.filnamn + ".pdf", skapaPdf(r));
